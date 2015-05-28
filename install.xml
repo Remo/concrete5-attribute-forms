@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<concrete5-cif version="1.0">
+    <blocktypes>
+        <blocktype handle="attribute_form" package="attribute_forms" />
+    </blocktypes>
+    <attributecategories>
+        <category handle="attribute_form" allow-sets="1" package="attribute_forms"/>
+    </attributecategories>
+    <singlepages>
+        <page name="Forms" path="dashboard/forms" filename="dashboard/forms/view.php" pagetype="" description="" package="attribute_forms"></page>
+        <page name="Types" path="dashboard/forms/types" filename="dashboard/forms/types.php" pagetype="" description="" package="attribute_forms"></page>
+        <page name="Attributes" path="dashboard/forms/attributes" filename="dashboard/forms/attributes.php" pagetype="" description="" package="attribute_forms"></page>
+    </singlepages>
+</concrete5-cif>
