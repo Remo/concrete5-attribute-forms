@@ -49,4 +49,26 @@
         </field>
         <field name="sortOrder" type="I"></field>
     </table>
+    <table name="atAttributeSwitcher">
+        <field name="avID" type="I" size="10">
+            <key/>
+            <unsigned/>
+        </field>
+        <field name="value" type="I1" size="1">
+            <notnull/>
+            <default value="0"/>
+        </field>
+    </table>
+    <table name="atAttributeSwitcherSettings">
+        <field name="akID" type="I" size="10">
+            <key/>
+            <unsigned/>
+        </field>
+        <field name="akCheckedByDefault" type="I1" size="1">
+            <notnull/>
+            <default value="0"/>
+        </field>
+        <field name="checkedActions" type="X2"></field>
+        <field name="uncheckedActions" type="X2"></field>
+    </table>
 </schema>
