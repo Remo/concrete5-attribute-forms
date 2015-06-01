@@ -1,11 +1,12 @@
 <?php
 namespace Concrete\Package\AttributeForms\Models;
 
-use Concrete\Core\Foundation\Object;
-use Loader;
-use Concrete\Core\Attribute\Key\Key as AttributeKey;
-use Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey;
-use Concrete\Package\AttributeForms\Src\Attribute\Value\AttributeFormValue;
+use Concrete\Core\Foundation\Object,
+    Concrete\Core\Support\Facade\Database,
+    Loader,
+    Concrete\Core\Attribute\Key\Key as AttributeKey,
+    Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey,
+    Concrete\Package\AttributeForms\Src\Attribute\Value\AttributeFormValue;
 
 class AttributeForm extends Object
 {
@@ -16,7 +17,7 @@ class AttributeForm extends Object
     {
         $this->afID = $afID;
         if ($row == null && $afID != null) {
-            $db = Loader::db();
+            $db = Database::connection();
             $row = $db->GetRow('SELECT * FROM AttributeForms WHERE afID = ?', array($afID));
         }
         if ($row) {
@@ -42,7 +43,7 @@ class AttributeForm extends Object
 
     protected function load($ID)
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $row = $db->GetRow("SELECT * FROM " . self::$table . " WHERE afID = ?", array($ID));
         $this->setPropertiesFromArray($row);
     }
@@ -56,7 +57,7 @@ class AttributeForm extends Object
 
     public static function add($data = [])
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $data['dateCreated'] = date('Y-m-d H:i:s');
         $data['dateUpdated'] = $data['dateCreated'];
 
@@ -78,7 +79,7 @@ class AttributeForm extends Object
 
     public function update($data = [])
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $data['dateUpdated'] = date('Y-m-d H:i:s');
 
         return $db->update(self::$table, $data, ['afID' => $this->getID()]);
@@ -86,7 +87,7 @@ class AttributeForm extends Object
 
     public function delete()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Execute("delete from " . self::$table . " where afID = ?", array($this->getID()));
 
         $r = $db->Execute('select avID, akID from AttributeFormsAttributeValues where afID = ?',
@@ -141,7 +142,7 @@ class AttributeForm extends Object
     {
         $attribs = AttributeFormKey::getAttributes($this->getID(), 'getSearchIndexValue');
 
-        $db = Loader::db();
+        $db = Database::connection();
 
         $db->Execute('delete from AttributeFormsIndexAttributes where afID = ?', array($this->getID()));
         $searchableAttributes = array('afID' => $this->getID());
@@ -151,7 +152,7 @@ class AttributeForm extends Object
 
     public function getAttributeValueObject($ak, $createIfNotFound = false)
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $av = false;
         $v = array($this->getID(), $ak->getAttributeKeyID());
         $avID = $db->GetOne("select avID from AttributeFormsAttributeValues where afID = ? and akID = ?", $v);

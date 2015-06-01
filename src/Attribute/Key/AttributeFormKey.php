@@ -4,7 +4,8 @@ namespace Concrete\Package\AttributeForms\Src\Attribute\Key;
 use Concrete\Core\Attribute\Key\Key,
     Concrete\Package\AttributeForms\Src\Attribute\Value\AttributeFormValue as AttributeFormAttributeValue,
     Concrete\Core\Attribute\Value\ValueList as AttributeValueList,
-    Loader;
+    Loader,
+    Concrete\Core\Support\Facade\Database;
 
 class AttributeFormKey extends Key
 {
@@ -28,7 +29,7 @@ class AttributeFormKey extends Key
      */
     public static function getAttributes($afID, $method = 'getValue')
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $values = $db->GetAll("select akID, avID from AttributeFormsAttributeValues where afID = ?", array($afID));
         $avl = new AttributeValueList();
         foreach ($values as $val) {
@@ -104,7 +105,7 @@ class AttributeFormKey extends Key
     {
         $av = $object->getAttributeValueObject($this, true);
         parent::saveAttribute($av, $value);
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Replace('AttributeFormsAttributeValues', array(
             'afID' => $object->getID(),
             'akID' => $this->getAttributeKeyID(),
@@ -131,7 +132,7 @@ class AttributeFormKey extends Key
     public function delete()
     {
         parent::delete();
-        $db = Loader::db();
+        $db = Database::connection();
         $r = $db->Execute('select avID from AttributeFormsAttributeValues where akID = ?', array($this->getAttributeKeyID()));
         while ($row = $r->FetchRow()) {
             $db->Execute('delete from AttributeValues where avID = ?', array($row['avID']));

@@ -2,8 +2,9 @@
 
 namespace Concrete\Package\AttributeForms\Attribute\AttributeSwitcher;
 
-use Loader;
-use \Concrete\Core\Attribute\Controller as AttributeTypeController;
+use Concrete\Core\Support\Facade\Database,
+    Loader,
+    Concrete\Core\Attribute\Controller as AttributeTypeController;
 
 class Controller extends AttributeTypeController
 {
@@ -19,7 +20,7 @@ class Controller extends AttributeTypeController
 
     public function getValue()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $value = $db->GetOne("select value from atAttributeSwitcher where avID = ?", array($this->getAttributeValueID()));
         return $value;
     }
@@ -53,7 +54,7 @@ class Controller extends AttributeTypeController
             return false;
         }
 
-        $db = Loader::db();
+        $db = Database::connection();
         $row = $db->GetRow('select akCheckedByDefault, checkedActions, uncheckedActions from atAttributeSwitcherSettings where akID = ?', $ak->getAttributeKeyID());
         $this->akCheckedByDefault = $row['akCheckedByDefault'];
         $this->akCheckedActions = $row['checkedActions'];
@@ -100,14 +101,14 @@ class Controller extends AttributeTypeController
     // run when we call setAttribute(), instead of saving through the UI
     public function saveValue($value)
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $value = ($value == false || $value == '0') ? 0 : 1;
         $db->Replace('atAttributeSwitcher', array('avID' => $this->getAttributeValueID(), 'value' => $value), 'avID', true);
     }
 
     public function deleteKey()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Execute('delete from atAttributeSwitcherSettings where akID = ?', array($this->getAttributeKey()->getAttributeKeyID()));
 
         $arr = $this->attributeKey->getAttributeValueIDList();
@@ -119,14 +120,14 @@ class Controller extends AttributeTypeController
     public function duplicateKey($newAK)
     {
         $this->load();
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Execute('insert into atAttributeSwitcherSettings (akID, akCheckedByDefault) values (?, ?)', array($newAK->getAttributeKeyID(), $this->akCheckedByDefault));
     }
 
     public function saveKey($data)
     {
         $ak = $this->getAttributeKey();
-        $db = Loader::db();
+        $db = Database::connection();
         $akCheckedByDefault = $data['akCheckedByDefault'];
 
         if ($data['akCheckedByDefault'] != 1) {
@@ -157,7 +158,7 @@ class Controller extends AttributeTypeController
 
     public function deleteValue()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Execute('delete from atAttributeSwitcher where avID = ?', array($this->getAttributeValueID()));
     }
 

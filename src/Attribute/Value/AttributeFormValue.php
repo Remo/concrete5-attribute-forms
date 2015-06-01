@@ -2,12 +2,18 @@
 namespace Concrete\Package\AttributeForms\Src\Attribute\Value;
 
 use Concrete\Core\Attribute\Value\Value,
-    Loader;
+    Loader,
+    Concrete\Core\Support\Facade\Database,
+    Concrete\Package\AttributeForms\Models\AttributeForm;
 
 class AttributeFormValue extends Value
 {
+    /**
+     * @var AttributeForm
+     */
+    private $item;
 
-    public function setAttributeForm($object)
+    public function setAttributeForm(AttributeForm $object)
     {
         $this->item = $object;
     }
@@ -19,11 +25,12 @@ class AttributeFormValue extends Value
         if ($cav->getAttributeValueID() == $avID) {
             return $cav;
         }
+        return null;
     }
 
     public function delete()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Execute('delete from AttributeFormsAttributeValues where afID = ? and akID = ? and avID = ?', array(
             $this->item->getID(),
             $this->attributeKey->getAttributeKeyID(),

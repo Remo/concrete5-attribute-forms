@@ -1,11 +1,12 @@
 <?php
 namespace Concrete\Package\AttributeForms\Models;
 
-use Concrete\Core\Foundation\Object;
-use Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey;
-use Loader;
-use Localization;
-use PermissionKey;
+use Concrete\Core\Foundation\Object,
+    Concrete\Core\Support\Facade\Database,
+    Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey,
+    Loader,
+    Localization,
+    PermissionKey;
 
 class AttributeFormType extends Object
 {
@@ -15,7 +16,7 @@ class AttributeFormType extends Object
     {
         $this->aftID = $aftID;
         if ($row == null) {
-            $db = Loader::db();
+            $db = Database::connection();
             $row = $db->GetRow('SELECT * FROM AttributeFormTypes WHERE aftID=?', array($aftID));
         }
         $this->setPropertiesFromArray($row);
@@ -28,13 +29,13 @@ class AttributeFormType extends Object
 
     public function update($data)
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $db->update('AttributeFormTypes', $data, ['aftID' => $this->aftID]);
     }
 
     public static function add($data)
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $data['dateCreated'] = date('Y-m-d H:i:s');
         $data['dateUpdated'] = $data['dateCreated'];
         $db->insert('AttributeFormTypes', $data);
@@ -43,7 +44,7 @@ class AttributeFormType extends Object
 
     public function remove()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         $db->Execute('DELETE FROM AttributeFormTypes WHERE afID=?', array($this->aftID));
     }
 
@@ -75,7 +76,7 @@ class AttributeFormType extends Object
 
     public function getAttributes()
     {
-        $db = Loader::db();
+        $db = Database::connection();
         return $db->GetCol('SELECT akID FROM AttributeFormTypeAttributes WHERE aftID = ? ORDER BY sortOrder',
             array($this->getID()));
     }
@@ -84,7 +85,7 @@ class AttributeFormType extends Object
     public function setAttributes($attributes)
     {
         if (is_array($attributes)) {
-            $db = Loader::db();
+            $db = Database::connection();
             $db->Execute('DELETE FROM AttributeFormTypeAttributes WHERE aftID = ?',
                 array($this->getID()));
             $sortOrder = 1;
