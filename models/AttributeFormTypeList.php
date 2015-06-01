@@ -12,7 +12,7 @@ class AttributeFormTypeList extends DatabaseItemList
 
     protected function setBaseQuery()
     {
-        $this->setQuery('SELECT aftID, formName, dateCreated, dateUpdated FROM AttributeFormTypes');
+        $this->setQuery('SELECT aftID, deleteSpam, formName, dateCreated, dateUpdated FROM AttributeFormTypes');
     }
 
     protected function createQuery()

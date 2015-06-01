@@ -30,6 +30,21 @@ defined('C5_EXECUTE') or die('Access Denied.');
                 <div class="col-md-8">
                     <div class="form-group">
                         <label class="col-sm-2 control-label">
+                            <?= t('Delete SPAM') ?>
+                        </label>
+
+                        <div class="col-sm-10">
+                            <?= $form->checkbox('deleteSpam',
+                                1,
+                                isset($attributeForm) ? $attributeForm->getDeleteSpam() : false) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">
                             <?= t('Attributes') ?>
                         </label>
 

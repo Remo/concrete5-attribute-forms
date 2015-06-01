@@ -85,6 +85,11 @@ class AttributeForm extends Object
         return $db->update(self::$table, $data, ['afID' => $this->getID()]);
     }
 
+    public function markAsSpam()
+    {
+        return $this->update(['isSpam' => 1]);
+    }
+
     public function delete()
     {
         $db = Database::connection();
@@ -102,6 +107,17 @@ class AttributeForm extends Object
         }
 
         $db->Execute('delete from AttributeFormsIndexAttributes where afID = ?', array($this->getID()));
+    }
+
+    public function getAttributeDataString()
+    {
+        $ret = '';
+        $aft = AttributeFormType::getByID($this->getTypeID());
+        $attributes = $aft->getAttributeObjects();
+        foreach ($attributes as $attribute) {
+            $ret .= sprintf('%s: %s', $attribute->getAttributeKeyDisplayName(), $this->getAttribute($attribute, 'display'));
+        }
+        return $ret;
     }
 
     public function getAttribute($ak, $displayMode = false)

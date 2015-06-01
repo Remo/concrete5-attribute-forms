@@ -17,7 +17,7 @@ class AttributeFormType extends Object
         $this->aftID = $aftID;
         if ($row == null) {
             $db = Database::connection();
-            $row = $db->GetRow('SELECT * FROM AttributeFormTypes WHERE aftID=?', array($aftID));
+            $row = $db->GetRow('SELECT * FROM AttributeFormTypes WHERE aftID = ?', array($aftID));
         }
         $this->setPropertiesFromArray($row);
     }
@@ -45,7 +45,7 @@ class AttributeFormType extends Object
     public function remove()
     {
         $db = Database::connection();
-        $db->Execute('DELETE FROM AttributeFormTypes WHERE afID=?', array($this->aftID));
+        $db->Execute('DELETE FROM AttributeFormTypes WHERE afID = ?', array($this->aftID));
     }
 
     public function getID()
@@ -61,6 +61,11 @@ class AttributeFormType extends Object
     public function getFormName()
     {
         return $this->formName;
+    }
+
+    public function getDeleteSpam()
+    {
+        return $this->deleteSpam == 1;
     }
 
     public function getAttributeObjects()
@@ -80,7 +85,6 @@ class AttributeFormType extends Object
         return $db->GetCol('SELECT akID FROM AttributeFormTypeAttributes WHERE aftID = ? ORDER BY sortOrder',
             array($this->getID()));
     }
-
 
     public function setAttributes($attributes)
     {

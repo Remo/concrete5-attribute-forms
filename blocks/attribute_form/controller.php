@@ -4,8 +4,9 @@ namespace Concrete\Package\AttributeForms\Block\AttributeForm;
 use Concrete\Core\Validation\CSRF\Token,
     Concrete\Package\AttributeForms\Models\AttributeFormType,
     Concrete\Package\AttributeForms\Models\AttributeFormTypeList,
-    Concrete\Core\Block\BlockController;
-use Concrete\Package\AttributeForms\Models\AttributeForm;
+    Concrete\Core\Block\BlockController,
+    Core,
+    Concrete\Package\AttributeForms\Models\AttributeForm;
 
 class Controller extends BlockController
 {
@@ -54,16 +55,30 @@ class Controller extends BlockController
             throw new \Exception('Invalid token');
         }
 
+        // get objects
         $aftID = $this->post('aftID');
-
         $aft = AttributeFormType::getByID($aftID);
+
+        // create new form entry
         $af = AttributeForm::add(['aftID' => $aftID]);
 
+        // get all attributes of type and save values from form to the database
         $attributes = $aft->getAttributeObjects();
-
         foreach ($attributes as $akID => $ak)
         {
             $af->setAttribute($ak, false);
+        }
+
+        // check SPAM
+        $submittedData = $af->getAttributeDataString();
+        $antispam = Core::make('helper/validation/antispam');
+        if (!$antispam->check($submittedData, 'attribute_form')) {
+            if ($aft->getDeleteSpam()) {
+                $af->delete();
+            }
+            else {
+                $af->markAsSpam();
+            }
         }
     }
 

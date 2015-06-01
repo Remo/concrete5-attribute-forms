@@ -70,11 +70,13 @@ class Types extends PageController
     public function save($aftID = 0)
     {
         $formName = $this->post('formName');
+        $deleteSpam = $this->post('deleteSpam', 0);
+        $data = ['formName' => $formName, 'deleteSpam' => $deleteSpam];
         if ($aftID > 0) {
             $attributeFormType = AttributeFormType::getByID($aftID);
-            $attributeFormType->update(['formName' => $formName]);
+            $attributeFormType->update($data);
         } else {
-            $attributeFormType = AttributeFormType::add(['formName' => $formName]);
+            $attributeFormType = AttributeFormType::add($data);
             $aftID = $attributeFormType->getID();
         }
 

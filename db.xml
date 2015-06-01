@@ -7,6 +7,11 @@
             <autoincrement/>
         </field>
         <field name="aftID" type="I"></field>
+        <field name="isSpam" type="I">
+            <key/>
+            <default value="0"/>
+            <unsigned/>
+        </field>
         <field name="dateCreated" type="T"></field>
         <field name="dateUpdated" type="T"></field>
         <index name="AttributeForms_IX1">
@@ -37,6 +42,7 @@
             <autoincrement/>
         </field>
         <field name="formName" type="C" size="255"></field>
+        <field name="deleteSpam" type="I" size="1"></field>
         <field name="dateCreated" type="T"></field>
         <field name="dateUpdated" type="T"></field>
     </table>
