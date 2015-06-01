@@ -24,13 +24,13 @@ class Types extends PageController
         // set action message if set
         switch ($message) {
             case 'added':
-                $this->set('message', t('Product template added'));
+                $this->set('message', t('Form type added'));
                 break;
             case 'updated':
-                $this->set('message', t('Product template updated'));
+                $this->set('message', t('Form type updated'));
                 break;
             case 'removed':
-                $this->set('message', t('Product template removed'));
+                $this->set('message', t('Form type removed'));
                 break;
         }
 

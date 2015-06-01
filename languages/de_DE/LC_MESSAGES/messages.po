@@ -1,0 +1,201 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: attribute_forms 0.9.7\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-06-01 20:18+0000\n"
+"PO-Revision-Date: 2015-06-01 22:23+0100\n"
+"Last-Translator: Remo Laubacher <remo.laubacher@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Basepath: ../../../../..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Language: de_DE\n"
+"X-Generator: Poedit 1.8.1\n"
+
+#: packages/attribute_forms/elements/forms/types/list.php:4
+#: packages/attribute_forms/install.xml:18
+msgid "Forms"
+msgstr "Formulare"
+
+#: packages/attribute_forms/install.xml:20
+msgid "Types"
+msgstr "Typen"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:19
+#: packages/attribute_forms/elements/forms/types/form.php:48
+#: packages/attribute_forms/install.xml:22
+msgid "Attributes"
+msgstr "Attribute"
+
+#: packages/attribute_forms/install.xml:24
+msgid "Results"
+msgstr "Ergebnisse"
+
+#: packages/attribute_forms/blocks/attribute_form/controller.php:20
+#: packages/attribute_forms/controller.php:15
+msgid "Attribute Form"
+msgstr "Attribut Formular"
+
+#: packages/attribute_forms/controller.php:20
+msgid "A package to create forms using attributes"
+msgstr "Ein Paket zum Erstellen von Formularen mit Hilfe von Attributen"
+
+#: packages/attribute_forms/attributes/attribute_switcher/controller.php:47
+#: packages/attribute_forms/attributes/attribute_switcher/controller.php:92
+#: packages/attribute_forms/attributes/attribute_switcher/form.php:8
+msgid "Yes"
+msgstr "Ja"
+
+#: packages/attribute_forms/attributes/attribute_switcher/controller.php:47
+msgid "No"
+msgstr "Nein"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:2
+msgid "Checkbox Options"
+msgstr "Checkbox Optionen"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:5
+msgid "Default Value"
+msgstr "Standardwert"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:12
+msgid "The checkbox will be checked by default."
+msgstr "Das Kontrollkästchen wird standardmässig aktiviert sein."
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:32
+msgid "Attribute"
+msgstr "Attribut"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:33
+msgid "Checked"
+msgstr "Aktiv"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:34
+msgid "Unchecked"
+msgstr "Inaktiv"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:45
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:51
+msgid "No Action"
+msgstr "Keine Aktion"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:45
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:51
+msgid "Hide"
+msgstr "Ausblenden"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:45
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:51
+#: packages/attribute_forms/elements/forms/results/list.php:23
+msgid "Show"
+msgstr "Anzeigen"
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:63
+msgid "Please save attribute first, you can then configure all the options"
+msgstr "Bitte Attribut speicheren um alle Optionen zu aktivieren"
+
+#: packages/attribute_forms/blocks/attribute_form/controller.php:25
+msgid "Inserts a form based on pre-defined types"
+msgstr "Attribut Formular einfügen"
+
+#: packages/attribute_forms/blocks/attribute_form/view.php:4
+msgid "No form type selected"
+msgstr "Kein Formulartyp ausgewählt"
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:25
+msgid "Attribute created"
+msgstr "Attribut erstellt"
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:28
+msgid "Attribute updated"
+msgstr "Attribut aktualisiert"
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:31
+msgid "Attribute deleted"
+msgstr "Attribut gelöscht"
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:100
+msgid "Invalid attribute ID."
+msgstr "Ungültige Attribut ID."
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:27
+msgid "Form type added"
+msgstr "Formulartyp hinzugefügt"
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:30
+msgid "Form type updated"
+msgstr "Formulartyp aktualisiert"
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:33
+msgid "Form type removed"
+msgstr "Formulartyp entfernt"
+
+#: packages/attribute_forms/elements/forms/attributes/list.php:5
+msgid ""
+"There are no attribute types available for the attribute form category. "
+"Please enable them in the <a href=\"%s\">system settings</a>."
+msgstr ""
+"Für die Attribut-Form-Kategorie gibt es keine Attributtypen. Bitte "
+"aktiviere sie in den <a href=\"%s\">Systemeinstellungen</a>."
+
+#: packages/attribute_forms/elements/forms/attributes/list.php:14
+msgid "Add Attribute"
+msgstr "Attribut hinzufügen"
+
+#: packages/attribute_forms/elements/forms/attributes/list.php:18
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: packages/attribute_forms/elements/forms/results/detail.php:4
+msgid "Form Result - %d"
+msgstr "Formular-Ergebnis - %d"
+
+#: packages/attribute_forms/elements/forms/results/detail.php:11
+#: packages/attribute_forms/elements/forms/results/list.php:11
+msgid "ID"
+msgstr "ID"
+
+#: packages/attribute_forms/elements/forms/results/detail.php:12
+msgid "Value"
+msgstr "Wert"
+
+#: packages/attribute_forms/elements/forms/results/list.php:4
+msgid "Form Results"
+msgstr "Formular-Ergebnisse"
+
+#: packages/attribute_forms/elements/forms/results/list.php:12
+msgid "Type"
+msgstr "Typ"
+
+#: packages/attribute_forms/elements/forms/types/form.php:10
+msgid "Edit Form"
+msgstr "Formular bearbeiten"
+
+#: packages/attribute_forms/elements/forms/types/form.php:10
+#: packages/attribute_forms/elements/forms/types/list.php:37
+msgid "Add Form"
+msgstr "Formular hinzufügen"
+
+#: packages/attribute_forms/elements/forms/types/form.php:18
+msgid "Form Name"
+msgstr "Formularname"
+
+#: packages/attribute_forms/elements/forms/types/form.php:33
+msgid "Delete SPAM"
+msgstr "SPAM löschen"
+
+#: packages/attribute_forms/elements/forms/types/form.php:70
+msgid "Save"
+msgstr "Speichern"
+
+#: packages/attribute_forms/elements/forms/types/list.php:11
+msgid "Name"
+msgstr "Name"
+
+#: packages/attribute_forms/elements/forms/types/list.php:21
+msgid "Edit"
+msgstr "Bearbeiten"
