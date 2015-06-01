@@ -1,10 +1,11 @@
 <?php
 namespace Concrete\Package\AttributeForms\Block\AttributeForm;
 
-use Concrete\Package\AttributeForms\Models\AttributeFormType;
-use Concrete\Package\AttributeForms\Models\AttributeFormTypeList,
+use Concrete\Core\Validation\CSRF\Token,
+    Concrete\Package\AttributeForms\Models\AttributeFormType,
+    Concrete\Package\AttributeForms\Models\AttributeFormTypeList,
     Concrete\Core\Block\BlockController;
-
+use Concrete\Package\AttributeForms\Models\AttributeForm;
 
 class Controller extends BlockController
 {
@@ -37,7 +38,33 @@ class Controller extends BlockController
     public function view() {
         $formType = AttributeFormType::getByID($this->aftID);
         $attributes = $formType->getAttributeObjects();
+
+        $token = new Token();
+
         $this->set('attributes', $attributes);
+        $this->set('aftID', $this->aftID);
+        $this->set('token', $token->generate('attribute_form_'. $this->bID));
+    }
+
+    public function action_submit()
+    {
+        // check CSRF token
+        $token = new Token();
+        if(!$token->validate('attribute_form_'. $this->bID, $this->post('_token'))) {
+            throw new \Exception('Invalid token');
+        }
+
+        $aftID = $this->post('aftID');
+
+        $aft = AttributeFormType::getByID($aftID);
+        $af = AttributeForm::add(['aftID' => $aftID]);
+
+        $attributes = $aft->getAttributeObjects();
+
+        foreach ($attributes as $akID => $ak)
+        {
+            $af->setAttribute($ak, false);
+        }
     }
 
 }

@@ -8,6 +8,8 @@ if (empty($aftID)) {
 if (is_array($attributes) && !empty($attributes)) {
     ?>
     <form method="post" action="<?= $this->action('submit') ?>">
+        <input type="hidden" name="aftID" value="<?= $aftID ?>">
+        <input type="hidden" name="_token" id="_token" value="<?= $token; ?>"/>
         <?php
         foreach ($attributes as $attribute) {
             ?>

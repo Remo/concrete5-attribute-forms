@@ -8,7 +8,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'attribute_forms';
     protected $appVersionRequired = '5.7.4.2';
-    protected $pkgVersion = '0.9.6';
+    protected $pkgVersion = '0.9.7';
 
     public function getPackageName()
     {

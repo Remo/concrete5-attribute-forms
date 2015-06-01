@@ -7,6 +7,8 @@
             <autoincrement/>
         </field>
         <field name="aftID" type="I"></field>
+        <field name="dateCreated" type="T"></field>
+        <field name="dateUpdated" type="T"></field>
         <index name="AttributeForms_IX1">
             <col>aftID</col>
         </index>

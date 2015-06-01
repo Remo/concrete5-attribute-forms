@@ -20,5 +20,7 @@
               package="attribute_forms"></page>
         <page name="Attributes" path="dashboard/forms/attributes" filename="dashboard/forms/attributes.php" pagetype=""
               description="" package="attribute_forms"></page>
+        <page name="Results" path="dashboard/forms/results" filename="dashboard/forms/results.php" pagetype=""
+              description="" package="attribute_forms"></page>
     </singlepages>
 </concrete5-cif>

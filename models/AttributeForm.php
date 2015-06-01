@@ -12,9 +12,32 @@ class AttributeForm extends Object
     public static $table = 'AttributeForms';
     private $autoIndex = true;
 
+    public function __construct($afID = null, $row = null)
+    {
+        $this->afID = $afID;
+        if ($row == null && $afID != null) {
+            $db = Loader::db();
+            $row = $db->GetRow('SELECT * FROM AttributeForms WHERE afID = ?', array($afID));
+        }
+        if ($row) {
+            $this->setPropertiesFromArray($row);
+        }
+    }
+
     public function getID()
     {
         return $this->afID;
+    }
+
+    public function getTypeID()
+    {
+        return $this->aftID;
+    }
+
+    public function getTypeName()
+    {
+        $aft = AttributeFormType::getByID($this->getTypeID());
+        return $aft->getFormName();
     }
 
     protected function load($ID)
@@ -130,7 +153,7 @@ class AttributeForm extends Object
     {
         $db = Loader::db();
         $av = false;
-        $v = array($this->getPID(), $ak->getAttributeKeyID());
+        $v = array($this->getID(), $ak->getAttributeKeyID());
         $avID = $db->GetOne("select avID from AttributeFormsAttributeValues where afID = ? and akID = ?", $v);
         if ($avID > 0) {
             $av = AttributeFormValue::getByID($avID);
