@@ -9,7 +9,7 @@
             <thead>
             <tr>
                 <th><?= t('ID') ?></th>
-                <th><?= t('Type') ?></th>
+                <th><?= t('Date Created') ?></th>
                 <th></th>
             </tr>
             </thead>
@@ -17,7 +17,7 @@
             <?php foreach ($forms as $form) { ?>
                 <tr>
                     <td><?= $form->getID() ?></td>
-                    <td><?= $form->getTypeName() ?></td>
+                    <td><?= $form->getDateCreated() ?></td>
                     <td>
                         <a class="btn btn-primary pull-right"
                            href="<?php echo $view->action('detail', $form->getID()) ?>"><?php echo t('Show') ?>

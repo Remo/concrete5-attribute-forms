@@ -50,4 +50,9 @@ class AttributeFormList extends DatabaseItemList
         $this->filterByTypeID($aft->getID());
     }
 
+    public function sortByDateCreated($dir = 'asc')
+    {
+        $this->sortBy('dateCreated', $dir);
+    }
+
 }

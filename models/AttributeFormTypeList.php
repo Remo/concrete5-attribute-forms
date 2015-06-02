@@ -54,4 +54,9 @@ class AttributeFormTypeList extends DatabaseItemList
         return $result;
     }
 
+    public function sortByFormName($dir = 'asc')
+    {
+        $this->sortBy('formName', $dir);
+    }
+
 }

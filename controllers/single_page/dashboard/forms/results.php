@@ -17,6 +17,7 @@ class Results extends PageController
     {
         $currentPage = Page::getCurrentPage();
         $aftl = new AttributeFormTypeList();
+        $aftl->sortByFormName();
         $this->set('formTypes', $aftl->getPage());
         $this->set('formTypesPagination', $aftl->displayPagingV2(Loader::helper('navigation')->getLinkToCollection($currentPage), true));
     }
@@ -26,6 +27,7 @@ class Results extends PageController
         $aft = AttributeFormType::getByID($aftID);
         $afl = new AttributeFormList();
         $afl->filterByType($aft);
+        $afl->sortByDateCreated('desc');
         $this->set('formName', $aft->getFormName());
         $this->set('forms', $afl->getPage());
         $this->set('formsPagination', $afl->displayPagingV2(Loader::helper('navigation')->getLinkToCollection($currentPage), true));

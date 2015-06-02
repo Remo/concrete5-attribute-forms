@@ -41,6 +41,11 @@ class AttributeForm extends Object
         return $aft->getFormName();
     }
 
+    public function getDateCreated()
+    {
+        return $this->dateCreated;
+    }
+
     protected function load($ID)
     {
         $db = Database::connection();
