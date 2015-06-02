@@ -40,4 +40,14 @@ class AttributeFormList extends DatabaseItemList
         return parent::getTotal();
     }
 
+    public function filterByTypeID($aftID)
+    {
+        $this->filter('aftID', $aftID);
+    }
+
+    public function filterByType(AttributeFormType $aft)
+    {
+        $this->filterByTypeID($aft->getID());
+    }
+
 }

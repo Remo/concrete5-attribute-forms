@@ -3,6 +3,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 $taskElements = array(
     'view' => 'forms/results/list',
+    'entries' => 'forms/results/form_list',
     'detail' => 'forms/results/detail',
 );
 
