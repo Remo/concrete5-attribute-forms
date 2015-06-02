@@ -17,9 +17,14 @@
                 <tr>
                     <td><?= $formType->getFormName() ?></td>
                     <td>
-                        <a class="btn btn-primary pull-right"
-                           href="<?php echo $view->action('entries', $formType->getID()) ?>"><?php echo t('Show Entries') ?>
-                        </a>
+                        <div class="btn-group pull-right">
+                            <a class="btn btn-default"
+                               href="<?php echo $view->action('excel', $formType->getID()) ?>"><?php echo t('Download Excel') ?>
+                            </a>
+                            <a class="btn btn-primary"
+                               href="<?php echo $view->action('entries', $formType->getID()) ?>"><?php echo t('Show Entries') ?>
+                            </a>
+                        </div>
                     </td>
                 </tr>
             <?php } ?>

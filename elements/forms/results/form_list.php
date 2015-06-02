@@ -10,6 +10,9 @@
             <tr>
                 <th><?= t('ID') ?></th>
                 <th><?= t('Date Created') ?></th>
+                <?php if ($showSpam) { ?>
+                    <th><?= t('Is SPAM?')?></th>
+                <?php } ?>
                 <th></th>
             </tr>
             </thead>
@@ -17,7 +20,10 @@
             <?php foreach ($forms as $form) { ?>
                 <tr>
                     <td><?= $form->getID() ?></td>
-                    <td><?= $form->getDateCreated() ?></td>
+                    <td><?= $date->formatDateTime($form->getDateCreated()) ?></td>
+                    <?php if ($showSpam) { ?>
+                        <td><?= $form->getIsSpam() ? t('Yes') : t('No') ?></td>
+                    <?php } ?>
                     <td>
                         <a class="btn btn-primary pull-right"
                            href="<?php echo $view->action('detail', $form->getID()) ?>"><?php echo t('Show') ?>

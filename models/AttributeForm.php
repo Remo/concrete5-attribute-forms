@@ -46,6 +46,11 @@ class AttributeForm extends Object
         return $this->dateCreated;
     }
 
+    public function getIsSpam()
+    {
+        return $this->isSpam == 1;
+    }
+
     protected function load($ID)
     {
         $db = Database::connection();

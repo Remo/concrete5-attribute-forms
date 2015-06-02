@@ -1,0 +1,12 @@
+{
+  "name": "remo/attribute_forms",
+  "type": "concrete5-package",
+  "require": {
+    "php": ">=5.4",
+    "composer/installers": "~1.0.7"
+  },
+  "minimum-stability": "dev",
+  "support": {
+    "source": "https://github.com/Remo/concrete5-attribute-forms/src"
+  }
+}
