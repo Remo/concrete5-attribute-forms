@@ -28,7 +28,9 @@ $akID = $this->getAttributeKey()->getAttributeKeyID();
                     }
                     if (checkedActions[i] == "show") {
                         $("#attribute-key-id-" + i).show();
-                        $("#attribute-key-id-" + i).css("margin-left", "50px");
+                        <?php if ($indentation) { ?>
+                            $("#attribute-key-id-" + i).css("margin-left", "<?=$indentation?>px");
+                        <?php } ?>
                     }
                 }
             }
@@ -39,7 +41,9 @@ $akID = $this->getAttributeKey()->getAttributeKeyID();
                     }
                     if (uncheckedActions[i] == "show") {
                         $("#attribute-key-id-" + i).show();
-                        $("#attribute-key-id-" + i).css("margin-left", "50px");
+                        <?php if ($indentation) { ?>
+                            $("#attribute-key-id-" + i).css("margin-left", "<?=$indentation?>px");
+                        <?php } ?>
                     }
                 }
             }

@@ -78,5 +78,6 @@
         </field>
         <field name="checkedActions" type="X2"></field>
         <field name="uncheckedActions" type="X2"></field>
+        <field name="indentation" type="I"></field>
     </table>
 </schema>

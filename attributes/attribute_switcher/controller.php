@@ -55,10 +55,12 @@ class Controller extends AttributeTypeController
         }
 
         $db = Database::connection();
-        $row = $db->GetRow('select akCheckedByDefault, checkedActions, uncheckedActions from atAttributeSwitcherSettings where akID = ?', $ak->getAttributeKeyID());
+        $row = $db->GetRow('select akCheckedByDefault, checkedActions, uncheckedActions, indentation from atAttributeSwitcherSettings where akID = ?', $ak->getAttributeKeyID());
         $this->akCheckedByDefault = $row['akCheckedByDefault'];
         $this->akCheckedActions = $row['checkedActions'];
         $this->akUncheckedActions = $row['uncheckedActions'];
+        $this->indentation = $row['indentation'];
+        $this->set('indentation', $this->indentation);
         $this->set('akCheckedByDefault', $this->akCheckedByDefault);
         $this->set('akCheckedActions', json_decode($this->akCheckedActions, true));
         $this->set('akUncheckedActions', json_decode($this->akUncheckedActions, true));
@@ -134,6 +136,8 @@ class Controller extends AttributeTypeController
             $akCheckedByDefault = 0;
         }
 
+        $indentation = $data['indentation'] ?: 0;
+
         $checkedActions = json_encode($data['checkedActions']);
         $uncheckedActions = json_encode($data['uncheckedActions']);
 
@@ -142,6 +146,7 @@ class Controller extends AttributeTypeController
             'akCheckedByDefault' => $akCheckedByDefault,
             'checkedActions' => $checkedActions,
             'uncheckedActions' => $uncheckedActions,
+            'indentation' => $indentation,
         ), array('akID'), true);
     }
 
