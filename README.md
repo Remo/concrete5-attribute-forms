@@ -17,3 +17,5 @@ This package uses the concrete5 attribute system and is thus very flexible if ne
 Since version 5.7 of concrete5 hasn't been on the market for very long the list of custom attribute types is limited. We'll update this list in the future:
 
 * https://github.com/Remo/concrete5-attribute-plain-text Allows you to add static text to give your users hints or additional information about a form field
+* http://www.concrete5.org/marketplace/addons/colorpicker-attribute Adds a color picker to your forms
+* http://www.concrete5.org/marketplace/addons/fileset-attribute1 Adds a fileset list to your form
