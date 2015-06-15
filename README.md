@@ -11,3 +11,9 @@ _Work in progress - not ready for production!_
 * Use doctrine instead of hacky models
 * Mail templates using attribute handles as placeholders
 
+## Attributes
+
+This package uses the concrete5 attribute system and is thus very flexible if need to add new types of form fields.
+Since version 5.7 of concrete5 hasn't been on the market for very long the list of custom attribute types is limited. We'll update this list in the future:
+
+* https://github.com/Remo/concrete5-attribute-plain-text Allows you to add static text to give your users hints or additional information about a form field
