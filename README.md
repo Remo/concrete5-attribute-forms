@@ -20,3 +20,4 @@ Since version 5.7 of concrete5 hasn't been on the market for very long the list 
 * http://www.concrete5.org/marketplace/addons/colorpicker-attribute Adds a color picker to your forms
 * http://www.concrete5.org/marketplace/addons/fileset-attribute1 Adds a fileset list to your form
 * https://github.com/Remo/concrete5-attribute-masked-input An attribute where you can restrict the input using a format mask
+* https://github.com/Remo/concrete5-attribute-multi-text An attribute where you can ask for multiple values in a single attribute. Useful to group similar things.
