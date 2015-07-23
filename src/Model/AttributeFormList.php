@@ -1,5 +1,5 @@
 <?php
-namespace Concrete\Package\AttributeForms\Models;
+namespace Concrete\Package\AttributeForms\Src\Model;
 
 use Loader,
     Localization,

@@ -1,7 +1,7 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Models\AttributeFormType;
+use Concrete\Package\AttributeForms\Src\Model\AttributeFormType;
 use PageController;
 use Page;
 use User;
@@ -9,9 +9,9 @@ use Loader;
 use Localization;
 use GroupList;
 use Group;
-use Concrete\Package\AttributeForms\Models\AttributeFormTypeList;
+use Concrete\Package\AttributeForms\Src\Model\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey;
-use Concrete\Package\AttributeForms\Models\AttributeForm;
+use Concrete\Package\AttributeForms\Src\Model\AttributeForm;
 
 class Types extends PageController
 {

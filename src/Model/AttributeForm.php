@@ -1,5 +1,5 @@
 <?php
-namespace Concrete\Package\AttributeForms\Models;
+namespace Concrete\Package\AttributeForms\Src\Model;
 
 use Concrete\Core\Foundation\Object,
     Concrete\Core\Support\Facade\Database,
