@@ -1,13 +1,13 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Models\AttributeForm,
-    Concrete\Package\AttributeForms\Models\AttributeFormList,
-    Concrete\Package\AttributeForms\Models\AttributeFormTypeList,
+use Concrete\Package\AttributeForms\Src\Model\AttributeForm,
+    Concrete\Package\AttributeForms\Src\Model\AttributeFormList,
+    Concrete\Package\AttributeForms\Src\Model\AttributeFormTypeList,
     PageController,
     Loader,
     Page,
-    Concrete\Package\AttributeForms\Models\AttributeFormType;
+    Concrete\Package\AttributeForms\Src\Model\AttributeFormType;
 
 class Results extends PageController
 {

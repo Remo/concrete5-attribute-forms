@@ -2,11 +2,11 @@
 namespace Concrete\Package\AttributeForms\Block\AttributeForm;
 
 use Concrete\Core\Validation\CSRF\Token,
-    Concrete\Package\AttributeForms\Models\AttributeFormType,
-    Concrete\Package\AttributeForms\Models\AttributeFormTypeList,
+    Concrete\Package\AttributeForms\Src\Model\AttributeFormType,
+    Concrete\Package\AttributeForms\Src\Model\AttributeFormTypeList,
     Concrete\Core\Block\BlockController,
     Core,
-    Concrete\Package\AttributeForms\Models\AttributeForm;
+    Concrete\Package\AttributeForms\Src\Model\AttributeForm;
 
 class Controller extends BlockController
 {
