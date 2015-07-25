@@ -42,20 +42,10 @@
             <autoincrement/>
         </field>
         <field name="formName" type="C" size="255"></field>
+        <field name="attributes" type="X2"></field>
         <field name="deleteSpam" type="I" size="1"></field>
         <field name="dateCreated" type="T"></field>
         <field name="dateUpdated" type="T"></field>
-    </table>
-    <table name="AttributeFormTypeAttributes">
-        <field name="aftID" type="I">
-            <key/>
-            <unsigned/>
-        </field>
-        <field name="akID" type="I">
-            <key/>
-            <unsigned/>
-        </field>
-        <field name="sortOrder" type="I"></field>
     </table>
     <table name="atAttributeSwitcher">
         <field name="avID" type="I" size="10">

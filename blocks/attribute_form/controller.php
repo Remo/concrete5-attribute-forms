@@ -38,7 +38,7 @@ class Controller extends BlockController
 
     public function view() {
         $formType = AttributeFormType::getByID($this->aftID);
-        $attributes = $formType->getAttributeObjects();
+        $attributes = $formType->getAttributes();
 
         $token = new Token();
 

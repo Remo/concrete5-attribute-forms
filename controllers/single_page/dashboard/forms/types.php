@@ -39,7 +39,7 @@ class Types extends PageController
         $this->set('formTypesPagination', $aftl->displayPagingV2(Loader::helper('navigation')->getLinkToCollection($currentPage), true));
     }
 
-    protected function getAttributes()
+    protected function getAttributeKeys()
     {
         $list = AttributeFormKey::getList();
         $attributes = array();
@@ -51,12 +51,13 @@ class Types extends PageController
 
     public function add()
     {
+        $this->requireAsset('javascript', 'underscore');
         $this->requireAsset('redactor');
         $this->requireAsset('core/file-manager');
 
-        $attributes = $this->getAttributes();
+        $attributeKeys = $this->getAttributeKeys();
 
-        $this->set('attributes', $attributes);
+        $this->set('attributeKeys', $attributeKeys);
     }
 
     public function edit($aftID)
@@ -71,7 +72,11 @@ class Types extends PageController
     {
         $formName = $this->post('formName');
         $deleteSpam = $this->post('deleteSpam', 0);
-        $data = ['formName' => $formName, 'deleteSpam' => $deleteSpam];
+
+        $attributes = json_decode($this->post('attributes'));
+        unset($attributes->attributeKeys);
+
+        $data = ['formName' => $formName, 'deleteSpam' => $deleteSpam, 'attributes' => json_encode($attributes)];
         if ($aftID > 0) {
             $attributeFormType = AttributeFormType::getByID($aftID);
             $attributeFormType->update($data);
@@ -79,9 +84,6 @@ class Types extends PageController
             $attributeFormType = AttributeFormType::add($data);
             $aftID = $attributeFormType->getID();
         }
-
-        // set attributes
-        $attributeFormType->setAttributes($this->post('attributes'));
 
         $this->redirect('/dashboard/forms/types/updated');
 

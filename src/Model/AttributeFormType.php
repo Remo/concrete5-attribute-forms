@@ -68,40 +68,9 @@ class AttributeFormType extends Object
         return $this->deleteSpam == 1;
     }
 
-    public function getAttributeObjects()
-    {
-        $attributes = $this->getAttributes();
-        $result = [];
-        foreach ($attributes as $akID) {
-            $afk = AttributeFormKey::getByID($akID);
-            $result[] = $afk;
-        }
-        return $result;
-    }
-
     public function getAttributes()
     {
-        $db = Database::connection();
-        return $db->GetCol('SELECT akID FROM AttributeFormTypeAttributes WHERE aftID = ? ORDER BY sortOrder',
-            array($this->getID()));
-    }
-
-    public function setAttributes($attributes)
-    {
-        if (is_array($attributes)) {
-            $db = Database::connection();
-            $db->Execute('DELETE FROM AttributeFormTypeAttributes WHERE aftID = ?',
-                array($this->getID()));
-            $sortOrder = 1;
-            foreach ($attributes as $akID) {
-                $data = [
-                    'aftID' => $this->getID(),
-                    'akID' => $akID,
-                    'sortOrder' => $sortOrder++,
-                ];
-                $db->insert('AttributeFormTypeAttributes', $data);
-            }
-        }
+        return json_decode($this->attributes);
     }
 
 }
