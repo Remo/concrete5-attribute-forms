@@ -1,13 +1,13 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Src\Model\AttributeForm,
-    Concrete\Package\AttributeForms\Src\Model\AttributeFormList,
-    Concrete\Package\AttributeForms\Src\Model\AttributeFormTypeList,
+use Concrete\Package\AttributeForms\Src\Entity\AttributeForm,
+    Concrete\Package\AttributeForms\Src\AttributeFormList,
+    Concrete\Package\AttributeForms\Src\AttributeFormTypeList,
     PageController,
     Loader,
     Page,
-    Concrete\Package\AttributeForms\Src\Model\AttributeFormType;
+    Concrete\Package\AttributeForms\Src\Entity\AttributeFormType;
 
 class Results extends PageController
 {
@@ -15,24 +15,27 @@ class Results extends PageController
 
     public function view()
     {
-        $currentPage = Page::getCurrentPage();
         $aftl = new AttributeFormTypeList();
         $aftl->sortByFormName();
         $this->set('formTypes', $aftl->getPage());
-        $this->set('formTypesPagination', $aftl->displayPagingV2(Loader::helper('navigation')->getLinkToCollection($currentPage), true));
+        $this->set('formTypesPagination', $aftl->getPagination()->renderDefaultView());
+
+        $this->requireAsset('css', 'core/frontend/pagination');
     }
 
     public function entries($aftID)
     {
-        $currentPage = Page::getCurrentPage();
         $aft = AttributeFormType::getByID($aftID);
-        $afl = new AttributeFormList();
-        $afl->filterByType($aft);
-        $afl->sortByDateCreated('desc');
+        $afLst = new AttributeFormList();
+        $afLst->filterByType($aft);
+        $afLst->sortByDateCreated('desc');
+        
         $this->set('showSpam', !$aft->getDeleteSpam());
         $this->set('formName', $aft->getFormName());
-        $this->set('forms', $afl->getPage());
-        $this->set('formsPagination', $afl->displayPagingV2(Loader::helper('navigation')->getLinkToCollection($currentPage), true));
+        $this->set('forms', $afLst->getPage());
+        $this->set('formsPagination', $afLst->getPagination()->renderDefaultView());
+
+        $this->requireAsset('css', 'core/frontend/pagination');
     }
 
     public function excel($aftID)
@@ -58,7 +61,7 @@ class Results extends PageController
         foreach ($attributes as $attribute) {
             $headers[] = $attribute->getAttributeKeyDisplayName();
         }
-        $entries = $afl->get(0);
+        $entries = $afl->getResults();
 
         echo '<tr>';
         foreach ($headers as $header) {

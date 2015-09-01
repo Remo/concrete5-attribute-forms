@@ -4,7 +4,7 @@ $akID = $this->getAttributeKey()->getAttributeKeyID();
 <div id="attribute-switcher-<?= $akID ?>">
     <label>
         <?php
-        $cb = Loader::helper('form')->checkbox($this->field('value'), 1, $checked);
+        $cb = Core::make('helper/form')->checkbox($this->field('value'), 1, $checked);
         print $cb . ' <span>' . t('Yes') . '</span>';
         ?>
     </label>

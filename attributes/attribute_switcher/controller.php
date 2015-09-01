@@ -3,7 +3,7 @@
 namespace Concrete\Package\AttributeForms\Attribute\AttributeSwitcher;
 
 use Concrete\Core\Support\Facade\Database,
-    Loader,
+    Core,
     Concrete\Core\Attribute\Controller as AttributeTypeController;
 
 class Controller extends AttributeTypeController
@@ -91,12 +91,12 @@ class Controller extends AttributeTypeController
 
     public function search()
     {
-        print '<label class="checkbox">' . Loader::helper('form')->checkbox($this->field('value'), 1, $this->request('value') == 1) . ' ' . t('Yes') . '</label>';
+        print '<label class="checkbox">' . Core::make('helper/form')->checkbox($this->field('value'), 1, $this->request('value') == 1) . ' ' . t('Yes') . '</label>';
     }
 
     public function type_form()
     {
-        $this->set('form', Loader::helper('form'));
+        $this->set('form', Core::make('helper/form'));
         $this->load();
     }
 

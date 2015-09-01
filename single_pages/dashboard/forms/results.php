@@ -8,4 +8,4 @@ $taskElements = array(
 );
 
 $element = $taskElements[$this->controller->getTask()];
-Loader::element($element, get_defined_vars() + ['view' => $this], 'attribute_forms');
+View::element($element, get_defined_vars() + ['view' => $this], 'attribute_forms');

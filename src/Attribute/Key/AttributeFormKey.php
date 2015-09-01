@@ -4,7 +4,7 @@ namespace Concrete\Package\AttributeForms\Src\Attribute\Key;
 use Concrete\Core\Attribute\Key\Key,
     Concrete\Package\AttributeForms\Src\Attribute\Value\AttributeFormValue as AttributeFormAttributeValue,
     Concrete\Core\Attribute\Value\ValueList as AttributeValueList,
-    Loader,
+    Core,
     Concrete\Core\Support\Facade\Database;
 
 class AttributeFormKey extends Key
@@ -72,6 +72,10 @@ class AttributeFormKey extends Key
         return $ak;
     }
 
+    /**
+     *
+     * @return AttributeFormKey[]
+     */
     public static function getList()
     {
         return parent::getList('attribute_form');

@@ -1,7 +1,7 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Src\Model\AttributeFormType;
+use Concrete\Package\AttributeForms\Src\Entity\AttributeFormType;
 use PageController;
 use Page;
 use User;
@@ -9,9 +9,9 @@ use Loader;
 use Localization;
 use GroupList;
 use Group;
-use Concrete\Package\AttributeForms\Src\Model\AttributeFormTypeList;
+use Concrete\Package\AttributeForms\Src\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey;
-use Concrete\Package\AttributeForms\Src\Model\AttributeForm;
+use Concrete\Package\AttributeForms\Src\Entity\AttributeForm;
 
 class Types extends PageController
 {
@@ -19,8 +19,6 @@ class Types extends PageController
 
     public function view($message = false)
     {
-        $currentPage = Page::getCurrentPage();
-
         // set action message if set
         switch ($message) {
             case 'added':
@@ -36,7 +34,9 @@ class Types extends PageController
 
         $aftl = new AttributeFormTypeList();
         $this->set('formTypes', $aftl->getPage());
-        $this->set('formTypesPagination', $aftl->displayPagingV2(Loader::helper('navigation')->getLinkToCollection($currentPage), true));
+        $this->set('formTypesPagination', $aftl->getPagination()->renderDefaultView());
+
+        $this->requireAsset('css', 'core/frontend/pagination');
     }
 
     protected function getAttributeKeys()
@@ -64,7 +64,7 @@ class Types extends PageController
     {
         $this->add();
         $attributeForm = AttributeFormType::getByID($aftID);
-        $this->set('selectedAttributes', $attributeForm->getAttributes());
+        $this->set('selectedAttributes', $attributeForm->getDecodedAttributes());
         $this->set('attributeForm', $attributeForm);
     }
 
@@ -76,15 +76,21 @@ class Types extends PageController
         $attributes = json_decode($this->post('attributes'));
         unset($attributes->attributeKeys);
 
-        $data = ['formName' => $formName, 'deleteSpam' => $deleteSpam, 'attributes' => json_encode($attributes)];
+        $aftLst = new AttributeFormTypeList();
+        $em = $aftLst->getEntityManager();
+
         if ($aftID > 0) {
             $attributeFormType = AttributeFormType::getByID($aftID);
-            $attributeFormType->update($data);
         } else {
-            $attributeFormType = AttributeFormType::add($data);
-            $aftID = $attributeFormType->getID();
+            $attributeFormType = new AttributeFormType();
         }
+        $attributeFormType->setFormName($formName);
+        $attributeFormType->setDeleteSpam($deleteSpam);
+        $attributeFormType->setAttributes(json_encode($attributes));
 
+        $em->persist($attributeFormType);
+        $em->flush();
+        
         $this->redirect('/dashboard/forms/types/updated');
 
     }

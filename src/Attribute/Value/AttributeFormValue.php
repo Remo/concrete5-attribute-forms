@@ -4,7 +4,7 @@ namespace Concrete\Package\AttributeForms\Src\Attribute\Value;
 use Concrete\Core\Attribute\Value\Value,
     Loader,
     Concrete\Core\Support\Facade\Database,
-    Concrete\Package\AttributeForms\Src\Model\AttributeForm;
+    Concrete\Package\AttributeForms\Src\Entity\AttributeForm;
 
 class AttributeFormValue extends Value
 {

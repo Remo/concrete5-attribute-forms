@@ -135,6 +135,10 @@ defined('C5_EXECUTE') or die('Access Denied.');
         );
         var attributeKeys = <?=json_encode($attributeKeys)?>;
         var attributesData = <?=json_encode($selectedAttributes)?>;
+        if(!attributesData){
+            attributesData = {};
+            attributesData.formPages = [];
+        }
         attributesData.attributeKeys = attributeKeys;
 
         function renderAttributes() {
