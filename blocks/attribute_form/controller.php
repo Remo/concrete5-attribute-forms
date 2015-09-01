@@ -54,6 +54,7 @@ class Controller extends BlockController
 
     public function action_submit()
     {
+        \Events::dispatch('pre_attribute_forms_submit', $this);
         // check CSRF token
         $token = new Token();
         if (!$token->validate('attribute_form_'.$this->bID,
@@ -91,5 +92,7 @@ class Controller extends BlockController
             }
         }
         $em->flush();
+
+        \Events::dispatch('post_attribute_forms_submit', $this, $af);
     }
 }
