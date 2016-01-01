@@ -1,43 +1,47 @@
-<?xml version="1.0"?>
-<schema version="0.3">
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+  xmlns="http://www.concrete5.org/doctrine-xml/0.5"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.concrete5.org/doctrine-xml/0.5 http://concrete5.github.io/doctrine-xml/doctrine-xml-0.5.xsd">
+
+  
     <table name="AttributeFormsAttributeValues">
-        <field name="afID" type="I">
-            <key/>
-            <default value="0"/>
+        <field name="afID" type="integer">
             <unsigned/>
+            <default value="0"/>
+            <key/>
         </field>
-        <field name="akID" type="I">
-            <key/>
-            <default value="0"/>
+        <field name="akID" type="integer">
             <unsigned/>
+            <default value="0"/>
+            <key/>
         </field>
-        <field name="avID" type="I">
-            <key/>
-            <default value="0"/>
+        <field name="avID" type="integer">
             <unsigned/>
+            <default value="0"/>
+            <key/>
         </field>
     </table>
     <table name="atAttributeSwitcher">
-        <field name="avID" type="I" size="10">
-            <key/>
+        <field name="avID" type="integer" size="10">
             <unsigned/>
+            <key/>
         </field>
-        <field name="value" type="I1" size="1">
+        <field name="value" type="smallint" size="1">
             <notnull/>
             <default value="0"/>
         </field>
     </table>
     <table name="atAttributeSwitcherSettings">
-        <field name="akID" type="I" size="10">
-            <key/>
+        <field name="akID" type="integer" size="10">
             <unsigned/>
+            <key/>
         </field>
-        <field name="akCheckedByDefault" type="I1" size="1">
+        <field name="akCheckedByDefault" type="smallint" size="1">
             <notnull/>
             <default value="0"/>
         </field>
-        <field name="checkedActions" type="X2"></field>
-        <field name="uncheckedActions" type="X2"></field>
-        <field name="indentation" type="I"></field>
+        <field name="checkedActions" type="text"></field>
+        <field name="uncheckedActions" type="text"></field>
+        <field name="indentation" type="integer"></field>
     </table>
 </schema>
