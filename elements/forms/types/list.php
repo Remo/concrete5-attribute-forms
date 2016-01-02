@@ -13,27 +13,40 @@
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($formTypes as $formType) { ?>
+            <?php
+            if(count($formTypes) > 0):
+                foreach ($formTypes as $formType): ?>
+                    <tr>
+                        <td><?= $formType->getFormName() ?></td>
+                        <td>
+                            <a class="btn btn-primary"
+                               href="<?= $view->action('edit', $formType->getID()) ?>"><?= t('Edit') ?>
+                            </a>
+                        </td>
+                    </tr>
+                <?php
+                endforeach;
+            else: ?>
                 <tr>
-                    <td><?= $formType->getFormName() ?></td>
-                    <td>
-                        <a class="btn btn-primary"
-                           href="<?php echo $view->action('edit', $formType->getID()) ?>"><?php echo t('Edit') ?>
-                        </a>
+                    <td colspan="2">
+                        <h4><?=t('No forms found.');?></h4>
                     </td>
                 </tr>
-            <?php } ?>
+            <?php 
+            endif; ?>
             </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="8">
-                    <?= $formTypesPagination ?>
-                </td>
-            </tr>
-            </tfoot>
+            <?php if (isset($formTypesPagination)): ?>
+                <tfoot>
+                    <tr>
+                        <td colspan="8">
+                            <?= $formTypesPagination ?>
+                        </td>
+                    </tr>
+                </tfoot>
+            <?php endif; ?>
         </table>
 
-        <a href="<?= View::url('/dashboard/forms/types/add') ?>" class="btn btn-primary">
+        <a href="<?= $view->action('add'); ?>" class="btn btn-primary">
             <?= t('Add Form') ?>
         </a>
     </div>

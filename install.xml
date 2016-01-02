@@ -4,12 +4,12 @@
         <blocktype handle="attribute_form" package="attribute_forms"/>
     </blocktypes>
     <attributecategories>
-        <category handle="attribute_form" allow-sets="1" package="attribute_forms"/>
+        <category handle="form" allow-sets="1" package="attribute_forms"/>
     </attributecategories>
     <attributetypes>
         <attributetype handle="attribute_switcher" package="attribute_forms">
             <categories>
-                <category handle="attribute_form"/>
+                <category handle="form"/>
             </categories>
         </attributetype>
     </attributetypes>

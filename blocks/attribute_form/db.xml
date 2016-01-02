@@ -6,5 +6,7 @@
             <unsigned/>
         </field>
         <field name="aftID" type="I"></field>
+        <field name="notifyMeOnSubmission" type="I1"></field>
+        <field name="notifySubmitor" type="I1"></field>
     </table>
 </schema>

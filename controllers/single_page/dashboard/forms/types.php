@@ -1,50 +1,36 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Src\Entity\AttributeFormType;
-use PageController;
-use Page;
-use User;
-use Loader;
-use Localization;
-use GroupList;
-use Group;
-use Concrete\Package\AttributeForms\Src\AttributeFormTypeList;
-use Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey;
-use Concrete\Package\AttributeForms\Src\Entity\AttributeForm;
+use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
+use Concrete\Package\AttributeForms\AttributeFormTypeList;
+use Concrete\Package\AttributeForms\Entity\AttributeFormType;
+use Concrete\Core\Page\Controller\DashboardPageController;
 
-class Types extends PageController
+class Types extends DashboardPageController
 {
     protected $helpers = array('form');
 
-    public function view($message = false)
+    public function view()
     {
-        // set action message if set
-        switch ($message) {
-            case 'added':
-                $this->set('message', t('Form type added'));
-                break;
-            case 'updated':
-                $this->set('message', t('Form type updated'));
-                break;
-            case 'removed':
-                $this->set('message', t('Form type removed'));
-                break;
-        }
-
         $aftl = new AttributeFormTypeList();
         $this->set('formTypes', $aftl->getPage());
-        $this->set('formTypesPagination', $aftl->getPagination()->renderDefaultView());
 
-        $this->requireAsset('css', 'core/frontend/pagination');
+        $pagination = $aftl->getPagination();
+        if ($pagination->haveToPaginate()) {
+            $this->set('formTypesPagination', $pagination->renderDefaultView());
+            $this->requireAsset('css', 'core/frontend/pagination');
+        }
     }
 
     protected function getAttributeKeys()
     {
         $list = AttributeFormKey::getList();
         $attributes = array();
-        foreach ($list as $item) {
-            $attributes[$item->getAttributeKeyHandle()] = $item;
+        foreach ($list as $ak) {
+            $item = new \stdClass();
+            $item->akID = $ak->getAttributeKeyID();
+            $item->akName = $ak->getAttributeKeyDisplayName();
+            $attributes[$ak->getAttributeKeyHandle()] = $item;
         }
         return $attributes;
     }
@@ -55,9 +41,7 @@ class Types extends PageController
         $this->requireAsset('redactor');
         $this->requireAsset('core/file-manager');
 
-        $attributeKeys = $this->getAttributeKeys();
-
-        $this->set('attributeKeys', $attributeKeys);
+        $this->set('attributeKeys', $this->getAttributeKeys());
     }
 
     public function edit($aftID)
@@ -76,22 +60,22 @@ class Types extends PageController
         $attributes = json_decode($this->post('attributes'));
         unset($attributes->attributeKeys);
 
-        $aftLst = new AttributeFormTypeList();
-        $em = $aftLst->getEntityManager();
-
         if ($aftID > 0) {
             $attributeFormType = AttributeFormType::getByID($aftID);
         } else {
             $attributeFormType = new AttributeFormType();
         }
+        
         $attributeFormType->setFormName($formName);
         $attributeFormType->setDeleteSpam($deleteSpam);
         $attributeFormType->setAttributes(json_encode($attributes));
+        $attributeFormType->save();
 
-        $em->persist($attributeFormType);
-        $em->flush();
-        
-        $this->redirect('/dashboard/forms/types/updated');
-
+        if ($aftID > 0) {
+            $this->flash("message", t('Form type updated'));
+        }else{
+            $this->flash("message", t('Form type added'));
+        }
+        $this->redirect($this->action(''));
     }
 }

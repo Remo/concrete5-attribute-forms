@@ -1,45 +1,37 @@
 <?php
 
-namespace Concrete\Package\AttributeForms\Src;
+namespace Concrete\Package\AttributeForms;
 
 use Concrete\Core\Search\ItemList\ItemList as AbstractItemList;
-use Concrete\Package\AttributeForms\Src\Repository\Search\Pagination;
+use Concrete\Package\AttributeForms\Repository\Search\Pagination;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Logging\EchoSQLLogger;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Pagerfanta\Adapter\DoctrineSelectableAdapter;
+use Concrete\Package\AttributeForms\MeschApp;
 
-use Package,
-    Database,
+use Database,
     Exception;
 
 /**
- * @property \Doctrine\Common\Collections\Criteria $criteria
- * @property \Doctrine\ORM\EntityManager $em
- * @property \Concrete\Core\Package\Package $pkg
  * @method Pagination getPagination()
  */
 abstract class AbstractRepositoryList extends AbstractItemList
 {
-    /* @var Doctrine\Common\Collections\Criteria */
+    /** @var Doctrine\Common\Collections\Criteria */
     protected $criteria;
     
     private $orderings;
 
-    /* @var \Package */
-    protected $pkg;
-
-    /* @var \Doctrine\ORM\EntityManager */
+    /** @var \Doctrine\ORM\EntityManager */
     protected $em;
 
     public function __construct()
     {
         $this->criteria  = Criteria::create();
         $this->orderings = array();
-        $this->pkg = Package::getByHandle($this->getPackageHandle());
-        $this->em  = $this->pkg->getEntityManager();
+        $this->em  = MeschApp::em();
     }
 
     /**
@@ -49,8 +41,6 @@ abstract class AbstractRepositoryList extends AbstractItemList
     {
         return $this->criteria;
     }
-
-    protected abstract function getPackageHandle();
 
     protected abstract function getEntityClassName();
     
@@ -71,20 +61,6 @@ abstract class AbstractRepositoryList extends AbstractItemList
         return $this->em;
     }
 
-    /**
-     * Finds an entity by its primary key / identifier.
-     *
-     * @param mixed    $id          The identifier.
-     * @param int      $lockMode    The lock mode.
-     * @param int|null $lockVersion The lock version.
-     *
-     * @return object|null The entity instance or NULL if the entity can not be found.
-     */
-    public function getByID($id, $lockMode = LockMode::NONE, $lockVersion = null)
-    {
-        return $this->getRepository()->find($id, $lockMode, $lockVersion);
-    }
-
     protected function createPaginationObject()
     {
         $adapter    = new DoctrineSelectableAdapter($this->getRepository(), $this->getQueryObject());
@@ -101,9 +77,9 @@ abstract class AbstractRepositoryList extends AbstractItemList
         return $this->getRepository()->matching($this->criteria);
     }
 
-    public function getResult($mixed)
+    public final function getResult($mixed)
     {
-        return false;
+        throw new Exception(t('Unused method'));
     }
 
     public final function getResults()

@@ -1,8 +1,8 @@
 <?php
+use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
 
 if (empty($aftID)) {
     echo t('No form type selected');
-
     return;
 }
 
@@ -20,14 +20,13 @@ if (!empty($attributes)) {
                     <?php
                     if (is_array($formPage->attributes) && !empty($formPage->attributes)) {
                         foreach ($formPage->attributes as $attribute) {
-                            $attributeObject = \Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey::getByID($attribute->akID);
+                            
+                            $attributeObject = AttributeFormKey::getByID($attribute->akID);
                             ?>
-                            <div class="form-group row attribute-row"
-                                 id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
-                                <label
-                                    class="col-sm-4 control-label"><?= tc('AttributeKeyName',
-                                        $attributeObject->getAttributeKeyName()) ?></label>
-
+                            <div class="form-group row attribute-row" id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
+                                <label class="col-sm-4 control-label">
+                                    <?= tc('AttributeKeyName', $attributeObject->getAttributeKeyName()) ?>
+                                </label>
                                 <div class="col-sm-8">
                                     <?php $attributeObject->render('form', false); ?>
                                 </div>

@@ -1,15 +1,14 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Src\Entity\AttributeForm,
-    Concrete\Package\AttributeForms\Src\AttributeFormList,
-    Concrete\Package\AttributeForms\Src\AttributeFormTypeList,
-    PageController,
-    Loader,
-    Page,
-    Concrete\Package\AttributeForms\Src\Entity\AttributeFormType;
+use Concrete\Package\AttributeForms\Entity\AttributeFormType;
+use Concrete\Package\AttributeForms\Entity\AttributeForm;
+use Concrete\Package\AttributeForms\AttributeFormList;
+use Concrete\Package\AttributeForms\AttributeFormTypeList;
+use Concrete\Core\Page\Controller\DashboardPageController;
+    
 
-class Results extends PageController
+class Results extends DashboardPageController
 {
     protected $helpers = array('form', 'date');
 
@@ -18,9 +17,12 @@ class Results extends PageController
         $aftl = new AttributeFormTypeList();
         $aftl->sortByFormName();
         $this->set('formTypes', $aftl->getPage());
-        $this->set('formTypesPagination', $aftl->getPagination()->renderDefaultView());
 
-        $this->requireAsset('css', 'core/frontend/pagination');
+        $pagination = $aftl->getPagination();
+        if ($pagination->haveToPaginate()) {
+            $this->set('formTypesPagination', $pagination->renderDefaultView());
+            $this->requireAsset('css', 'core/frontend/pagination');
+        }
     }
 
     public function entries($aftID)
@@ -33,9 +35,12 @@ class Results extends PageController
         $this->set('showSpam', !$aft->getDeleteSpam());
         $this->set('formName', $aft->getFormName());
         $this->set('forms', $afLst->getPage());
-        $this->set('formsPagination', $afLst->getPagination()->renderDefaultView());
 
-        $this->requireAsset('css', 'core/frontend/pagination');
+        $pagination = $afLst->getPagination();
+        if ($pagination->haveToPaginate()) {
+            $this->set('formsPagination', $pagination->renderDefaultView());
+            $this->requireAsset('css', 'core/frontend/pagination');
+        }
     }
 
     public function excel($aftID)
@@ -97,6 +102,7 @@ class Results extends PageController
 
         $this->set('af', $af);
         $this->set('afID', $afID);
+        $this->set('aftID', $af->getTypeID());
         $this->set('attributes', $attributes);
     }
 }

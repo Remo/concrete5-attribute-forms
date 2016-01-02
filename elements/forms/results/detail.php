@@ -27,3 +27,6 @@
         </table>
     </div>
 </div>
+<div class="btn-toolbar">
+    <a href="<?=$view->action('entries', $aftID);?>" class="btn btn-default"> <?=t('Back');?> </a>
+</div>

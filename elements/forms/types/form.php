@@ -67,7 +67,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
     <table class="table table-striped table-bordered" border="0" cellspacing="1" cellpadding="0">
         <thead>
         <tr>
-            <td class="header"><?php echo t('Page') ?></td>
+            <td class="header"><?= t('Page') ?></td>
         </tr>
         </thead>
         <tbody class="form-pages">
@@ -76,11 +76,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
             <td>
                 <strong><%- page.name %></strong>
                 <button class="btn btn-default remove-page pull-right" data-index="<%- i %>"><?= t('Remove Form Page') ?></button>
-
+                <div class="clearfix spacer-row-3"></div>
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
-                        <td class="header"><?php echo t('Attribute') ?></td>
+                        <td class="header"><?= t('Attribute') ?></td>
                     </tr>
                     </thead>
                     <tbody class="form-page-attributes">
@@ -97,10 +97,13 @@ defined('C5_EXECUTE') or die('Access Denied.');
                     <tr>
                         <td>
                             <select name="new-attribute" class="form-control">
-                                <% _.each( rc.attributeKeys, function( attributeKey, l ){ %>
+                                <% _.each( rc.attributeKeys, function( attributeKey, l ){
+                                            console.log(attributeKey);
+                                            %>
                                 <option value="<%- attributeKey.akID %>"><%- attributeKey.akName %></option>
                                 <% }); %>
                             </select>
+                            <div class="spacer-row-1"></div>
                             <button class="btn btn-primary new-attribute-add" data-page-index="<%- i %>"><?= t('Add Page Attribute') ?></button>
                         </td>
                     </tr>

@@ -7,18 +7,18 @@
     <table name="AttributeFormsAttributeValues">
         <field name="afID" type="integer">
             <unsigned/>
-            <default value="0"/>
             <key/>
+            <default value="0" />
         </field>
         <field name="akID" type="integer">
             <unsigned/>
-            <default value="0"/>
             <key/>
+            <default value="0"/>
         </field>
         <field name="avID" type="integer">
             <unsigned/>
-            <default value="0"/>
             <key/>
+            <default value="0"/>
         </field>
     </table>
     <table name="atAttributeSwitcher">
@@ -27,8 +27,8 @@
             <key/>
         </field>
         <field name="value" type="smallint" size="1">
-            <notnull/>
             <default value="0"/>
+            <notnull/>
         </field>
     </table>
     <table name="atAttributeSwitcherSettings">
@@ -37,8 +37,8 @@
             <key/>
         </field>
         <field name="akCheckedByDefault" type="smallint" size="1">
-            <notnull/>
             <default value="0"/>
+            <notnull/>
         </field>
         <field name="checkedActions" type="text"></field>
         <field name="uncheckedActions" type="text"></field>

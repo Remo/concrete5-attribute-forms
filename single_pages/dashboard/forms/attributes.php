@@ -10,6 +10,6 @@ $taskElements = array(
 );
 
 $element = $taskElements[$this->controller->getTask()];
-View::element($element, get_defined_vars(), 'attribute_forms');
+View::element($element, get_defined_vars() + ['view' => $this], 'attribute_forms');
 
 

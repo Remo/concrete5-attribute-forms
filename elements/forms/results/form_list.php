@@ -17,7 +17,9 @@
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($forms as $form) { ?>
+            <?php
+            if(count($forms) > 0):
+                foreach ($forms as $form): ?>                
                 <tr>
                     <td><?= $form->getID() ?></td>
                     <td><?= $date->formatDateTime($form->getDateCreated()) ?></td>
@@ -26,19 +28,30 @@
                     <?php } ?>
                     <td>
                         <a class="btn btn-primary pull-right"
-                           href="<?php echo $view->action('detail', $form->getID()) ?>"><?php echo t('Show') ?>
+                           href="<?= $view->action('detail', $form->getID()) ?>"><?= t('Show') ?>
                         </a>
                     </td>
                 </tr>
-            <?php } ?>
+            <?php
+                endforeach;
+            else: ?>
+                <tr>
+                    <td colspan="4">
+                        <h4><?=t('No entries found.');?></h4>
+                    </td>
+                </tr>
+            <?php
+            endif; ?>
             </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="3">
-                    <?= $formsPagination ?>
-                </td>
-            </tr>
-            </tfoot>
+            <?php if (isset($formsPagination)): ?>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">
+                            <?= $formsPagination ?>
+                        </td>
+                    </tr>
+                </tfoot>
+            <?php endif; ?>
         </table>
     </div>
 </div>

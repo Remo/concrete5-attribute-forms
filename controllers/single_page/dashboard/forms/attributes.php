@@ -1,37 +1,23 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Core\Page\Controller\PageController;
+use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
 use Concrete\Core\Attribute\Key\Category as AttributeKeyCategory;
 use Concrete\Core\Attribute\Type as AttributeType;
-use Concrete\Package\AttributeForms\Src\Attribute\Key\AttributeFormKey;
-use Page;
-use Loader;
+use Concrete\Core\Page\Controller\DashboardPageController;
+use Core;
 
-class Attributes extends PageController
+class Attributes extends DashboardPageController
 {
     protected $helpers = array('form');
 
     public function on_start()
     {
-        $this->set('category', AttributeKeyCategory::getByHandle('attribute_form'));
+        $this->set('category', AttributeKeyCategory::getByHandle('form'));
     }
 
-    public function view($message = false)
+    public function view()
     {
-        // set action message if set
-        switch ($message) {
-            case 'attribute_created':
-                $this->set('message', t('Attribute created'));
-                break;
-            case 'attribute_updated':
-                $this->set('message', t('Attribute updated'));
-                break;
-            case 'attribute_deleted':
-                $this->set('message', t('Attribute deleted'));
-                break;
-        }
-
         $attribs = AttributeFormKey::getList();
 
         $this->set('attribs', $attribs);
@@ -56,7 +42,8 @@ class Attributes extends PageController
         } else {
             $type = AttributeType::getByID($this->post('atID'));
             AttributeFormKey::add($type, $this->post());
-            $this->redirect('/dashboard/forms/attributes/', 'attribute_created');
+            $this->flash("message", t('Attribute created'));
+            $this->redirect($this->action(''));
         }
     }
 
@@ -64,7 +51,7 @@ class Attributes extends PageController
     {
         $key = AttributeFormKey::getByID($akID);
         if (!is_object($key) || $key->isAttributeKeyInternal()) {
-            $this->redirect('/dashboard/forms/attributes/');
+            $this->redirect($this->action(''));
         }
         $type = $key->getAttributeType();
         $this->set('key', $key);
@@ -76,7 +63,7 @@ class Attributes extends PageController
         $akID = $this->post('akID');
         $key = AttributeFormKey::getByID($akID);
         if (!is_object($key) || $key->isAttributeKeyInternal()) {
-            $this->redirect('/dashboard/forms/attributes/');
+            $this->redirect($this->action(''));
         }
         $type = $key->getAttributeType();
 
@@ -88,7 +75,8 @@ class Attributes extends PageController
         } else {
             AttributeType::getByID($this->post('atID'));
             $key->update($this->post());
-            $this->redirect('/dashboard/forms/attributes/', 'attribute_updated');
+            $this->flash("message", t('Attribute updated'));
+            $this->redirect($this->action(''));
         }
     }
 
@@ -100,14 +88,15 @@ class Attributes extends PageController
                 throw new Exception(t('Invalid attribute ID.'));
             }
 
-            $valt = Loader::helper('validation/token');
+            $valt = Core::make('token');
             if (!$valt->validate('delete_attribute', $token)) {
                 throw new Exception($valt->getErrorMessage());
             }
 
             $ak->delete();
 
-            $this->redirect("/dashboard/forms/attributes", 'attribute_deleted');
+            $this->flash("message", t('Attribute deleted'));
+            $this->redirect($this->action(''));
         } catch (Exception $e) {
             $this->set('error', $e);
         }
@@ -115,7 +104,7 @@ class Attributes extends PageController
 
     protected function getAttributeTypes()
     {
-        $attributeFormTypes = AttributeType::getList('attribute_form');
+        $attributeFormTypes = AttributeType::getList('form');
         $types = array();
         foreach ($attributeFormTypes as $attributeFormType) {
             $types[$attributeFormType->getAttributeTypeID()] = $attributeFormType->getAttributeTypeDisplayName();

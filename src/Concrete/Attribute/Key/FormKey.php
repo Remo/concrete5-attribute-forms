@@ -1,13 +1,12 @@
 <?php
-namespace Concrete\Package\AttributeForms\Src\Attribute\Key;
+namespace Concrete\Package\AttributeForms\Attribute\Key;
 
-use Concrete\Core\Attribute\Key\Key,
-    Concrete\Package\AttributeForms\Src\Attribute\Value\AttributeFormValue as AttributeFormAttributeValue,
+use Concrete\Core\Attribute\Key\Key as AttributeKey,
+    Concrete\Package\AttributeForms\Attribute\Value\FormValue as AttributeFormValue,
     Concrete\Core\Attribute\Value\ValueList as AttributeValueList,
-    Core,
-    Concrete\Core\Support\Facade\Database;
+    Database;
 
-class AttributeFormKey extends Key
+class FormKey extends AttributeKey
 {
 
     public function getIndexedSearchTable()
@@ -30,7 +29,7 @@ class AttributeFormKey extends Key
     public static function getAttributes($afID, $method = 'getValue')
     {
         $db = Database::connection();
-        $values = $db->GetAll("select akID, avID from AttributeFormsAttributeValues where afID = ?", array($afID));
+        $values = $db->fetchAll("select akID, avID from AttributeFormsAttributeValues where afID = ?", array($afID));
         $avl = new AttributeValueList();
         foreach ($values as $val) {
             $ak = static::getByID($val['akID']);
@@ -45,7 +44,7 @@ class AttributeFormKey extends Key
 
     public function getAttributeValue($avID, $method = 'getValue')
     {
-        $av = AttributeFormAttributeValue::getByID($avID);
+        $av = AttributeFormValue::getByID($avID);
         if (is_object($av)) {
             $av->setAttributeKey($this);
             return $av->{$method}();
@@ -74,27 +73,27 @@ class AttributeFormKey extends Key
 
     /**
      *
-     * @return AttributeFormKey[]
+     * @return FormKey[]
      */
     public static function getList()
     {
-        return parent::getList('attribute_form');
+        return parent::getList('form');
     }
 
 
     public static function getColumnHeaderList()
     {
-        return parent::getList('attribute_form', array('akIsColumnHeader' => 1));
+        return parent::getList('form', array('akIsColumnHeader' => 1));
     }
 
     public static function getSearchableIndexedList()
     {
-        return parent::getList('attribute_form', array('akIsSearchableIndexed' => 1));
+        return parent::getList('form', array('akIsSearchableIndexed' => 1));
     }
 
     public static function getSearchableList()
     {
-        return parent::getList('attribute_form', array('akIsSearchable' => 1));
+        return parent::getList('form', array('akIsSearchable' => 1));
     }
 
     /**
@@ -129,7 +128,7 @@ class AttributeFormKey extends Key
             $args = array('akHandle' => $fargs[0], 'akName' => $fargs[1], 'akIsSearchable' => $fargs[2]);
         }
 
-        $ak = parent::add('attribute_form', $at, $args, $pkg);
+        $ak = parent::add('form', $at, $args, $pkg);
         return $ak;
     }
 
@@ -137,11 +136,20 @@ class AttributeFormKey extends Key
     {
         parent::delete();
         $db = Database::connection();
-        $r = $db->Execute('select avID from AttributeFormsAttributeValues where akID = ?', array($this->getAttributeKeyID()));
-        while ($row = $r->FetchRow()) {
-            $db->Execute('delete from AttributeValues where avID = ?', array($row['avID']));
-        }
-        $db->Execute('delete from AttributeFormsAttributeValues where akID = ?', array($this->getAttributeKeyID()));
+
+        $qb = $db->createQueryBuilder();
+        $subQb = $db->createQueryBuilder();
+        
+        $qb->delete('AttributeValues')->where(
+            $qb->expr()->comparison('avID',  'IN', '(' . $subQb->select('atfv.avID')
+                                        ->from('AttributeFormsAttributeValues', 'atfv')
+                                        ->where($subQb->expr()->eq('atfv.akID', $this->getAttributeKeyID()))
+                                        ->getSQL() . ')'
+                )
+        );
+        $db->query($qb->getSQL());
+
+        $db->delete('AttributeFormsAttributeValues', array('akID' => $this->getAttributeKeyID()));
     }
 
 }

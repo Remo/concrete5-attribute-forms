@@ -1,12 +1,11 @@
 <?php
-namespace Concrete\Package\AttributeForms\Src\Attribute\Value;
+namespace Concrete\Package\AttributeForms\Attribute\Value;
 
-use Concrete\Core\Attribute\Value\Value,
-    Loader,
-    Concrete\Core\Support\Facade\Database,
-    Concrete\Package\AttributeForms\Src\Entity\AttributeForm;
+use Concrete\Core\Attribute\Value\Value as AttributeValue;
+use Concrete\Package\AttributeForms\Entity\AttributeForm;
+use Database;
 
-class AttributeFormValue extends Value
+class FormValue extends AttributeValue
 {
     /**
      * @var AttributeForm
@@ -31,15 +30,14 @@ class AttributeFormValue extends Value
     public function delete()
     {
         $db = Database::connection();
-        $db->Execute('delete from AttributeFormsAttributeValues where afID = ? and akID = ? and avID = ?', array(
-            $this->item->getID(),
-            $this->attributeKey->getAttributeKeyID(),
-            $this->getAttributeValueID()
+        $db->delete('AttributeFormsAttributeValues', array(
+            'afID' => $this->item->getID(),
+            'akID' => $this->attributeKey->getAttributeKeyID(),
+            'avID' => $this->getAttributeValueID()
         ));
 
         // Before we run delete() on the parent object, we make sure that attribute value isn't being referenced in the table anywhere else
-        $num = $db->GetOne('select count(avID) from AttributeFormsAttributeValues where avID = ?',
-            array($this->getAttributeValueID()));
+        $num = $db->fetchColumn('select count(avID) from AttributeFormsAttributeValues where avID = ?', array($this->getAttributeValueID()));
         if ($num < 1) {
             parent::delete();
         }

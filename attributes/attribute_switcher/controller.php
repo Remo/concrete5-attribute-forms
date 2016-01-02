@@ -2,9 +2,10 @@
 
 namespace Concrete\Package\AttributeForms\Attribute\AttributeSwitcher;
 
-use Concrete\Core\Support\Facade\Database,
-    Core,
-    Concrete\Core\Attribute\Controller as AttributeTypeController;
+use Concrete\Core\Attribute\Controller as AttributeTypeController;
+
+use Database,
+    Core;
 
 class Controller extends AttributeTypeController
 {
@@ -21,7 +22,7 @@ class Controller extends AttributeTypeController
     public function getValue()
     {
         $db = Database::connection();
-        $value = $db->GetOne("select value from atAttributeSwitcher where avID = ?", array($this->getAttributeValueID()));
+        $value = $db->fetchColumn("select value from atAttributeSwitcher where avID = ?", array($this->getAttributeValueID()));
         return $value;
     }
 
@@ -55,11 +56,13 @@ class Controller extends AttributeTypeController
         }
 
         $db = Database::connection();
-        $row = $db->GetRow('select akCheckedByDefault, checkedActions, uncheckedActions, indentation from atAttributeSwitcherSettings where akID = ?', $ak->getAttributeKeyID());
-        $this->akCheckedByDefault = $row['akCheckedByDefault'];
-        $this->akCheckedActions = $row['checkedActions'];
-        $this->akUncheckedActions = $row['uncheckedActions'];
-        $this->indentation = $row['indentation'];
+        $row = $db->fetchAssoc('select akCheckedByDefault, checkedActions, uncheckedActions, indentation from atAttributeSwitcherSettings where akID = ?', array($ak->getAttributeKeyID()));
+        if(is_array($row)){
+            $this->akCheckedByDefault = $row['akCheckedByDefault'];
+            $this->akCheckedActions = $row['checkedActions'];
+            $this->akUncheckedActions = $row['uncheckedActions'];
+            $this->indentation = $row['indentation'];
+        }
         $this->set('indentation', $this->indentation);
         $this->set('akCheckedByDefault', $this->akCheckedByDefault);
         $this->set('akCheckedActions', json_decode($this->akCheckedActions, true));
@@ -111,19 +114,19 @@ class Controller extends AttributeTypeController
     public function deleteKey()
     {
         $db = Database::connection();
-        $db->Execute('delete from atAttributeSwitcherSettings where akID = ?', array($this->getAttributeKey()->getAttributeKeyID()));
+        $db->delete('atAttributeSwitcherSettings', array('akID' => $this->getAttributeKey()->getAttributeKeyID()));
 
-        $arr = $this->attributeKey->getAttributeValueIDList();
-        foreach ($arr as $id) {
-            $db->Execute('delete from atAttributeSwitcher where avID = ?', array($id));
-        }
+        $IDs = $this->attributeKey->getAttributeValueIDList();
+        $qb = $db->createQueryBuilder();
+        $qb->delete('atAttributeSwitcher')->where($qb->expr()->in('avID', $IDs));
+        $db->query($qb->getSQL());
     }
 
     public function duplicateKey($newAK)
     {
         $this->load();
         $db = Database::connection();
-        $db->Execute('insert into atAttributeSwitcherSettings (akID, akCheckedByDefault) values (?, ?)', array($newAK->getAttributeKeyID(), $this->akCheckedByDefault));
+        $db->insert('atAttributeSwitcherSettings', array('akID' => $newAK->getAttributeKeyID(), 'akCheckedByDefault' => $this->akCheckedByDefault));
     }
 
     public function saveKey($data)
@@ -164,7 +167,7 @@ class Controller extends AttributeTypeController
     public function deleteValue()
     {
         $db = Database::connection();
-        $db->Execute('delete from atAttributeSwitcher where avID = ?', array($this->getAttributeValueID()));
+        $db->delete('atAttributeSwitcher', array('avID' => $this->getAttributeValueID()));
     }
 
 }

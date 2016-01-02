@@ -13,29 +13,42 @@
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($formTypes as $formType) { ?>
+            <?php
+            if(count($formTypes) > 0):
+                foreach ($formTypes as $formType): ?>
                 <tr>
                     <td><?= $formType->getFormName() ?></td>
                     <td>
                         <div class="btn-group pull-right">
                             <a class="btn btn-default"
-                               href="<?php echo $view->action('excel', $formType->getID()) ?>"><?php echo t('Download Excel') ?>
+                               href="<?= $view->action('excel', $formType->getID()) ?>"><?= t('Download Excel') ?>
                             </a>
                             <a class="btn btn-primary"
-                               href="<?php echo $view->action('entries', $formType->getID()) ?>"><?php echo t('Show Entries') ?>
+                               href="<?= $view->action('entries', $formType->getID()) ?>"><?= t('Show Entries') ?>
                             </a>
                         </div>
                     </td>
                 </tr>
-            <?php } ?>
+             <?php
+                endforeach;
+            else: ?>
+                <tr>
+                    <td colspan="2">
+                        <h4><?=t('No forms available.');?></h4>
+                    </td>
+                </tr>
+            <?php
+            endif; ?>
             </tbody>
-            <tfoot>
-            <tr>
-                <td colspan="8">
-                    <?= $formTypesPagination ?>
-                </td>
-            </tr>
-            </tfoot>
+            <?php if (isset($formTypesPagination)): ?>
+                <tfoot>
+                    <tr>
+                        <td colspan="8">
+                            <?= $formTypesPagination ?>
+                        </td>
+                    </tr>
+                </tfoot>
+            <?php endif; ?>
         </table>
     </div>
 </div>

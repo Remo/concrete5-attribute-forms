@@ -1,8 +1,7 @@
 <?php
-namespace Concrete\Package\AttributeForms\Src\Entity;
+namespace Concrete\Package\AttributeForms\Entity;
 
-use Concrete\Package\AttributeForms\Src\AttributeFormTypeList,
-    Concrete\Core\Attribute\Key\Key as AttributeKey;
+use Concrete\Core\Attribute\Key\Key as AttributeKey;
 use DateTime;
 
 
@@ -10,8 +9,10 @@ use DateTime;
  * @Entity
  * @Table(name="AttributeFormTypes")
  * @HasLifecycleCallbacks
+ *
+ * @method AttributeFormType getByID(mixed $id)
  */
-class AttributeFormType
+class AttributeFormType extends EntityBase
 {
 
     /**
@@ -46,18 +47,6 @@ class AttributeFormType
     protected $dateUpdated;
 
     
-
-    /**
-     *
-     * @param int $ID
-     * @return AttributeFormType
-     */
-    public static function getByID($ID)
-    {
-        $attrFormLst = new AttributeFormTypeList();
-        return $attrFormLst->getByID($ID);
-    }
-
     public function getID()
     {
         return $this->ID;

@@ -1,14 +1,13 @@
 <?php
-namespace Concrete\Package\AttributeForms\Src\Repository\Search;
+namespace Concrete\Package\AttributeForms\Repository\Search;
 
-use \Concrete\Package\AttributeForms\Src\AbstractRepositoryList;
-use \Pagerfanta\Adapter\AdapterInterface;
-use \Pagerfanta\Pagerfanta;
-use Core;
+use Concrete\Package\AttributeForms\AbstractRepositoryList;
+use Pagerfanta\Adapter\AdapterInterface;
+use Pagerfanta\Pagerfanta;
 
 class Pagination extends \Concrete\Core\Search\Pagination\Pagination
 {
-    /** @var \Concrete\Package\MeschSupportVideo\Src\AbstractRepositoryList  */
+    /** @var \Concrete\Package\AttributeForms\AbstractRepositoryList  */
     protected $list;
 
     public function __construct(AbstractRepositoryList $itemList, AdapterInterface $adapter)
