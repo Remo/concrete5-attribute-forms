@@ -97,9 +97,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                     <tr>
                         <td>
                             <select name="new-attribute" class="form-control">
-                                <% _.each( rc.attributeKeys, function( attributeKey, l ){
-                                            console.log(attributeKey);
-                                            %>
+                                <% _.each( rc.attributeKeys, function( attributeKey, l ){ %>
                                 <option value="<%- attributeKey.akID %>"><%- attributeKey.akName %></option>
                                 <% }); %>
                             </select>

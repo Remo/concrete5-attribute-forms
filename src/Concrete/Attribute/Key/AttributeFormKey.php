@@ -2,11 +2,11 @@
 namespace Concrete\Package\AttributeForms\Attribute\Key;
 
 use Concrete\Core\Attribute\Key\Key as AttributeKey,
-    Concrete\Package\AttributeForms\Attribute\Value\FormValue as AttributeFormValue,
+    Concrete\Package\AttributeForms\Attribute\Value\AttributeFormValue,
     Concrete\Core\Attribute\Value\ValueList as AttributeValueList,
     Database;
 
-class FormKey extends AttributeKey
+class AttributeFormKey extends AttributeKey
 {
 
     public function getIndexedSearchTable()
@@ -73,27 +73,27 @@ class FormKey extends AttributeKey
 
     /**
      *
-     * @return FormKey[]
+     * @return AttributeFormKey[]
      */
     public static function getList()
     {
-        return parent::getList('form');
+        return parent::getList('attribute_form');
     }
 
 
     public static function getColumnHeaderList()
     {
-        return parent::getList('form', array('akIsColumnHeader' => 1));
+        return parent::getList('attribute_form', array('akIsColumnHeader' => 1));
     }
 
     public static function getSearchableIndexedList()
     {
-        return parent::getList('form', array('akIsSearchableIndexed' => 1));
+        return parent::getList('attribute_form', array('akIsSearchableIndexed' => 1));
     }
 
     public static function getSearchableList()
     {
-        return parent::getList('form', array('akIsSearchable' => 1));
+        return parent::getList('attribute_form', array('akIsSearchable' => 1));
     }
 
     /**
@@ -128,7 +128,7 @@ class FormKey extends AttributeKey
             $args = array('akHandle' => $fargs[0], 'akName' => $fargs[1], 'akIsSearchable' => $fargs[2]);
         }
 
-        $ak = parent::add('form', $at, $args, $pkg);
+        $ak = parent::add('attribute_form', $at, $args, $pkg);
         return $ak;
     }
 

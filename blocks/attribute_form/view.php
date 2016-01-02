@@ -1,5 +1,5 @@
 <?php
-use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
+use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 
 if (empty($aftID)) {
     echo t('No form type selected');

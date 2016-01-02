@@ -1,7 +1,7 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
+use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Entity\AttributeFormType;
 use Concrete\Core\Page\Controller\DashboardPageController;

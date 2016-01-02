@@ -1,7 +1,7 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
-use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
+use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Core\Attribute\Key\Category as AttributeKeyCategory;
 use Concrete\Core\Attribute\Type as AttributeType;
 use Concrete\Core\Page\Controller\DashboardPageController;
@@ -13,7 +13,7 @@ class Attributes extends DashboardPageController
 
     public function on_start()
     {
-        $this->set('category', AttributeKeyCategory::getByHandle('form'));
+        $this->set('category', AttributeKeyCategory::getByHandle('attribute_form'));
     }
 
     public function view()
@@ -104,7 +104,7 @@ class Attributes extends DashboardPageController
 
     protected function getAttributeTypes()
     {
-        $attributeFormTypes = AttributeType::getList('form');
+        $attributeFormTypes = AttributeType::getList('attribute_form');
         $types = array();
         foreach ($attributeFormTypes as $attributeFormType) {
             $types[$attributeFormType->getAttributeTypeID()] = $attributeFormType->getAttributeTypeDisplayName();

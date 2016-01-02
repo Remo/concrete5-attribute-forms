@@ -2,8 +2,8 @@
 namespace Concrete\Package\AttributeForms\Entity;
 
 use Concrete\Core\Attribute\Key\Key as AttributeKey;
-use Concrete\Package\AttributeForms\Attribute\Key\FormKey as AttributeFormKey;
-use Concrete\Package\AttributeForms\Attribute\Value\FormValue as AttributeFormValue;
+use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
+use Concrete\Package\AttributeForms\Attribute\Value\AttributeFormValue;
 use Database,
     DateTime;
 

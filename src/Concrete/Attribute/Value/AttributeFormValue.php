@@ -5,7 +5,7 @@ use Concrete\Core\Attribute\Value\Value as AttributeValue;
 use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Database;
 
-class FormValue extends AttributeValue
+class AttributeFormValue extends AttributeValue
 {
     /**
      * @var AttributeForm
