@@ -25,7 +25,7 @@ if (!empty($attributes)) {
                             ?>
                             <div class="form-group row attribute-row" id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
                                 <label class="col-sm-4 control-label">
-                                    <?= tc('AttributeKeyName', $attributeObject->getAttributeKeyName()) ?>
+                                    <?= $attributeObject->getAttributeKeyDisplayName(); ?>
                                 </label>
                                 <div class="col-sm-8">
                                     <?php $attributeObject->render('form', false); ?>

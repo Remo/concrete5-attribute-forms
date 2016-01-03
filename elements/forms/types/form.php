@@ -115,6 +115,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
         <tr>
             <td>
                 <input type="text" name="new-page" class="form-control">
+                <div class="spacer-row-1"></div>
                 <button class="btn btn-primary new-page-add"><?= t('Add Form Page') ?></button>
             </td>
         </tr>

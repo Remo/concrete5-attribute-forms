@@ -1,8 +1,10 @@
 <?php
 namespace Concrete\Package\AttributeForms;
 
+use Concrete\Core\Foundation\Service\ProviderList;
 use Concrete\Core\Backup\ContentImporter,
-    Package;
+    Package,
+    Core;
 
 class Controller extends Package
 {
@@ -40,6 +42,20 @@ class Controller extends Package
     {
         parent::upgrade();
         $this->installXmlContent();
+    }
+
+    public function on_start()
+    {
+        if (file_exists($this->getPackagePath().'/vendor/autoload.php')) {
+            require_once $this->getPackagePath().'/vendor/autoload.php';
+        }
+
+        if (file_exists(DIR_BASE.'/vendor/autoload.php')) {
+            require_once DIR_BASE.'/vendor/autoload.php';
+        }
+
+        $list = new ProviderList(Core::getFacadeApplication());
+        $list->registerProvider('\Concrete\Package\AttributeForms\Service\Provider');
     }
 
     public function uninstall()

@@ -7,6 +7,7 @@ use Concrete\Package\AttributeForms\AttributeFormList;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Core\Page\Controller\DashboardPageController;
     
+use Core;
 
 class Results extends DashboardPageController
 {
@@ -45,53 +46,35 @@ class Results extends DashboardPageController
 
     public function excel($aftID)
     {
-        header("Content-Type: application/vnd.ms-excel");
-        header("Cache-control: private");
-        header("Pragma: public");
-        header("Content-Disposition: inline; filename=form_entries_{$aftID}.xls");
-        header("Content-Title: Form Entries {$aftID}");
-
         $aft = AttributeFormType::getByID($aftID);
         $afl = new AttributeFormList();
         $afl->sortByDateCreated('desc');
         $afl->filterByType($aft);
+        $entries = $afl->getResults();
 
-        $attributes = $aft->getAttributeObjects();
-
-        echo '<table>';
-
+        $excelExport = Core::make('helper/excel/export'); /* @var $excelExport \Concrete\Package\AttributeForms\Service\Excel\Export */
+        $date       = Core::make('helper/date');
+        
         // Add table header
-        $headers = [t('ID'), t('Date Created')];
-
+        $headers    = array(t('ID'), t('Date Created'));
+        $attributes = $aft->getAttributeObjects();
         foreach ($attributes as $attribute) {
             $headers[] = $attribute->getAttributeKeyDisplayName();
         }
-        $entries = $afl->getResults();
-
-        echo '<tr>';
-        foreach ($headers as $header) {
-            echo '<th>' . $header . '</th>';
-        }
-        echo '</tr>';
 
         // Add table content
+        $data = array();
         foreach ($entries as $entry) {
-            echo '<tr>';
-            echo '<td>' . $entry->getID() . '</td>';
-            echo '<td>' . $entry->getDateCreated() . '</td>';
-
+            $row = array($entry->getID(), $date->formatDateTime($entry->getDateCreated()));
             foreach ($attributes as $attribute) {
-                echo '<td>';
-                echo $entry->getAttribute($attribute, 'display');
-                echo '</td>';
-
+                $row[] = $entry->getAttribute($attribute, 'display');
             }
-
-            echo '</tr>';
+            $data[] = $row;
         }
-        echo '</table>';
-        die();
 
+        $excelExport->addTabContent(t('Form Entries - %s', $aft->getFormName()), $headers, $data);
+        $excelExport->download("form_entries_{$aftID}");
+        die();
     }
 
     public function detail($afID)
