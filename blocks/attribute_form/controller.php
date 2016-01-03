@@ -6,6 +6,7 @@ use Concrete\Core\Validation\CSRF\Token;
 use Concrete\Package\AttributeForms\Entity\AttributeFormType;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Entity\AttributeForm;
+use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
 use Concrete\Core\Block\BlockController;
 use Events,
@@ -101,15 +102,34 @@ class Controller extends BlockController
         // get objects
         $aftID = $this->post('aftID');
         $aft   = AttributeFormType::getByID($aftID);
+        
+        $attributes = $aft->getDecodedAttributes();
+        foreach ($attributes->formPages as $i => $formPage){
+            foreach ($formPage->attributes as $j => $attr) {
+                if ($attr->required) {
+                    $ak = AttributeFormKey::getByID($attr->akID);
+                    $e1 = $ak->validateAttributeForm();
+                    if ($e1 == false) {
+                        $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                    } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                        $this->errors->add($e1);
+                    }
+                }
+            }
+        }
 
+        if($this->errors->has()){
+            $this->redirectToView(FALSE, $this->errors);
+        }
+        
         // create new form entry
         $af    = new AttributeForm();
         $af->setTypeID($aftID);
         $af->save();
 
         // get all attributes of type and save values from form to the database
-        $attributes = $aft->getAttributeObjects();
-        foreach ($attributes as $akID => $ak) {
+        $attributeObjs = $aft->getAttributeObjects();
+        foreach ($attributeObjs as $akID => $ak) {
             $af->setAttribute($ak, false);
         }
 

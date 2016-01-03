@@ -3,6 +3,7 @@ namespace Concrete\Package\AttributeForms;
 
 use Concrete\Core\Foundation\Service\ProviderList;
 use Concrete\Core\Backup\ContentImporter,
+    AssetList,
     Package,
     Core;
 
@@ -56,8 +57,16 @@ class Controller extends Package
 
         $list = new ProviderList(Core::getFacadeApplication());
         $list->registerProvider('\Concrete\Package\AttributeForms\Service\Provider');
+
+        $this->registerAssets();
     }
 
+    private function registerAssets()
+    {
+        $al  = AssetList::getInstance();
+        $al->register('javascript', 'mesch/attribute_form', 'js/attribute.forms.js', array('minify' => true), $this);
+    }
+    
     public function uninstall()
     {
         parent::uninstall();

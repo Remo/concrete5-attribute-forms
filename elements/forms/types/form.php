@@ -72,37 +72,44 @@ defined('C5_EXECUTE') or die('Access Denied.');
         </thead>
         <tbody class="form-pages">
         <% _.each( rc.formPages, function( page, i ){ %>
-        <tr>
+        <tr class="form-page" data-index="<%- i %>">
             <td>
                 <strong><%- page.name %></strong>
-                <button class="btn btn-default remove-page pull-right" data-index="<%- i %>"><?= t('Remove Form Page') ?></button>
+                <button class="btn btn-default remove-page pull-right"><?= t('Remove Form Page') ?></button>
                 <div class="clearfix spacer-row-3"></div>
                 <table class="table table-striped table-bordered">
                     <thead>
                     <tr>
                         <td class="header"><?= t('Attribute') ?></td>
+                        <td class="header" width="80"><?= t('Mandatory') ?></td>
+                        <td class="header" width="80"></td>
                     </tr>
                     </thead>
                     <tbody class="form-page-attributes">
                     <% _.each( page.attributes, function( attribute, j ){ %>
-                        <tr>
+                        <tr class="form-page-attribute" data-index="<%- j %>">
                             <td>
                                 <%- attribute.akName %>
-                                <button class="btn btn-default remove-attribute pull-right" data-page-index="<%- i %>" data-index="<%- j %>"><?= t('Remove Attribute') ?></button>
+                            </td>
+                            <td class="text-center">
+                                <input type="checkbox" class="attribute-required" value="1" <%- attribute.required?'checked="checked"':'' %>/>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-default remove-attribute pull-right" ><?= t('Remove Attribute') ?></button>
                             </td>
                         </tr>
                     <% }); %>
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td>
+                        <td colspan="3">
                             <select name="new-attribute" class="form-control">
                                 <% _.each( rc.attributeKeys, function( attributeKey, l ){ %>
                                 <option value="<%- attributeKey.akID %>"><%- attributeKey.akName %></option>
                                 <% }); %>
                             </select>
                             <div class="spacer-row-1"></div>
-                            <button class="btn btn-primary new-attribute-add" data-page-index="<%- i %>"><?= t('Add Page Attribute') ?></button>
+                            <button class="btn btn-primary new-attribute-add"><?= t('Add Page Attribute') ?></button>
                         </td>
                     </tr>
                     </tfoot>
@@ -122,72 +129,11 @@ defined('C5_EXECUTE') or die('Access Denied.');
         </tfoot>
     </table>
 </script>
-
 <script type="text/javascript">
     $(document).ready(function () {
-
-        $('.ccm-advanced-editor').redactor({
-            'plugins': ['concrete5']
+        attributeFormsApp.initFormTypesView({
+            attributeKeys: <?= json_encode($attributeKeys) ?>,
+            selectedAttributes: <?= json_encode($selectedAttributes) ?>
         });
-
-        // setup underscore template
-        _.templateSettings.variable = "rc";
-        var templateAttributes = _.template(
-            $("script.attributes-template").html()
-        );
-        var attributeKeys = <?=json_encode($attributeKeys)?>;
-        var attributesData = <?=json_encode($selectedAttributes)?>;
-        if(!attributesData){
-            attributesData = {};
-            attributesData.formPages = [];
-        }
-        attributesData.attributeKeys = attributeKeys;
-
-        function renderAttributes() {
-            $("#attributes-container").html(templateAttributes(attributesData));
-
-            // make attribute list sortable
-            // @TODO we have to update our JSON variable!
-            $(".form-pages, .form-page-attributes").sortable();
-
-            // save JSON in form
-            $("#attributes").val(JSON.stringify(attributesData));
-        }
-        renderAttributes();
-
-
-        // attribute actions
-        $("#attributes-container").on("click", ".new-page-add", function (event) {
-            event.preventDefault();
-            var newPageName = $(this).closest("tr").find("input[name=new-page]").val();
-            attributesData.formPages.push({name: newPageName, attributes: []});
-            renderAttributes();
-        });
-        $("#attributes-container").on("click", ".remove-page", function (event) {
-            var index = $(this).data("index");
-            attributesData.formPages.splice(index, 1);
-            renderAttributes();
-        });
-        $("#attributes-container").on("click", ".new-attribute-add", function (event) {
-            event.preventDefault();
-            var $newAttribute = $(this).closest("tr").find("select option:selected"),
-                newAttributeName = $newAttribute.text(),
-                newAttributeValue = $newAttribute.val(),
-                pageIndex = $(this).data("page-index");
-
-            attributesData.formPages[pageIndex].attributes.push({
-                akName: newAttributeName,
-                akID: newAttributeValue
-            });
-            renderAttributes();
-        });
-        $("#attributes-container").on("click", ".remove-attribute", function (event) {
-            var pageIndex = $(this).data("page-index"),
-                index = $(this).data("index");
-
-            attributesData.formPages[pageIndex].attributes.splice(index, 1);
-            renderAttributes();
-        });
-
     });
 </script>

@@ -40,6 +40,7 @@ class Types extends DashboardPageController
         $this->requireAsset('javascript', 'underscore');
         $this->requireAsset('redactor');
         $this->requireAsset('core/file-manager');
+        $this->requireAsset('javascript', 'mesch/attribute_form');
 
         $this->set('attributeKeys', $this->getAttributeKeys());
     }
