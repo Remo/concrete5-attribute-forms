@@ -7,27 +7,30 @@ var attributeFormsApp = {
         this.templateAttributes = _.template(
             $("script.attributes-template").html()
         );
+        this.data = {
+            attributeKeys: params.attributeKeys,
+            attributesData: params.selectedAttributes,
+            attributeOptions: params.attributeOptions
+        };
         
-        this.attributesData = params.selectedAttributes;
-        if(!this.attributesData){
-            this.attributesData = {
+        if(!this.data.attributesData){
+            this.data.attributesData = {
                 formPages: []
             };
         }
-        this.attributesData.attributeKeys = params.attributeKeys;
         this.renderAttributes();
 
         // attribute actions
         $("#attributes-container").on("click", ".new-page-add", function (event) {
             event.preventDefault();
             var newPageName = $(this).closest("tr").find("input[name=new-page]").val();
-            attributeFormsApp.attributesData.formPages.push({name: newPageName, attributes: []});
+            attributeFormsApp.data.attributesData.formPages.push({name: newPageName, attributes: []});
             attributeFormsApp.renderAttributes();
         });
         
         $("#attributes-container").on("click", ".remove-page", function (event) {
             var index = $(this).closest('tr.form-page').data("index");
-            attributeFormsApp.attributesData.formPages.splice(index, 1);
+            attributeFormsApp.data.attributesData.formPages.splice(index, 1);
             attributeFormsApp.renderAttributes();
         });
         
@@ -38,7 +41,7 @@ var attributeFormsApp = {
                 newAttributeValue = $newAttribute.val(),
                 pageIndex = $(this).closest('tr.form-page').data("index");
 
-            attributeFormsApp.attributesData.formPages[pageIndex].attributes.push({
+            attributeFormsApp.data.attributesData.formPages[pageIndex].attributes.push({
                 akName: newAttributeName,
                 akID: newAttributeValue,
                 required: false,
@@ -50,7 +53,7 @@ var attributeFormsApp = {
             var pageIndex = $(this).closest('tr.form-page').data("index"),
                 index = $(this).closest('tr.form-page-attribute').data("index");
 
-            attributeFormsApp.attributesData.formPages[pageIndex].attributes.splice(index, 1);
+            attributeFormsApp.data.attributesData.formPages[pageIndex].attributes.splice(index, 1);
             attributeFormsApp.renderAttributes();
         });
         
@@ -58,10 +61,46 @@ var attributeFormsApp = {
             var pageIndex = $(this).closest('tr.form-page').data("index"),
                 index = $(this).closest('tr.form-page-attribute').data("index");
                 
-            attributeFormsApp.attributesData
+            attributeFormsApp.data
+                    .attributesData
                     .formPages[pageIndex]
                     .attributes[index].required = $(this).is(':checked');
             attributeFormsApp.updateFormData();
+        });
+        
+        $("#attributes-container").on("change", ".attribute-option", function (event) {
+            var pageIndex = $(this).closest('tr.form-page').data("index"),
+                index = $(this).closest('tr.form-page-attribute').data("index");
+                
+            var attr = attributeFormsApp.data.attributesData.formPages[pageIndex].attributes[index];
+            var options = attr.options ? attr.options : {};
+            
+            
+            var optionKey = $(this).data('name');
+            var isUnique  = attributeFormsApp.data.attributeOptions[attr.atHandle][optionKey].unique;
+            if($(this).is(':checked') && isUnique){
+                attributeFormsApp.data.attributesData.formPages.forEach(function(page, i) {
+                    page.attributes.forEach(function(attribute, j){
+                        if(attribute.options){
+                            attributeFormsApp.data
+                                    .attributesData
+                                    .formPages[i]
+                                    .attributes[j]
+                                    .options[optionKey] = false;
+                        }
+                    });
+                });
+            }
+            options[optionKey] = $(this).is(':checked');
+            attributeFormsApp.data.attributesData
+                    .formPages[pageIndex]
+                    .attributes[index]
+                    .options = options;
+            if($(this).is(':checked') && isUnique){
+                attributeFormsApp.renderAttributes();
+            }else{
+                attributeFormsApp.updateFormData();
+            }
         });
     },
     initRedactor: function () {
@@ -70,7 +109,7 @@ var attributeFormsApp = {
         });
     },
     renderAttributes: function() {
-        $("#attributes-container").html(this.templateAttributes(this.attributesData));
+        $("#attributes-container").html(this.templateAttributes(this.data));
 
         // make attribute list sortable
         $(".form-pages").sortable({
@@ -78,7 +117,7 @@ var attributeFormsApp = {
                 ui.item.startPos = ui.item.index();
             },
             stop: function(event, ui) {
-                attributeFormsApp.attributesData.formPages.move(ui.item.startPos, ui.item.index());
+                attributeFormsApp.data.attributesData.formPages.move(ui.item.startPos, ui.item.index());
                 attributeFormsApp.renderAttributes();
             }
         });
@@ -89,7 +128,7 @@ var attributeFormsApp = {
             },
             stop: function(event, ui) {
                 var pageIndex = ui.item.closest('tr.form-page').data("index");
-                attributeFormsApp.attributesData.formPages[pageIndex].attributes.move(ui.item.startPos, ui.item.index());
+                attributeFormsApp.data.attributesData.formPages[pageIndex].attributes.move(ui.item.startPos, ui.item.index());
                 attributeFormsApp.renderAttributes();
             }
         });
@@ -97,7 +136,7 @@ var attributeFormsApp = {
     },
     updateFormData: function(){
         // save JSON in form
-        $("#attributes").val(JSON.stringify(this.attributesData));
+        $("#attributes").val(JSON.stringify(this.data.attributesData));
     }
 };
 Array.prototype.move = function (from, to) {

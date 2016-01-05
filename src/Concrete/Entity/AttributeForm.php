@@ -101,10 +101,18 @@ class AttributeForm extends EntityBase
         $this->dateUpdated = $dateUpdated;
     }
 
+    /**
+     * Return Attribute Form Type object
+     * @return AttributeFormType
+     */
+    public function getTypeObj()
+    {
+        return AttributeFormType::getByID($this->getTypeID());
+    }
+    
     public function getTypeName()
     {
-        $aft = AttributeFormType::getByID($this->getTypeID());
-        return $aft->getFormName();
+        return $this->getTypeObj()->getFormName();
     }
 
     public function isSpam()

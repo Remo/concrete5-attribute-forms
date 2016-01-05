@@ -12,6 +12,11 @@
                 <category handle="attribute_form"/>
             </categories>
         </attributetype>
+        <attributetype handle="email" package="attribute_forms">
+            <categories>
+                <category handle="attribute_form"/>
+            </categories>
+        </attributetype>
     </attributetypes>
     <singlepages>
         <page name="Forms" path="dashboard/forms" filename="dashboard/forms/view.php" pagetype="" description="" package="attribute_forms"></page>

@@ -8,6 +8,7 @@ use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
+use Concrete\Package\AttributeForms\MeschApp;
 use Concrete\Core\Block\BlockController;
 use Events,
     Config,
@@ -104,8 +105,8 @@ class Controller extends BlockController
         $aft   = AttributeFormType::getByID($aftID);
         
         $attributes = $aft->getDecodedAttributes();
-        foreach ($attributes->formPages as $i => $formPage){
-            foreach ($formPage->attributes as $j => $attr) {
+        foreach ($attributes->formPages as $formPage){
+            foreach ($formPage->attributes as $attr) {
                 if ($attr->required) {
                     $ak = AttributeFormKey::getByID($attr->akID);
                     $e1 = $ak->validateAttributeForm();
@@ -120,6 +121,7 @@ class Controller extends BlockController
 
         if($this->errors->has()){
             $this->redirectToView(FALSE, $this->errors);
+            die();
         }
         
         // create new form entry
@@ -144,56 +146,81 @@ class Controller extends BlockController
                 $af->save();
             }
         }
-        
+
+        if (intval($this->notifyMeOnSubmission) > 0 ) {
+            $this->sendNotificationMailToAdmin($af);
+        }
+
+        if (intval($this->notifySubmitor) > 0 ) {
+            $this->sendNotificationsMailToSubmitor($af);
+        }
+
         Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
 
         $this->redirectToView();
     }
 
-    private function sendNotificationsMail(AttributeFormType $aft, AttributeForm $af){
-        if (intval($this->notifyMeOnSubmission) > 0 ) {
-            if (Config::get('concrete.email.form_block.address') && strstr(Config::get('concrete.email.form_block.address'), '@')) {
-                $formFormEmailAddress = Config::get('concrete.email.form_block.address');
-            } else {
-                $adminUserInfo = UserInfo::getByID(USER_SUPER_ID);
-                $formFormEmailAddress = $adminUserInfo->getUserEmail();
-            }
+    private function sendNotificationMailToAdmin(AttributeForm $af)
+    {
+        $cfg = MeschApp::getFileConfig();
+        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.default.address'));
+        $fromName = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
 
-            /* @var $mh \Concrete\Core\Mail\Service */
-            $mh = Core::make('helper/mail');
-            $mh->to($this->recipientEmail);
-            $mh->from($formFormEmailAddress);
-            $mh->replyto($replyToEmailAddress);
-            $mh->addParameter('formName', $this->surveyName);
-            $mh->addParameter('questionSetId', $this->questionSetId);
-            $mh->addParameter('questionAnswerPairs', $questionAnswerPairs);
-            $mh->load('block_form_submission', 'attribute_forms');
-            $mh->setSubject(t('%s Form Submission', $aft->getFormName()));
-            //echo $mh->body.'<br>';
-            @$mh->sendMail();
+        $toEmailAddress = Config::get('concrete.email.form_block.address');
+        if (!$toEmailAddress || !strstr($toEmailAddress, '@')) {
+            $toEmailAddress = UserInfo::getByID(USER_SUPER_ID)->getUserEmail();
+        }
+        $aft   = $af->getTypeObj();
+        $attrs = $aft->getAttributesByAttrType('email', 'send_notification_from');
+
+        $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
+        $mh->to($toEmailAddress);
+        $mh->from($fromAddress, $fromName);
+        foreach ($attrs as $akID => $attr){
+            $replyTo = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
+            $mh->replyto($replyTo);
+        }
+        $mh->addParameter('af', $af);
+        $mh->load('attribute_form_admin_notif', 'attribute_forms');
+        $mh->setSubject(t('%s Attribute Form Submission', $aft->getFormName()));
+        @$mh->sendMail();
+    }
+
+    private function sendNotificationsMailToSubmitor(AttributeForm $af)
+    {
+        $cfg = MeschApp::getFileConfig();
+        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.default.address'));
+        $fromName = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
+
+        $aft = $af->getTypeObj();
+        $attrs = $aft->getAttributesByAttrType('email', 'send_notification_from');
+        
+        if(empty($attrs)){
+            return false;
         }
 
-        if (intval($this->notifySubmitor) > 0 ) {
-            if (Config::get('concrete.email.form_block.address') && strstr(Config::get('concrete.email.form_block.address'), '@')) {
-                $formFormEmailAddress = Config::get('concrete.email.form_block.address');
-            } else {
-                $adminUserInfo = UserInfo::getByID(USER_SUPER_ID);
-                $formFormEmailAddress = $adminUserInfo->getUserEmail();
-            }
-
-            /* @var $mh \Concrete\Core\Mail\Service */
-            $mh = Core::make('helper/mail');
-            $mh->to($this->recipientEmail);
-            $mh->from($formFormEmailAddress);
-            $mh->replyto($replyToEmailAddress);
-            $mh->addParameter('formName', $this->surveyName);
-            $mh->addParameter('questionSetId', $this->questionSetId);
-            $mh->addParameter('questionAnswerPairs', $questionAnswerPairs);
-            $mh->load('block_form_submission', 'attribute_forms');
-            $mh->setSubject(t('%s Form Submission', $aft->getFormName()));
-            //echo $mh->body.'<br>';
-            @$mh->sendMail();
+        $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
+        $mh->from($fromAddress, $fromName);
+        
+        foreach ($attrs as $akID => $attr){
+            $toEmailAddress = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
+            $mh->to($toEmailAddress);
         }
+        
+        $mh->addParameter('af', $af);
+        $mh->load('attribute_form_submitor_notif', 'attribute_forms');
+        
+        $subject = t('%s Attribute Form Submission', $aft->getFormName());
+        $attrs = $aft->getAttributesByAttrType('text', 'message_subject');
+        if (!empty($attrs)) {
+            $subject = Config::get("concrete.site").": ";
+            foreach ($attrs as $akID => $attr) {
+                $subject .= $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
+            }
+        }
+
+        $mh->setSubject($subject);
+        @$mh->sendMail();
     }
 
     private function redirectToView($message = false, $errors = false)
@@ -201,13 +228,11 @@ class Controller extends BlockController
         $session = Core::make('session');
 
         if ($message) {
-            $session->getFlashBag()->add('custom_message',
-                array('success_msg', $message));
+            $session->getFlashBag()->add('custom_message', array('success_msg', $message));
         }
 
         if ($errors) {
-            $session->getFlashBag()->add('custom_error',
-                array('errors', $errors));
+            $session->getFlashBag()->add('custom_error', array('errors', $errors));
         }
 
         $arguments = array($this->getCollectionObject());

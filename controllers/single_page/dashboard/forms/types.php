@@ -1,6 +1,7 @@
 <?php
 namespace Concrete\Package\AttributeForms\Controller\SinglePage\Dashboard\Forms;
 
+use Concrete\Package\AttributeForms\Attribute\Options as AttributeOptions;
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Entity\AttributeFormType;
@@ -30,6 +31,7 @@ class Types extends DashboardPageController
             $item = new \stdClass();
             $item->akID = $ak->getAttributeKeyID();
             $item->akName = $ak->getAttributeKeyDisplayName();
+            $item->atHandle = $ak->getAttributeTypeHandle();
             $attributes[$ak->getAttributeKeyHandle()] = $item;
         }
         return $attributes;
@@ -42,6 +44,7 @@ class Types extends DashboardPageController
         $this->requireAsset('core/file-manager');
         $this->requireAsset('javascript', 'mesch/attribute_form');
 
+        $this->set('attributeOptions', AttributeOptions::get());
         $this->set('attributeKeys', $this->getAttributeKeys());
     }
 
@@ -49,7 +52,12 @@ class Types extends DashboardPageController
     {
         $this->add();
         $attributeForm = AttributeFormType::getByID($aftID);
-        $this->set('selectedAttributes', $attributeForm->getDecodedAttributes());
+
+        $selectedAttributes = $attributeForm->getDecodedAttributes(
+                $includeAtHandle = true /* needed to determine attribute options */
+        );
+        
+        $this->set('selectedAttributes', $selectedAttributes);
         $this->set('attributeForm', $attributeForm);
     }
 
@@ -57,9 +65,6 @@ class Types extends DashboardPageController
     {
         $formName = $this->post('formName');
         $deleteSpam = $this->post('deleteSpam', 0);
-
-        $attributes = json_decode($this->post('attributes'));
-        unset($attributes->attributeKeys);
 
         if ($aftID > 0) {
             $attributeFormType = AttributeFormType::getByID($aftID);
@@ -69,7 +74,7 @@ class Types extends DashboardPageController
         
         $attributeFormType->setFormName($formName);
         $attributeFormType->setDeleteSpam($deleteSpam);
-        $attributeFormType->setAttributes(json_encode($attributes));
+        $attributeFormType->setAttributes($this->post('attributes'));
         $attributeFormType->save();
 
         if ($aftID > 0) {

@@ -1,7 +1,7 @@
 <?php
 namespace Concrete\Package\AttributeForms\Entity;
 
-use Concrete\Core\Attribute\Key\Key as AttributeKey;
+use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use DateTime;
 
 
@@ -106,9 +106,51 @@ class AttributeFormType extends EntityBase
         return $this->deleteSpam == 1;
     }
 
-    public function getDecodedAttributes()
+    /**
+     * Get attributes as json object
+     * @param boolean $includeAtHandle include attribute type handle
+     * @return object
+     */
+    public function getDecodedAttributes($includeAtHandle = false)
     {
-        return json_decode($this->attributes);
+        $selectedAttributes = json_decode($this->attributes);
+        // Include attribute type handle
+        if ($includeAtHandle && is_object($selectedAttributes)) {
+            foreach ($selectedAttributes->formPages as $page) {
+                foreach ($page->attributes as $attr) {
+                    $ak = AttributeFormKey::getByID($attr->akID);
+                    if (is_object($ak)) {
+                        $attr->atHandle = $ak->getAttributeTypeHandle();
+                    }
+                }
+            }
+        }
+
+        return $selectedAttributes;
+    }
+
+    public function getAttributesByAttrType($atHandle, $hasOption = false)
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        $attrs = array();
+        if (is_object($selectedAttributes)) {
+            foreach ($selectedAttributes->formPages as $page) {
+                foreach ($page->attributes as $attr) {
+                    $ak = AttributeFormKey::getByID($attr->akID);
+                    if (is_object($ak) && $ak->getAttributeTypeHandle() == $atHandle) {
+                        if($hasOption){
+                            if(isset($attr->options->$hasOption) && $attr->options->$hasOption == true){
+                                $attrs[$attr->akID] = $attr;
+                            }
+                        }else{
+                            $attrs[$attr->akID] = $attr;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $attrs;
     }
 
     /**
@@ -131,6 +173,10 @@ class AttributeFormType extends EntityBase
     }
 
 
+    /**
+     * Return all used attribute keys
+     * @return AttributeFormKey[]
+     */
     public function getAttributeObjects()
     {
         $decodedAttrs = $this->getDecodedAttributes();
@@ -138,7 +184,7 @@ class AttributeFormType extends EntityBase
         if($decodedAttrs){
             foreach ($decodedAttrs->formPages as $page){
                 foreach ($page->attributes as $attr){
-                    $attrObjs[$attr->akID] = AttributeKey::getInstanceByID($attr->akID);
+                    $attrObjs[$attr->akID] = AttributeFormKey::getByID($attr->akID);
                 }
             }
         }

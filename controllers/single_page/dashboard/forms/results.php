@@ -80,7 +80,7 @@ class Results extends DashboardPageController
     public function detail($afID)
     {
         $af = AttributeForm::getByID($afID);
-        $aft = AttributeFormType::getByID($af->getTypeID());
+        $aft = $af->getTypeObj();
         $attributes = $aft->getAttributeObjects();
 
         $this->set('af', $af);

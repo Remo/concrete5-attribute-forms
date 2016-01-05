@@ -47,11 +47,33 @@ class MeschApp
 
     /**
      * Get the standard database config liaison
-     * 
+     *
      * @return \Concrete\Core\Config\Repository\Liaison
      */
     public static function cfg()
     {
         return self::pkg()->getConfig();
+    }
+
+    /**
+     * Get the standard filesystem config liaison
+     *
+     * <code>
+     *    Config File Path: /application/config/generated_overrides/package_handle/mesch.php
+     *    Conent e.g
+     *    return array( <br>
+     *            "email" => array(
+     *                     "address" => "youremail.com",
+     *                     "name" => "some"
+     *                  )
+     *            );
+     * </code>
+     *
+     *
+     * @return \Concrete\Core\Config\Repository\Liaison
+     */
+    public static function getFileConfig()
+    {
+        return self::pkg()->getFileConfig();
     }
 }

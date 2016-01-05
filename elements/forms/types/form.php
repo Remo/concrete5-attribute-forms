@@ -71,7 +71,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
         </tr>
         </thead>
         <tbody class="form-pages">
-        <% _.each( rc.formPages, function( page, i ){ %>
+        <% _.each( rc.attributesData.formPages, function( page, i ){ %>
         <tr class="form-page" data-index="<%- i %>">
             <td>
                 <strong><%- page.name %></strong>
@@ -89,7 +89,19 @@ defined('C5_EXECUTE') or die('Access Denied.');
                     <% _.each( page.attributes, function( attribute, j ){ %>
                         <tr class="form-page-attribute" data-index="<%- j %>">
                             <td>
-                                <%- attribute.akName %>
+                                <%- attribute.akName %><br>
+                                <% _.each( rc.attributeOptions[attribute.atHandle], function( opt, optKey ){
+                                    var optText = opt["text"];
+                                    if(!attribute.options){
+                                        attribute.options = {};
+                                        attribute.options[optKey] = false;
+                                    }
+                                %>
+                                    <label class="control-label" style="font-weight:normal;">
+                                        <input type="checkbox" data-name="<%- optKey %>" class="attribute-option" value="1" <%- attribute.options[optKey]?'checked="checked"':'' %>/>
+                                        <span><%- optText %></span>
+                                    </label>
+                                <% }); %>
                             </td>
                             <td class="text-center">
                                 <input type="checkbox" class="attribute-required" value="1" <%- attribute.required?'checked="checked"':'' %>/>
@@ -133,7 +145,8 @@ defined('C5_EXECUTE') or die('Access Denied.');
     $(document).ready(function () {
         attributeFormsApp.initFormTypesView({
             attributeKeys: <?= json_encode($attributeKeys) ?>,
-            selectedAttributes: <?= json_encode($selectedAttributes) ?>
+            selectedAttributes: <?= json_encode($selectedAttributes) ?>,
+            attributeOptions: <?= json_encode($attributeOptions) ?>
         });
     });
 </script>
