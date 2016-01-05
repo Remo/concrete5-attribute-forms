@@ -1,7 +1,7 @@
 msgid ""
-msgstr "Project-Id-Version: attribute_forms 0.9.7\n"
+msgstr "Project-Id-Version: attribute_forms 0.9.9.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-01 20:18+0000\n"
+"POT-Creation-Date: 2016-01-05 14:34+0000\n"
 "MIME-Version: 1.0\n"
 "X-Poedit-Basepath: ../../..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -10,40 +10,42 @@ msgstr "Project-Id-Version: attribute_forms 0.9.7\n"
 "Language: \n"
 
 #: packages/attribute_forms/elements/forms/types/list.php:4
-#: packages/attribute_forms/install.xml:18
+#: packages/attribute_forms/install.xml:22
 msgid "Forms"
 msgstr ""
 
-#: packages/attribute_forms/install.xml:20
+#: packages/attribute_forms/install.xml:23
 msgid "Types"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:19
-#: packages/attribute_forms/elements/forms/types/form.php:48
-#: packages/attribute_forms/install.xml:22
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:15
+#: packages/attribute_forms/elements/forms/types/form.php:51
+#: packages/attribute_forms/install.xml:24
 msgid "Attributes"
 msgstr ""
 
-#: packages/attribute_forms/install.xml:24
+#: packages/attribute_forms/install.xml:25
 msgid "Results"
 msgstr ""
 
-#: packages/attribute_forms/blocks/attribute_form/controller.php:20
-#: packages/attribute_forms/controller.php:15
+#: packages/attribute_forms/blocks/attribute_form/controller.php:31
+#: packages/attribute_forms/controller.php:20
 msgid "Attribute Form"
 msgstr ""
 
-#: packages/attribute_forms/controller.php:20
+#: packages/attribute_forms/controller.php:25
 msgid "A package to create forms using attributes"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/controller.php:47
-#: packages/attribute_forms/attributes/attribute_switcher/controller.php:92
+#: packages/attribute_forms/attributes/attribute_switcher/controller.php:48
+#: packages/attribute_forms/attributes/attribute_switcher/controller.php:97
 #: packages/attribute_forms/attributes/attribute_switcher/form.php:8
+#: packages/attribute_forms/elements/forms/results/form_list.php:27
 msgid "Yes"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/controller.php:47
+#: packages/attribute_forms/attributes/attribute_switcher/controller.php:48
+#: packages/attribute_forms/elements/forms/results/form_list.php:27
 msgid "No"
 msgstr ""
 
@@ -51,83 +53,132 @@ msgstr ""
 msgid "Checkbox Options"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:5
-msgid "Default Value"
-msgstr ""
-
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:12
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:7
 msgid "The checkbox will be checked by default."
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:32
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:11
+msgid "Indentation"
+msgstr ""
+
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:26
+#: packages/attribute_forms/elements/forms/types/form.php:83
 msgid "Attribute"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:33
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:27
 msgid "Checked"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:34
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:28
 msgid "Unchecked"
 msgstr ""
 
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:39
 #: packages/attribute_forms/attributes/attribute_switcher/type_form.php:45
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:51
 msgid "No Action"
 msgstr ""
 
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:39
 #: packages/attribute_forms/attributes/attribute_switcher/type_form.php:45
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:51
 msgid "Hide"
 msgstr ""
 
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:39
 #: packages/attribute_forms/attributes/attribute_switcher/type_form.php:45
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:51
-#: packages/attribute_forms/elements/forms/results/list.php:23
+#: packages/attribute_forms/elements/forms/results/form_list.php:31
 msgid "Show"
 msgstr ""
 
-#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:63
+#: packages/attribute_forms/attributes/attribute_switcher/type_form.php:55
 msgid "Please save attribute first, you can then configure all the options"
 msgstr ""
 
-#: packages/attribute_forms/blocks/attribute_form/controller.php:25
+#: packages/attribute_forms/attributes/email/controller.php:35
+msgid "Invalid email address provided."
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/controller.php:36
 msgid "Inserts a form based on pre-defined types"
 msgstr ""
 
-#: packages/attribute_forms/blocks/attribute_form/view.php:4
+#: packages/attribute_forms/blocks/attribute_form/controller.php:114
+#, php-format
+msgid "The field \"%s\" is required"
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/controller.php:185
+#: packages/attribute_forms/blocks/attribute_form/controller.php:213
+#, php-format
+msgid "%s Attribute Form Submission"
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/form.php:3
+msgid "Form Type"
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/form.php:9
+msgid "Notfications"
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/form.php:13
+msgid "Notify me on submission."
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/form.php:19
+msgid "Notify submitor."
+msgstr ""
+
+#: packages/attribute_forms/blocks/attribute_form/view.php:5
 msgid "No form type selected"
 msgstr ""
 
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:25
+#: packages/attribute_forms/blocks/attribute_form/view.php:67
+msgid "Required fields."
+msgstr ""
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:45
 msgid "Attribute created"
 msgstr ""
 
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:28
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:78
 msgid "Attribute updated"
 msgstr ""
 
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:31
-msgid "Attribute deleted"
-msgstr ""
-
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:100
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:88
 msgid "Invalid attribute ID."
 msgstr ""
 
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:27
-msgid "Form type added"
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/attributes.php:98
+msgid "Attribute deleted"
 msgstr ""
 
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:30
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/results.php:59
+#: packages/attribute_forms/elements/forms/results/detail.php:11
+#: packages/attribute_forms/elements/forms/results/form_list.php:11
+msgid "ID"
+msgstr ""
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/results.php:59
+#: packages/attribute_forms/elements/forms/results/form_list.php:12
+msgid "Date Created"
+msgstr ""
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/results.php:75
+#, php-format
+msgid "Form Entries - %s"
+msgstr ""
+
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:81
 msgid "Form type updated"
 msgstr ""
 
-#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:33
-msgid "Form type removed"
+#: packages/attribute_forms/controllers/single_page/dashboard/forms/types.php:83
+msgid "Form type added"
 msgstr ""
 
 #: packages/attribute_forms/elements/forms/attributes/list.php:5
+#, php-format
 msgid "There are no attribute types available for the attribute form category. Please enable them in the <a href=\"%s\">system settings</a>."
 msgstr ""
 
@@ -135,56 +186,136 @@ msgstr ""
 msgid "Add Attribute"
 msgstr ""
 
-#: packages/attribute_forms/elements/forms/attributes/list.php:18
+#: packages/attribute_forms/elements/forms/attributes/list.php:20
 msgid "Add"
 msgstr ""
 
 #: packages/attribute_forms/elements/forms/results/detail.php:4
+#, php-format
 msgid "Form Result - %d"
-msgstr ""
-
-#: packages/attribute_forms/elements/forms/results/detail.php:11
-#: packages/attribute_forms/elements/forms/results/list.php:11
-msgid "ID"
 msgstr ""
 
 #: packages/attribute_forms/elements/forms/results/detail.php:12
 msgid "Value"
 msgstr ""
 
+#: packages/attribute_forms/elements/forms/results/detail.php:31
+msgid "Back"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/results/form_list.php:4
+#, php-format
+msgid "Form Results - %s"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/results/form_list.php:14
+msgid "Is SPAM?"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/results/form_list.php:40
+msgid "No entries found."
+msgstr ""
+
 #: packages/attribute_forms/elements/forms/results/list.php:4
 msgid "Form Results"
 msgstr ""
 
-#: packages/attribute_forms/elements/forms/results/list.php:12
-msgid "Type"
-msgstr ""
-
-#: packages/attribute_forms/elements/forms/types/form.php:10
-msgid "Edit Form"
-msgstr ""
-
-#: packages/attribute_forms/elements/forms/types/form.php:10
-#: packages/attribute_forms/elements/forms/types/list.php:37
-msgid "Add Form"
-msgstr ""
-
-#: packages/attribute_forms/elements/forms/types/form.php:18
-msgid "Form Name"
-msgstr ""
-
-#: packages/attribute_forms/elements/forms/types/form.php:33
-msgid "Delete SPAM"
-msgstr ""
-
-#: packages/attribute_forms/elements/forms/types/form.php:70
-msgid "Save"
-msgstr ""
-
+#: packages/attribute_forms/elements/forms/results/list.php:11
 #: packages/attribute_forms/elements/forms/types/list.php:11
 msgid "Name"
 msgstr ""
 
-#: packages/attribute_forms/elements/forms/types/list.php:21
+#: packages/attribute_forms/elements/forms/results/list.php:24
+msgid "Download Excel"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/results/list.php:27
+msgid "Show Entries"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/results/list.php:37
+msgid "No forms available."
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:12
+msgid "Edit Form"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:12
+#: packages/attribute_forms/elements/forms/types/list.php:50
+msgid "Add Form"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:20
+msgid "Form Name"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:35
+msgid "Delete SPAM"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:61
+msgid "Save"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:70
+msgid "Page"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:78
+msgid "Remove Form Page"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:84
+msgid "Mandatory"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:110
+msgid "Remove Attribute"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:124
+msgid "Add Page Attribute"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/form.php:138
+msgid "Add Form Page"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/list.php:23
 msgid "Edit"
+msgstr ""
+
+#: packages/attribute_forms/elements/forms/types/list.php:32
+msgid "No forms found."
+msgstr ""
+
+#: packages/attribute_forms/mail/attribute_form_admin_notif.php:12
+#, php-format
+msgid ""
+"\n"
+"There has been a submission of the form %s through your concrete5 website.\n"
+"\n"
+"%s\n"
+"\n"
+"To view all of this form's submissions, visit %s \n"
+"\n"
+""
+msgstr ""
+
+#: packages/attribute_forms/src/Concrete/Attribute/Options.php:45
+msgid "Reply to this email address"
+msgstr ""
+
+#: packages/attribute_forms/src/Concrete/Attribute/Options.php:51
+msgid "Use as email subject"
+msgstr ""
+
+#: packages/attribute_forms/src/Concrete/AbstractRepositoryList.php:82
+msgid "Unused method"
+msgstr ""
+
+#: packages/attribute_forms/src/Concrete/AbstractRepositoryList.php:125
+#: packages/attribute_forms/src/Concrete/AbstractRepositoryList.php:134
+msgid "Invalid SQL in order by"
 msgstr ""
