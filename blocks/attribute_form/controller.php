@@ -10,7 +10,8 @@ use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
 use Concrete\Package\AttributeForms\MeschApp;
 use Concrete\Core\Block\BlockController;
-use Events,
+use UserInfo,
+    Events,
     Config,
     Core;
     
