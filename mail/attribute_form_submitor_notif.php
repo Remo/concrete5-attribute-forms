@@ -3,7 +3,7 @@ defined('C5_EXECUTE') or die("Access Denied.");
 /* @var $af Concrete\Package\AttributeForms\Entity\AttributeForm */
 $aft           = $af->getTypeObj();
 $submittedData = '';
-foreach ($af->getAttributeObjects() as $ak) {
+foreach ($aft->getAttributeObjects() as $ak) {
     $submittedData .= $ak->getAttributeKeyDisplayName()."\r\n";
     $submittedData .= $af->getAttribute($ak, 'display')."\r\n"."\r\n";
 }
