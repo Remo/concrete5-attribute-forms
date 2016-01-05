@@ -1,5 +1,6 @@
 <?php
-namespace Concrete\Attribute\Email;
+
+namespace Concrete\Package\AttributeForms\Attribute\Email;
 
 use Concrete\Core\Attribute\DefaultController;
 use Core;
