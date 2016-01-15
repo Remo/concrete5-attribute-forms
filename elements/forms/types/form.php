@@ -57,8 +57,12 @@ defined('C5_EXECUTE') or die('Access Denied.');
                     </div>
                 </div>
             </div>
-
-            <button class="btn btn-blue"><?= t('Save') ?></button>
+        </div>
+    </div>
+    <div class="ccm-dashboard-form-actions-wrapper">
+        <div class="ccm-dashboard-form-actions">
+            <a href="<?=$view->action('');?>" class="pull-left btn btn-default"> <?=t('Back');?> </a>
+            <button class="pull-right btn btn-success" type="submit" > <?= t('Save') ?> </button>
         </div>
     </div>
 </form>
@@ -117,7 +121,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                         <td colspan="3">
                             <select name="new-attribute" class="form-control">
                                 <% _.each( rc.attributeKeys, function( attributeKey, l ){ %>
-                                <option value="<%- attributeKey.akID %>"><%- attributeKey.akName %></option>
+                                <option value="<%- attributeKey.akID %>" data-athandle="<%- attributeKey.atHandle %>" ><%- attributeKey.akName %></option>
                                 <% }); %>
                             </select>
                             <div class="spacer-row-1"></div>

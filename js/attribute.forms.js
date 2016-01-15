@@ -39,12 +39,14 @@ var attributeFormsApp = {
             var $newAttribute = $(this).closest("tr").find("select option:selected"),
                 newAttributeName = $newAttribute.text(),
                 newAttributeValue = $newAttribute.val(),
+                atHandle = $newAttribute.data('athandle'),
                 pageIndex = $(this).closest('tr.form-page').data("index");
-
+                
             attributeFormsApp.data.attributesData.formPages[pageIndex].attributes.push({
                 akName: newAttributeName,
                 akID: newAttributeValue,
-                required: false,
+                atHandle: atHandle,
+                required: false
             });
             attributeFormsApp.renderAttributes();
         });
