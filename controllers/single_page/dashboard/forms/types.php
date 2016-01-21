@@ -6,6 +6,7 @@ use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Entity\AttributeFormType;
 use Concrete\Core\Page\Controller\DashboardPageController;
+use Concrete\Core\Captcha\Library as SystemCaptchaLibrary;
 
 class Types extends DashboardPageController
 {
@@ -44,6 +45,13 @@ class Types extends DashboardPageController
         $this->requireAsset('core/file-manager');
         $this->requireAsset('javascript', 'mesch/attribute_form');
 
+        $list     = SystemCaptchaLibrary::getList();
+        $captchas = array('' => t('Default'));
+        foreach ($list as $sc) {
+            $captchas[$sc->getSystemCaptchaLibraryHandle()] = $sc->getSystemCaptchaLibraryName();
+        }
+
+        $this->set('captchasLibraries', $captchas);
         $this->set('attributeOptions', AttributeOptions::get());
         $this->set('attributeKeys', $this->getAttributeKeys());
     }
@@ -63,8 +71,9 @@ class Types extends DashboardPageController
 
     public function save($aftID = 0)
     {
-        $formName = $this->post('formName');
-        $deleteSpam = $this->post('deleteSpam', 0);
+        $formName       = $this->post('formName');
+        $deleteSpam     = $this->post('deleteSpam', 0);
+        $captchaLibrary = $this->post('captchaLibrary');
 
         if ($aftID > 0) {
             $attributeFormType = AttributeFormType::getByID($aftID);
@@ -74,6 +83,7 @@ class Types extends DashboardPageController
         
         $attributeFormType->setFormName($formName);
         $attributeFormType->setDeleteSpam($deleteSpam);
+        $attributeFormType->setCaptchaLibraryHandle($captchaLibrary);
         $attributeFormType->setAttributes($this->post('attributes'));
         $attributeFormType->save();
 

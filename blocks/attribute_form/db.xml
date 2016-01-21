@@ -10,7 +10,25 @@
             <key/>
         </field>
         <field name="aftID" type="integer"></field>
-        <field name="notifyMeOnSubmission" type="smallint"></field>
-        <field name="notifySubmitor" type="smallint"></field>
+        <field name="submitText" type="string" size="255">
+            <default value="Submit"/>
+        </field>
+        <field name="thankyouMsg" type="text" size="65535"/>
+        <field name="notifyMeOnSubmission" type="boolean">
+            <unsigned/>
+            <default value="0"/>
+            <notnull/>
+          </field>
+        <field name="notifySubmitor" type="boolean">
+            <unsigned/>
+            <default value="0"/>
+            <notnull/>
+        </field>
+        <field name="recipientEmail" type="string" size="255"/>
+        <field name="displayCaptcha" type="boolean">
+            <unsigned/>
+            <default value="0"/>
+            <notnull/>
+        </field>
     </table>
 </schema>

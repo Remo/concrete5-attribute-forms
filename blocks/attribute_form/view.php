@@ -7,7 +7,7 @@ if (empty($aftID)) {
 }
 
 if (!empty($attributes)) {
-    ?>
+?>
 <br>
 <div class="row">
     <div class="col-xs-12">
@@ -62,10 +62,26 @@ if (!empty($attributes)) {
             </div>
         </div>
     <?php } ?>
+    <?php  if ($captcha): ?>
+    <div class="row">
+        <div class="col-sm-offset-4 col-sm-8">
+            <div class="form-group captcha">
+                <?php
+                $captchaLabel = $captcha->label();
+                if (!empty($captchaLabel)):?>
+                    <label class="control-label"><?= $captchaLabel; ?></label>
+                <?php
+                endif; ?>
+                <div><?php  $captcha->display(); ?></div>
+                <div><?php  $captcha->showInput(); ?></div>
+            </div>
+        </div>
+    </div>
+    <?php  endif; ?>
     <div class="row">
         <div class="col-sm-offset-4 col-sm-8">
             <span class="small text-muted">* <?=t('Required fields.');?></span>
-            <input type="submit" class="btn btn-primary pull-right">
+            <input type="submit" name="Submit" class="btn btn-primary pull-right" value="<?= h(t($submitText)); ?>" />
         </div>
     </div>
 </form>

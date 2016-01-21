@@ -43,6 +43,20 @@ defined('C5_EXECUTE') or die('Access Denied.');
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">
+                            <?= t('Captcha Library') ?>
+                        </label>
+                        <div class="col-sm-10">
+                            <?= $form->select('captchaLibrary',
+                                $captchasLibraries,
+                                isset($attributeForm) ? $attributeForm->getCaptchaLibraryHandle() : false) ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="col-md-8">

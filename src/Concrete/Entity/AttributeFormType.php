@@ -2,6 +2,7 @@
 namespace Concrete\Package\AttributeForms\Entity;
 
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
+use \Concrete\Core\Captcha\Library as SystemCaptchaLibrary;
 use DateTime;
 
 
@@ -37,6 +38,11 @@ class AttributeFormType extends EntityBase
     protected $deleteSpam;
 
     /**
+     * @Column(type="string")
+     */
+    protected $captchaLibraryHandle;
+
+    /**
      * @Column(type="datetime")
      */
     protected $dateCreated;
@@ -61,6 +67,22 @@ class AttributeFormType extends EntityBase
         return $this->attributes;
     }
 
+    public function getCaptchaLibraryHandle()
+    {
+        return $this->captchaLibraryHandle;
+    }
+
+    public function getCaptchaLibrary()
+    {
+        if (!empty($this->getCaptchaLibraryHandle())) {
+            $captcha = SystemCaptchaLibrary::getByHandle($this->getCaptchaLibraryHandle());
+        } else {
+            $captcha = SystemCaptchaLibrary::getActive();
+        }
+        
+        return $captcha->getController();
+    }
+
     public function getDateCreated()
     {
         return $this->dateCreated;
@@ -79,6 +101,11 @@ class AttributeFormType extends EntityBase
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    public function setCaptchaLibraryHandle($captchaLibraryHandle)
+    {
+        $this->captchaLibraryHandle = $captchaLibraryHandle;
     }
 
     public function setDateCreated($dateCreated)

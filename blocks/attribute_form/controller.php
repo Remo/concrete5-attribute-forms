@@ -82,23 +82,68 @@ class Controller extends BlockController
 
     public function view()
     {
-        $formType   = AttributeFormType::getByID($this->aftID);
-        $attributes = $formType->getDecodedAttributes();
+        $formType = AttributeFormType::getByID($this->aftID);
+
+        if (!is_object($formType)) {
+            return;
+        }
 
         $token = new Token();
-
-        $this->set('attributes', $attributes);
         $this->set('aftID', $this->aftID);
+        $this->set('attributes', $formType->getDecodedAttributes());
+        $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
         $this->set('token', $token->generate('attribute_form_'.$this->bID));
     }
 
-    public function action_submit()
+    public function save($data)
     {
+        if (!isset($data['submitText'])) {
+            $data['submitText'] = '';
+        }
+
+        if (!isset($data['notifyMeOnSubmission'])) {
+            $data['notifyMeOnSubmission'] = 0;
+        }
+
+        if (!isset($data['thankyouMsg'])) {
+            $data['thankyouMsg'] = '';
+        }
+
+        if (!isset($data['displayCaptcha'])) {
+            $data['displayCaptcha'] = 0;
+        }
+
+        parent::save($data);
+    }
+
+    public function action_submit($bID = false)
+    {
+        if ($this->bID != $bID) {
+            return false;
+        }
+
+        $this->view();
+
         Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
+
+        $ip = Core::make('helper/validation/ip');
+        if ($ip->isBanned()) {
+            $this->errors->add($ip->getErrorMessage());
+            return;
+        }
+
         // check CSRF token
         $token = new Token();
         if (!$token->validate('attribute_form_'.$this->bID, $this->post('_token'))) {
             throw new \Exception('Invalid token');
+        }
+
+        if ($this->displayCaptcha) {
+            $captcha = Core::make('helper/validation/captcha');
+            if (!$captcha->check()) {
+                $this->errors->add(t("Incorrect captcha code"));
+                $_REQUEST['ccmCaptchaCode'] = '';
+            }
         }
 
         // get objects
@@ -139,7 +184,9 @@ class Controller extends BlockController
         // check SPAM
         $submittedData = $af->getAttributeDataString();
         $antispam      = Core::make('helper/validation/antispam');
-        if (!$antispam->check($submittedData, 'attribute_form')) {
+        $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
+        
+        if ($foundSpam) {
             if ($aft->getDeleteSpam()) {
                 $af->delete();
             } else {
@@ -148,39 +195,43 @@ class Controller extends BlockController
             }
         }
 
-        if (intval($this->notifyMeOnSubmission) > 0 ) {
-            $this->sendNotificationMailToAdmin($af);
-        }
+        if (!$foundSpam) {
+            if (intval($this->notifyMeOnSubmission) > 0) {
+                $this->sendNotificationMailToAdmin($af);
+            }
 
-        if (intval($this->notifySubmitor) > 0 ) {
-            $this->sendNotificationsMailToSubmitor($af);
-        }
+            if (intval($this->notifySubmitor) > 0) {
+                $this->sendNotificationsMailToSubmitor($af);
+            }
 
-        Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
+            Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
+            $this->redirectToView($this->thankyouMsg);
+        }
 
         $this->redirectToView();
     }
 
     private function sendNotificationMailToAdmin(AttributeForm $af)
     {
-        $cfg = MeschApp::getFileConfig();
-        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.default.address'));
-        $fromName = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
+        $cfg         = MeschApp::getFileConfig();
+        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.form_block.address'));
 
-        $toEmailAddress = Config::get('concrete.email.form_block.address');
-        if (!$toEmailAddress || !strstr($toEmailAddress, '@')) {
-            $toEmailAddress = UserInfo::getByID(USER_SUPER_ID)->getUserEmail();
+        if (empty($fromAddress) || !strstr($fromAddress, '@')) {
+            $fromAddress = UserInfo::getByID(USER_SUPER_ID)->getUserEmail();
         }
+
         $aft   = $af->getTypeObj();
         $attrs = $aft->getAttributesByAttrType('email', 'send_notification_from');
 
         $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
-        $mh->to($toEmailAddress);
-        $mh->from($fromAddress, $fromName);
-        foreach ($attrs as $akID => $attr){
+        $mh->to($this->recipientEmail);
+        $mh->from($fromAddress);
+
+        foreach ($attrs as $akID => $attr) {
             $replyTo = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
             $mh->replyto($replyTo);
         }
+
         $mh->addParameter('af', $af);
         $mh->load('attribute_form_admin_notif', 'attribute_forms');
         $mh->setSubject(t('%s Attribute Form Submission', $aft->getFormName()));
@@ -189,30 +240,31 @@ class Controller extends BlockController
 
     private function sendNotificationsMailToSubmitor(AttributeForm $af)
     {
-        $cfg = MeschApp::getFileConfig();
+        $cfg         = MeschApp::getFileConfig();
         $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.default.address'));
-        $fromName = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
+        $fromName    = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
 
-        $aft = $af->getTypeObj();
+        $aft   = $af->getTypeObj();
         $attrs = $aft->getAttributesByAttrType('email', 'send_notification_from');
-        
-        if(empty($attrs)){
+
+        if (empty($attrs)) {
             return false;
         }
 
         $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
         $mh->from($fromAddress, $fromName);
-        
-        foreach ($attrs as $akID => $attr){
+
+        foreach ($attrs as $akID => $attr) {
             $toEmailAddress = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
             $mh->to($toEmailAddress);
         }
-        
+
         $mh->addParameter('af', $af);
         $mh->load('attribute_form_submitor_notif', 'attribute_forms');
-        
+
         $subject = t('%s Attribute Form Submission', $aft->getFormName());
-        $attrs = $aft->getAttributesByAttrType('text', 'message_subject');
+        $attrs   = $aft->getAttributesByAttrType('text', 'message_subject');
+        
         if (!empty($attrs)) {
             $subject = Config::get("concrete.site").": ";
             foreach ($attrs as $akID => $attr) {
