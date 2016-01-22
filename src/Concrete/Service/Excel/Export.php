@@ -2,6 +2,7 @@
 namespace Concrete\Package\AttributeForms\Service\Excel;
 
 use PHPExcel_Style_Border,
+    PHPExcel_Helper_HTML,
     PHPExcel_Style_Fill,
     PHPExcel_IOFactory,
     PHPExcel_Style,
@@ -117,7 +118,7 @@ class Export
 
         $rowCount = $this->startRow;
         $contentStartRow = $this->startRow;
-
+        
         if (!empty($headers)) {
             foreach ($headers as $i => $value) {
                 $activeSheet->setCellValueByColumnAndRow($i, $rowCount, $value);
@@ -148,6 +149,11 @@ class Export
         
         foreach ($data as $row) {
             foreach ($row as $i => $value) {
+                // Check if value contains Html tags
+                if ($value != strip_tags($value)) {
+                    $hh    = new PHPExcel_Helper_HTML();
+                    $value = $hh->toRichTextObject($value);
+                }
                 $activeSheet->setCellValueByColumnAndRow($i, $rowCount, $value);
             }
             $rowCount++;
