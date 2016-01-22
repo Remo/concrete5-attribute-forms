@@ -264,4 +264,36 @@ class AttributeForm extends EntityBase
         return $av;
     }
 
+    public function getAsText()
+    {
+        $aft = $this->getTypeObj();
+
+        $submittedData = '';
+        foreach ($aft->getAttributeObjects() as $ak) {
+            $label = $ak->getAttributeKeyDisplayName();
+            $value = $this->getAttribute($ak, 'display');
+
+            $submittedData .= $label . "\r\n";
+            $submittedData .= $value ."\r\n"."\r\n";
+        }
+
+        return $submittedData;
+    }
+
+    public function getAsHtml()
+    {
+        $aft = $this->getTypeObj();
+
+        $submittedDataHtml = '<table>';
+        foreach ($aft->getAttributeObjects() as $ak) {
+            $label = $ak->getAttributeKeyDisplayName();
+            $value = $this->getAttribute($ak, 'display');
+
+            $submittedDataHtml .= '<tr><th>' . h($label) . '</th><td>' . h($value) . '</td>/<tr>';
+        }
+        $submittedDataHtml .= '</table>';
+
+        return $submittedDataHtml;
+    }
+
 }
