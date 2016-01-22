@@ -72,7 +72,8 @@ class Results extends DashboardPageController
             $data[] = $row;
         }
 
-        $excelExport->addTabContent(t('Form Entries - %s', $aft->getFormName()), $headers, $data);
+        $sheetName = Core::make('helper/text')->shorten($aft->getFormName(), 31);
+        $excelExport->addTabContent($sheetName, $headers, $data);
         $excelExport->download("form_entries_{$aftID}");
         die();
     }
