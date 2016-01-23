@@ -138,17 +138,17 @@ class Controller extends BlockController
             throw new \Exception('Invalid token');
         }
 
+        // get objects
+        $aftID = $this->post('aftID');
+        $aft   = AttributeFormType::getByID($aftID);
+
         if ($this->displayCaptcha) {
-            $captcha = Core::make('helper/validation/captcha');
+            $captcha = $aft->getCaptchaLibrary();
             if (!$captcha->check()) {
                 $this->errors->add(t("Incorrect captcha code"));
                 $_REQUEST['ccmCaptchaCode'] = '';
             }
         }
-
-        // get objects
-        $aftID = $this->post('aftID');
-        $aft   = AttributeFormType::getByID($aftID);
         
         $attributes = $aft->getDecodedAttributes();
         foreach ($attributes->formPages as $formPage){
@@ -166,8 +166,7 @@ class Controller extends BlockController
         }
 
         if($this->errors->has()){
-            $this->redirectToView(FALSE, $this->errors);
-            die();
+            return;
         }
         
         // create new form entry
@@ -205,7 +204,7 @@ class Controller extends BlockController
             }
 
             Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
-            $this->redirectToView($this->thankyouMsg);
+            $this->redirectToView(h(t($this->thankyouMsg)));
         }
 
         $this->redirectToView();
@@ -291,5 +290,25 @@ class Controller extends BlockController
         $arguments = array($this->getCollectionObject());
         $url       = call_user_func_array(array('\URL', 'to'), $arguments);
         $this->redirect($url.'?'.http_build_query($_GET));
+    }
+
+    /**
+     * Use this method to display captcha image since the core tools
+     * uses the Default Active Captcha that is set in C5 Settings
+     * @param \Concrete\Core\Captcha\Controller $captcha
+     * @param int $aftID
+     */
+    public function diaplayCaptcha($captcha, $aftID)
+    {
+        $ci   = Core::make('helper/concrete/urls');
+        $pictureDispURL = $ci->getToolsURL('captcha');
+
+        $meschPictureDispURL = \URL::to('/ccm/attribute_forms/tools/captcha/', $aftID);
+
+        ob_start();
+        $captcha->display();
+        $captchaDisplay = ob_get_clean();
+        
+        print str_replace($pictureDispURL, $meschPictureDispURL, $captchaDisplay);
     }
 }

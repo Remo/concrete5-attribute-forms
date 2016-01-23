@@ -5,6 +5,7 @@ use Concrete\Core\Foundation\Service\ProviderList;
 use Concrete\Core\Backup\ContentImporter,
     AssetList,
     Package,
+    Route,
     Core;
 
 class Controller extends Package
@@ -59,6 +60,10 @@ class Controller extends Package
         $list->registerProvider('\Concrete\Package\AttributeForms\Service\Provider');
 
         $this->registerAssets();
+
+        Route::registerMultiple(array(
+            '/ccm/attribute_forms/tools/captcha/{atFormTypeID}' => array('\Concrete\Package\AttributeForms\Controller\Tools::displayCaptchaPicture'),
+        ));
     }
 
     private function registerAssets()

@@ -16,15 +16,20 @@ if (!empty($attributes)) {
                 <?php $errors->output(); ?>
             </div>
         <?php endif; ?>
-        <?php if (is_array($success_msg) && !empty($success_msg)) { ?>
+        <?php
+        if(!empty($success_msg)): ?>
             <div class="alert alert-success">
-                <ul>
-                    <?php foreach ($success_msg as $msg): ?>
-                        <li><?= $msg; ?></li>
-                    <?php endforeach; ?>
-                </ul>
+                <?php if (is_array($success_msg)): ?>
+                    <ul>
+                        <?php foreach ($success_msg as $msg): ?>
+                            <li><?= $msg; ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <?= $success_msg; ?>
+                <?php endif; ?>
             </div>
-        <?php } ?>
+        <?php endif; ?>
     </div>
 </div>
 <form method="post" action="<?= $this->action('submit') ?>">
@@ -72,7 +77,7 @@ if (!empty($attributes)) {
                     <label class="control-label"><?= $captchaLabel; ?></label>
                 <?php
                 endif; ?>
-                <div><?php  $captcha->display(); ?></div>
+                <div><?php  $controller->diaplayCaptcha($captcha, $aftID); ?></div>
                 <div><?php  $captcha->showInput(); ?></div>
             </div>
         </div>
