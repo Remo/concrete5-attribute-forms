@@ -289,7 +289,7 @@ class AttributeForm extends EntityBase
             $label = $ak->getAttributeKeyDisplayName();
             $value = $this->getAttribute($ak, 'display');
 
-            $submittedDataHtml .= '<tr><th>' . h($label) . '</th><td>' . h($value) . '</td>/<tr>';
+            $submittedDataHtml .= '<tr><th>' . h($label) . '</th><td>' . h($value) . '</td></tr>';
         }
         $submittedDataHtml .= '</table>';
 
