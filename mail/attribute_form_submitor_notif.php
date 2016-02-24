@@ -3,5 +3,5 @@ defined('C5_EXECUTE') or die("Access Denied.");
 /* @var $af Concrete\Package\AttributeForms\Entity\AttributeForm */
 $aft           = $af->getTypeObj();
 
-$body = html_entity_decode(nl2br($aft->getFormName()."\r\n"."\r\n".$af->getAsText()."\r\n".Config::get('concrete.site')."\r\n".BASE_URL));
-$bodyHTML = html_entity_decode(nl2br("<p>" . $aft->getFormName()."</p>".$af->getAsText()."<p>".Config::get('concrete.site')."</p>".BASE_URL));
+$body = $aft->getFormName()."\r\n"."\r\n".$af->getAsText()."\r\n".Config::get('concrete.site')."\r\n".BASE_URL;
+$bodyHTML = "<p>" . $aft->getFormName()."</p>".$af->getAsText()."<p>".Config::get('concrete.site')."</p>".BASE_URL;
