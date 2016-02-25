@@ -284,13 +284,13 @@ class AttributeForm extends EntityBase
     public function getAsHtml()
     {
         $aft = $this->getTypeObj();
-
+        $configHtmLawed = array('safe'=>1);
         $submittedDataHtml = '<table>';
         foreach ($aft->getAttributeObjects() as $ak) {
             $label = $ak->getAttributeKeyDisplayName();
             $value = $this->getAttribute($ak, 'display');
 
-            $submittedDataHtml .= '<tr><th>' . HtmLawed::htmLawed($label) . '</th><td>' . HtmLawed::htmLawed($value) . '</td></tr>';
+            $submittedDataHtml .= '<tr><th>' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th><td>' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
         }
         $submittedDataHtml .= '</table>';
 
