@@ -4,6 +4,7 @@ namespace Concrete\Package\AttributeForms\Entity;
 use Concrete\Core\Attribute\Key\Key as AttributeKey;
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Attribute\Value\AttributeFormValue;
+use Concrete\Package\AttributeForms\HtmLawed;
 use Database,
     DateTime;
 
@@ -273,8 +274,8 @@ class AttributeForm extends EntityBase
             $label = $ak->getAttributeKeyDisplayName();
             $value = $this->getAttribute($ak, 'display');
 
-            $submittedData .= $label . "\r\n";
-            $submittedData .= $value ."\r\n"."\r\n";
+            $submittedData .= h($label) . "\r\n";
+            $submittedData .= h($value) ."\r\n"."\r\n";
         }
 
         return $submittedData;
@@ -283,13 +284,13 @@ class AttributeForm extends EntityBase
     public function getAsHtml()
     {
         $aft = $this->getTypeObj();
-
+        $configHtmLawed = array('safe'=>1);
         $submittedDataHtml = '<table>';
         foreach ($aft->getAttributeObjects() as $ak) {
             $label = $ak->getAttributeKeyDisplayName();
             $value = $this->getAttribute($ak, 'display');
 
-            $submittedDataHtml .= '<tr><th>' . h($label) . '</th><td>' . h($value) . '</td></tr>';
+            $submittedDataHtml .= '<tr><th>' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th><td>' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
         }
         $submittedDataHtml .= '</table>';
 
