@@ -2,6 +2,7 @@
 
 namespace Concrete\Package\AttributeForms\Service\Form;
 
+use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Closure,
     Core;
 
@@ -32,16 +33,10 @@ class ActionManager
     /**
      *
      * @param string $name
-     * @param Closure $action with 2 args
-     * Example:
-     * <code>
-     *  $instance->register('ActionName', function($app, $args){
-     *      // Your custom code
-     *      // $args array(\Concrete\Package\AttributeForms\Entity\AttributeForm)
-     *  });
-     * </code>
+     * @param string|Closure $action if string "\Full\Class\Name::methodName"
+     * One argument passed to action: object instance of AttributeForm
      */
-    public function register($name, Closure $action)
+    public function register($name, $action)
     {
         $this->actions[$name] = $action;
     }
@@ -55,12 +50,21 @@ class ActionManager
         return array_keys(static::getInstance()->actions);
     }
 
-    public static function runAction($name, $parameters = array())
+    public static function runAction($name, AttributeForm $form)
     {
-
         if (!isset(static::getInstance()->actions[$name])) {
             throw new Exception(t('Undefined Action given "%s"', $name));
         }
-        return Core::make(static::getInstance()->actions[$name], $parameters);
+
+        $action = static::getInstance()->actions[$name];
+        if ($action instanceof Closure) {
+            $callable = $action;
+        } else {
+            $class      = reset(explode('::', $action));
+            $methodName = end(explode('::', $action));
+            $callable   = array(Core::make($class), $methodName);
+        }
+
+        return call_user_func($callable, $form);
     }
 }

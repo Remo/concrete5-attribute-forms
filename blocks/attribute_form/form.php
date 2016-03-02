@@ -9,6 +9,18 @@
             <?= $form->select('aftID', $formTypes, $aftID);?>
         </div>
     </fieldset>
+    <fieldset>
+        <legend><?= t('Custom Action On Submit')?></legend>
+        <div class="form-group" >
+            <?= $form->select('customAction', $customActions, $customAction);?>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend><?= t('Custom Notifications Handler')?></legend>
+        <div class="form-group" >
+            <?= $form->select('mailerAction', $mailerActions, $mailerAction );?>
+        </div>
+    </fieldset>
 </div>
 <div class="ccm-tab-content" id="ccm-tab-content-atform-options">
     <fieldset>

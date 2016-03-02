@@ -12,7 +12,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'attribute_forms';
     protected $appVersionRequired = '5.7.5.2';
-    protected $pkgVersion = '0.9.9.3';
+    protected $pkgVersion = '0.9.9.4';
 
     protected $pkgAutoloaderMapCoreExtensions = true;
     
@@ -64,6 +64,12 @@ class Controller extends Package
         Route::registerMultiple(array(
             '/ccm/attribute_forms/tools/captcha/{atFormTypeID}' => array('\Concrete\Package\AttributeForms\Controller\Tools::displayCaptchaPicture'),
         ));
+        
+        // Test
+        Service\Form\ActionManager::getInstance()->register('hey', function($form){
+            echo 'Goooooooood From Controller' . $form->getID();
+        });
+        Service\Form\ActionManager::getInstance()->register('hey2', '\Concrete\Package\AttributeForms\MeschApp::some');
     }
 
     private function registerAssets()

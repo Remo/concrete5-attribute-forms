@@ -75,6 +75,20 @@ class Controller extends BlockController
         $attFormTypeLst->sortByFormName();
         $formTypes      = $attFormTypeLst->getArray();
         $this->set('formTypes', $formTypes);
+
+        $customActions = array('' => '** '.t('None'));
+        foreach (ActionManager::get() as $actionName){
+            $customActions[$actionName] = t($actionName);
+        }
+
+        $this->set('customActions', $customActions);
+
+        $mailerActions = array('' => '** '.t('None'));
+        foreach (MailerManager::get() as $actionName){
+            $mailerActions[$actionName] = t($actionName);
+        }
+
+        $this->set('mailerActions', $mailerActions);
     }
 
     public function edit()
@@ -197,8 +211,10 @@ class Controller extends BlockController
         }
 
         if (!$foundSpam) {
-            ActionManager::runAction($this->customAction, array($af));
-
+            if(!empty($this->customAction)){
+                ActionManager::runAction($this->customAction, $af);
+            }
+            
             if (intval($this->notifyMeOnSubmission) > 0) {
                 $this->sendNotificationMailToAdmin($af);
             }
