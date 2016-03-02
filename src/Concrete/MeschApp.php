@@ -76,4 +76,10 @@ class MeschApp
     {
         return self::pkg()->getFileConfig();
     }
+
+    // JUST FOR TEST
+    public function sendMail($form, $notifyAdminOnSubmission, $notifySubmitor, $adminEmail){
+        $v = \View::getInstance();
+        $v->addFooterItem("<script>alert('Custom Handler For Mail Executed $notifyAdminOnSubmission, $notifySubmitor, $adminEmail');</script>");
+    }
 }

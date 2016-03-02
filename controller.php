@@ -66,10 +66,11 @@ class Controller extends Package
         ));
         
         // Test
-        Service\Form\ActionManager::getInstance()->register('hey', function($form){
-            echo 'Goooooooood From Controller' . $form->getID();
+        Service\Form\ActionManager::getInstance()->register('Test Custom Action', function(Entity\AttributeForm $form){
+            $v = \View::getInstance();
+            $v->addFooterItem('<script>alert("Custom Action Executed For form '.$form->getTypeName().'");</script>');
         });
-        Service\Form\ActionManager::getInstance()->register('hey2', '\Concrete\Package\AttributeForms\MeschApp::some');
+        Service\Form\MailerManager::getInstance()->register('Test Custom Mail Handler', '\Concrete\Package\AttributeForms\MeschApp::sendMail');
     }
 
     private function registerAssets()

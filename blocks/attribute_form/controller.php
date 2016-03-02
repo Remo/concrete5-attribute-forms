@@ -211,23 +211,29 @@ class Controller extends BlockController
         }
 
         if (!$foundSpam) {
-            if(!empty($this->customAction)){
+            if (!empty($this->customAction)) {
                 ActionManager::runAction($this->customAction, $af);
             }
-            
-            if (intval($this->notifyMeOnSubmission) > 0) {
-                $this->sendNotificationMailToAdmin($af);
-            }
 
-            if (intval($this->notifySubmitor) > 0) {
-                $this->sendNotificationsMailToSubmitor($af);
+            if (!empty($this->mailerAction)) {
+                MailerManager::runAction($this->mailerAction, 
+                    $af, $this->notifyMeOnSubmission,
+                    $this->notifySubmitor, $this->recipientEmail);
+            } else {
+                if (intval($this->notifyMeOnSubmission) > 0) {
+                    $this->sendNotificationMailToAdmin($af);
+                }
+
+                if (intval($this->notifySubmitor) > 0) {
+                    $this->sendNotificationsMailToSubmitor($af);
+                }
             }
 
             Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
-            $this->redirectToView(h(t($this->thankyouMsg)));
+            //$this->redirectToView(h(t($this->thankyouMsg)));
         }
 
-        $this->redirectToView();
+        //$this->redirectToView();
     }
 
     private function sendNotificationMailToAdmin(AttributeForm $af)

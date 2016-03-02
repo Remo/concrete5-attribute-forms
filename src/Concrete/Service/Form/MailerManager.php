@@ -1,26 +1,27 @@
 <?php
+
 namespace Concrete\Package\AttributeForms\Service\Form;
 
-class MailerManager extends ActionManager
+use Concrete\Package\AttributeForms\Entity\AttributeForm;
+
+class MailerManager extends AbstractActionManager
 {
     /**
      * @var null|self
      */
-    private static $loc = null;
-
-    private function __construct()
-    {
-
-    }
+    protected static $loc = null;
 
     /**
-     * @return MailerManager
+     * Run saved action
+     * @param string $name
+     * @param AttributeForm $form
+     * @param boolean $notifyAdminOnSubmission
+     * @param boolean $notifySubmitor
+     * @param string $adminEmail
+     * @return mixed
      */
-    public static function getInstance()
+    public static function runAction($name, AttributeForm $form, $notifyAdminOnSubmission, $notifySubmitor, $adminEmail)
     {
-        if (null === self::$loc) {
-            self::$loc = new self;
-        }
-        return self::$loc;
+        return parent::run($name, array($form, $notifyAdminOnSubmission, $notifySubmitor, $adminEmail));
     }
 }
