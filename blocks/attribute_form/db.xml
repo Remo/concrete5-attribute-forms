@@ -30,5 +30,7 @@
             <default value="0"/>
             <notnull/>
         </field>
+        <field name="customAction" type="string"></field>
+        <field name="mailerAction" type="string"></field>
     </table>
 </schema>

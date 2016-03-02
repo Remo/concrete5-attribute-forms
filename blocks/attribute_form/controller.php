@@ -9,6 +9,8 @@ use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
 use Concrete\Package\AttributeForms\MeschApp;
+use Concrete\Package\AttributeForms\Service\Form\ActionManager;
+use Concrete\Package\AttributeForms\Service\Form\MailerManager;
 use Concrete\Core\Block\BlockController;
 use UserInfo,
     Events,
@@ -195,6 +197,8 @@ class Controller extends BlockController
         }
 
         if (!$foundSpam) {
+            ActionManager::runAction($this->customAction, array($af));
+
             if (intval($this->notifyMeOnSubmission) > 0) {
                 $this->sendNotificationMailToAdmin($af);
             }
