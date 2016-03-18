@@ -113,6 +113,12 @@ class Controller extends BlockController
             $data['displayCaptcha'] = 0;
         }
 
+        // Clean up Extra Spaces between emails
+        if(!empty($data['recipientEmail'])){
+            $emails = array_map('trim', explode(',',$data['recipientEmail']));
+            $data['recipientEmail'] = implode(',', $emails);
+        }
+
         parent::save($data);
     }
 
