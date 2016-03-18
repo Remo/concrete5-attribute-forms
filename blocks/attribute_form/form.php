@@ -1,6 +1,7 @@
 <?php print Core::make('helper/concrete/ui')->tabs(array(
 	array('atform-general', t('General'), true),
 	array('atform-options', t('Options')),
+        array('atform-extra', t('Additional Actions')),
 ));?>
 <div class="ccm-tab-content" id="ccm-tab-content-atform-general">
     <fieldset>
@@ -9,19 +10,8 @@
             <?= $form->select('aftID', $formTypes, $aftID);?>
         </div>
     </fieldset>
-    <fieldset>
-        <legend><?= t('Custom Action On Submit')?></legend>
-        <div class="form-group" >
-            <?= $form->select('customAction', $customActions, $customAction);?>
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend><?= t('Custom Notifications Handler')?></legend>
-        <div class="form-group" >
-            <?= $form->select('mailerAction', $mailerActions, $mailerAction );?>
-        </div>
-    </fieldset>
 </div>
+
 <div class="ccm-tab-content" id="ccm-tab-content-atform-options">
     <fieldset>
         <div class="form-group">
@@ -64,3 +54,26 @@
         </div>
     </fieldset>
 </div>
+
+<div class="ccm-tab-content" id="ccm-tab-content-atform-extra">
+    <div class="ccm-atform-action-block-container">
+        <button type="button" class="btn btn-success ccm-add-atform-action-entry pull-right"><?= t('Add Action'); ?></button>
+        <div class="clearfix"></div>
+        <div class="ccm-atform-action-entries">
+
+        </div>
+    </div>
+</div>
+
+<?php $view->inc('elements/action_form_template.php'); ?>
+
+<script type="text/javascript">
+    var CCM_EDITOR_SECURITY_TOKEN = "<?= Core::make('token')->generate('editor'); ?>";
+    $(function(){
+        ATTR_FORM_BLOCK.init({
+            actionTypes: <?=json_encode($actionTypes);?>,
+            actions: [],
+            confirmMessage: '<?= t('Are you sure?'); ?>'
+        });
+    });
+</script>

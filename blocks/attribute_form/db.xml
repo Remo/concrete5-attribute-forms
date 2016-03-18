@@ -33,4 +33,17 @@
         <field name="customAction" type="string"></field>
         <field name="mailerAction" type="string"></field>
     </table>
+    <table name="btAttributeFormAction">
+        <field name="ID" type="integer">
+            <unsigned/>
+            <autoincrement/>
+            <key/>
+        </field>
+        <field name="bID" type="integer">
+            <unsigned/>
+        </field>
+        <field name="actionName" type="string"></field>
+        <field name="actionType" type="string"></field>
+        <field name="actionData" type="text"></field>
+    </table>
 </schema>
