@@ -1,4 +1,19 @@
 var attributeFormsApp = {
+    initFormTypesList: function (params) {
+       $('#mesch-ftypes-list').on('click', '.delete-form-type',function(e){
+            var $thiz = $(this);
+            var ftypeName = $thiz.closest('tr').find('.form-type-name').text();
+            MeschAlertDialog.confirm('', params.deleteFType.msg+'<br/>"'+ftypeName+'"',
+                                         params.deleteFType.ok,
+                                         params.deleteFType.cancel,
+                                         function(){
+                                             window.location.href = $thiz.attr('href');
+                                         }
+                                    );
+            
+            return false;
+        });  
+    },
     initFormTypesView: function (params) {
         this.initRedactor();
         
