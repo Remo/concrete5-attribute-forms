@@ -16,9 +16,8 @@
                 var action = this.params.actions[i];
                 this.addEntry(action);
             }
-
+            
             this.doSortCount();
-
             this.setupAddEntryAction();
             this.setupEditEntryAction();
             this.setupDeleteEntryAction();
@@ -27,10 +26,17 @@
             this.attachRedactor(this.formActionsContainer.find('.redactor-content'));
             $('#ccm-tab-content-atform-extra').on('change', 'select.actionTypeSelect', function(e){
                 var actionID = $(this).closest('.ccm-atform-action-entry').find('.ccm-atform-action-id').val();
+                var entry = ATTR_FORM_BLOCK.getActionByID(actionID);
+
                 $.post(CCM_DISPATCHER_FILENAME + '/ccm/attribute_forms/tools/form/action_type/render/'+$(this).val()+'/form',
-                    {"value": JSON.stringify({ID: actionID})}, function(data){
+                    {"value": JSON.stringify(entry)}, function(data){
                     $("#actionTypeForm"+actionID).html(data);
                 });
+            });
+            
+            this.formActionsContainer.find('.ccm-atform-action-entry').each(function() {
+                var $thiz = $(this);
+                setTimeout(function(){$thiz.find('.form-group').not('.first').hide();},1000);
             });
         },
         attachFileManagerLaunch: function($obj) {
@@ -76,12 +82,12 @@
         },
         setupEditEntryAction: function(){
             this.formActionsContainer.on('click','.ccm-edit-atform-action', function() {
-                $(this).closest('.ccm-atform-action-entry').find('.form-group').not('.first').slideToggle();
-                var thisEditButton = $(this).closest('.ccm-atform-action-entry').find('.btn.ccm-edit-atform-action');
-                if (thisEditButton.data('entryEditText') === thisEditButton.text()) {
-                    thisEditButton.text(thisEditButton.data('entryCloseText'));
-                } else if (thisEditButton.data('entryCloseText') === thisEditButton.text()) {
-                    thisEditButton.text(thisEditButton.data('entryEditText'));
+                if ($(this).data('entryEditText') === $(this).text()) {
+                    $(this).closest('.ccm-atform-action-entry').find('.form-group').not('.first').slideDown();
+                    $(this).text($(this).data('entryCloseText'));
+                } else if ($(this).data('entryCloseText') === $(this).text()) {
+                    $(this).closest('.ccm-atform-action-entry').find('.form-group').not('.first').slideUp();
+                    $(this).text($(this).data('entryEditText'));
                 }
             });  
         },
@@ -98,9 +104,10 @@
           $('.ccm-add-atform-action-entry').click(function() {
                 var thisModal = $(this).closest('.ui-dialog-content');
                 ATTR_FORM_BLOCK.addEntry({
-                    ID: ATTR_FORM_BLOCK.uniqid(),
+                    ID: ATTR_FORM_BLOCK.uniqid('atf_'),
                     actionName: '',
-                    actionType: ''
+                    actionType: '',
+                    executionOrder: '',
                 });
 
                 $('.ccm-atform-action-entry').not('.entry-closed').each(function() {
@@ -168,6 +175,13 @@
             }
 
             return retId;
+        },
+        getActionByID: function(actionID) {
+            for (var i = 0, len = this.params.actions.length; i < len; i++) {
+                if (this.params.actions[i].ID === actionID)
+                    return this.params.actions[i];
+            }
+            return {ID: actionID};
         }
     };
 }(window, $);

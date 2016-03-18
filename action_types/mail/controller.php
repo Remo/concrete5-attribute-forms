@@ -14,14 +14,13 @@ class Controller extends AbstractController
         return MeschApp::pkgHandle();
     }
 
-    public function validateForm($data = array())
+    public function validateForm(array $data, $actionID)
     {
-        if(!empty($data)){
-            $this->getValue()->setActionData($actionData);
-        }
+        $value = $this->getValue();
+        $value->setActionData($this->getParsedData($data, $actionID));
         
         $val = Core::make('helper/validation/form');
-        $val->setData($this->getValue()->getDataArray());
+        $val->setData($value->getDataArray());
         $val->addRequired('mailSubject', t('Please fill Mail Subject'));
         $val->addRequired('mailBody', t('Please fill Mail Body'));
 

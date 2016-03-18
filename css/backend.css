@@ -47,9 +47,6 @@
     display: block;
     margin-bottom: 0px;
 }
-.ccm-atform-action-entry.entry-closed .form-group:first-of-type label {
-    display: none;
-}
 .ccm-atform-action-block-container .btn.ccm-edit-atform-action {
     position: absolute;
     top: 10px;

@@ -10,7 +10,7 @@
     <div class="col-xs-12 col-sm-5">
         <div class="form-group">
             <?= $form->label($controller->field('mailBody'), t('Body').'<span class="text-danger required">*</span>'); ?>
-            <?= $form->textarea($controller->field('mailBody'), $controller->fieldValue('mailBody')); ?>
+            <?= $form->textarea($controller->field('mailBody'), $controller->fieldValue('mailBody'), array('class'=>'redactor-content')); ?>
         </div>
     </div>
 </div>

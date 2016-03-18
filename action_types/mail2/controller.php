@@ -14,7 +14,7 @@ class Controller extends AbstractController
         return MeschApp::pkgHandle();
     }
 
-    public function validateForm($data = array())
+    public function validateForm(array $data, $actionID)
     {
         if(!empty($data)){
             $this->getValue()->setActionData($actionData);

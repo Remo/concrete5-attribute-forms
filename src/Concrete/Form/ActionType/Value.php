@@ -9,14 +9,15 @@ class Value
     protected $actionName;
     protected $actionType;
     protected $actionData;
-
+    protected $executionOrder;
+    
     private $data;
 
     public function __construct($row = array())
     {
         $this->setPropertiesFromArray($row);
         if(empty($this->ID)){
-            $this->ID = uniqid();
+            $this->ID = uniqid('atf_');
         }
     }
     

@@ -64,6 +64,7 @@ class Controller extends BlockController
     public function edit()
     {
         $this->add();
+        $this->set('customActions', $this->getCustomFormActions());
     }
 
     public function view()
@@ -98,6 +99,7 @@ class Controller extends BlockController
                 'actionName' => $row['actionName'],
                 'actionType' => $row['actionType'],
                 'actionData' => $row['actionData'],
+                'executionOrder' => $row['executionOrder']
             ))->execute();
         }
     }
@@ -122,15 +124,18 @@ class Controller extends BlockController
 
         parent::save($data);
 
-        $db = \Database::connection();
+        $db = Database::connection();
         $db->delete('btAttributeFormAction', ['bID' => $this->bID]);
         if(is_array($data['customActions'])){
             for ($i = 0; $i < count($data['customActions']); $i++) {
+                $at = ActionTypeFactory::getByHandle($data['actionType'][$i]);
+                $actionData = $at->getParsedData($data, $data['actionID'][$i]);
                 $db->insert('btAttributeFormAction',[
                     'bID' => $this->bID,
                     'actionName' => $data['actionName'][$i],
                     'actionType' => $data['actionType'][$i],
-                    'actionData' => $data['actionData'][$i]
+                    'actionData' => $actionData,
+                    'executionOrder' => $i
                 ]);
             }
         }
@@ -147,19 +152,20 @@ class Controller extends BlockController
 
     public function validate($args)
     {
-        if(is_array($args['customActions'])){
+        if (is_array($args['customActions'])) {
             for ($i = 0; $i < count($args['customActions']); $i++) {
+                $actionName = trim($args['actionName'][$i]);
+                if (empty($actionName)) {
+                    $this->errors->add(t('The Action Name cannot be empty'));
+                }
                 $actionType = ActionTypeFactory::getByHandle($args['actionType'][$i]);
-                $e = $actionType->validateForm($args);
-                $db->insert('btAttributeFormAction',[
-                    'bID' => $this->bID,
-                    'actionName' => $data['actionName'][$i],
-                    'actionType' => $data['actionType'][$i],
-                    'actionData' => $data['actionData'][$i]
-                ]);
+                $e = $actionType->validateForm($args, $args['actionID'][$i]);
+                if ($e instanceof \Concrete\Core\Error\Error) {
+                    $this->errors->add($e);
+                }
             }
         }
-        return true;
+        return $this->errors;
     }
 
     public function action_submit($bID = false)
@@ -339,7 +345,8 @@ class Controller extends BlockController
     {
         $db = Database::connection();
         $qb = $db->createQueryBuilder()->select('*')->from('btAttributeFormAction');
-        $qb->where($qb->expr()->eq('bID', ':bID'))->setParameter('bID', $this->bID);
+        $qb->where($qb->expr()->eq('bID', ':bID'))->setParameter('bID', $this->bID)
+           ->orderBy('executionOrder');
 
         return $qb->execute()->fetchAll();
     }

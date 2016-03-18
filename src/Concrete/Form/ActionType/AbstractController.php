@@ -48,7 +48,7 @@ abstract class AbstractController extends \Concrete\Core\Controller\AbstractCont
         return basename($this->getCurrentDir());
     }
 
-    public function validateForm($data)
+    public function validateForm(array $data, $actionID)
     {
         return true;
     }
@@ -71,6 +71,11 @@ abstract class AbstractController extends \Concrete\Core\Controller\AbstractCont
         }
 
         return $default;
+    }
+
+    public function getParsedData(array $args, $actionID)
+    {
+        return serialize($args[$this->fieldPrefix][$actionID]);
     }
 
     public abstract function execute(AttributeForm $form, array $data = array());

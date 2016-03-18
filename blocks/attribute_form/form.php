@@ -72,7 +72,7 @@
     $(function(){
         ATTR_FORM_BLOCK.init({
             actionTypes: <?=json_encode($actionTypes);?>,
-            actions: [],
+            actions: <?=json_encode($customActions);?>,
             confirmMessage: '<?= t('Are you sure?'); ?>'
         });
     });

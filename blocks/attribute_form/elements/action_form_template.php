@@ -1,7 +1,7 @@
 <?php defined('C5_EXECUTE') or die("Access Denied."); ?>
 
 <script type="text/template" id="formActionTemplate">
-    <div class="ccm-atform-action-entry entry-well entry-closed">
+    <div class="ccm-atform-action-entry entry-well">
         <button type="button" class="btn btn-sm btn-default ccm-edit-atform-action" data-entry-close-text="<?= t('Collapse'); ?>" data-entry-edit-text="<?= t('Edit'); ?>"><?= t('Edit'); ?></button>
         <button type="button" class="btn btn-sm btn-danger ccm-delete-atform-action-entry"><?= t('Remove'); ?></button>
         <i class="fa fa-arrows"></i>
@@ -35,6 +35,6 @@
             
         </div>
         <div class="clearfix"></div>
-        <input class="ccm-atform-action-entry-sort" type="hidden" name="<?= $view->field('customActions'); ?>[]" value=""/>
+        <input class="ccm-atform-action-entry-sort" type="hidden" name="<?= $view->field('customActions'); ?>[]" value="<%=action.executionOrder%>"/>
     </div>
 </script>
