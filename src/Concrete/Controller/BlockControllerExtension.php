@@ -1,13 +1,24 @@
 <?php
-namespace Concrete\Package\AttributeForms\Controller;
+namespace Concrete\Package\Hosting\Controller;
+
+use Concrete\Core\Error\Error;
 
 trait BlockControllerExtension
 {
-    /** @var \Concrete\Core\Error\Error */
+    /** @var Error */
     protected $errors;
+
     protected $success_msg = array();
+
     /** @var \Session */
     protected $session;
+
+
+    protected function bControllerExtensionInit()
+    {
+        $this->errors = new Error();
+        $this->session = $this->app->make('session');
+    }
 
     protected function prepareSessionSets()
     {
@@ -29,7 +40,7 @@ trait BlockControllerExtension
             $this->set('errors', $this->errors);
         }
     }
-    
+
     public function flash($key, $value)
     {
         $this->session->getFlashBag()->add('custom_message', array($key, $value));
@@ -39,7 +50,7 @@ trait BlockControllerExtension
     {
         $this->session->getFlashBag()->add('custom_error', array($key, $value));
     }
-    
+
     protected function urlToAction()
     {
         $c = $this->getCollectionObject();

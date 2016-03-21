@@ -28,10 +28,11 @@
                 var actionID = $(this).closest('.ccm-atform-action-entry').find('.ccm-atform-action-id').val();
                 var entry = ATTR_FORM_BLOCK.getActionByID(actionID);
 
-                $.post(CCM_DISPATCHER_FILENAME + '/ccm/attribute_forms/tools/form/action_type/render/'+$(this).val()+'/form',
-                    {"value": JSON.stringify(entry)}, function(data){
-                    $("#actionTypeForm"+actionID).html(data);
-                });
+                if(entry.actionType == ''){
+                    entry.actionType = $(this).val();
+                }
+                
+                ATTR_FORM_BLOCK.loadActionTypeForm(entry);
             });
             
             this.formActionsContainer.find('.ccm-atform-action-entry').each(function() {
@@ -129,14 +130,17 @@
             var actionID = entry.ID;
             this.formActionsContainer.append(this._templateEntry({action: entry, actionTypes: this.params.actionTypes}));
 
-            var actionType = entry.actionType;
-            if(actionType == ''){
-                actionType = $('#actionType'+actionID).val();
+            if(entry.actionType == ''){
+                entry.actionType = $('#actionType'+actionID).val();
             }
-
-            $.post(CCM_DISPATCHER_FILENAME + '/ccm/attribute_forms/tools/form/action_type/render/'+actionType+'/form',
+            
+            this.loadActionTypeForm(entry);
+        },
+        loadActionTypeForm: function(entry){
+            $.post(CCM_DISPATCHER_FILENAME + '/ccm/attribute_forms/tools/form/action_type/render/'+entry.actionType+'/form',
                 {value: JSON.stringify(entry)}, function(data){
-                $("#actionTypeForm"+actionID).html(data);
+                $("#actionTypeForm"+entry.ID).html(data);
+                ATTR_FORM_BLOCK.attachRedactor($("#actionTypeForm"+entry.ID).find('.redactor-content'));
             });
         },
         uniqid: function (prefix, more_entropy) {
@@ -181,7 +185,7 @@
                 if (this.params.actions[i].ID === actionID)
                     return this.params.actions[i];
             }
-            return {ID: actionID};
+            return {ID: actionID, actionType: ''};
         }
     };
 }(window, $);

@@ -33,7 +33,8 @@ class Controller extends AbstractController
     
     public function execute(AttributeForm $form, array $data = array())
     {
-        
+        $afs = Core::make('mesch/atf/string', array($form));
+        $afs->parse();
     }
 
 }

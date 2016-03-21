@@ -41,8 +41,7 @@ class Controller extends BlockController
     {
         parent::__construct($obj);
         $this->setApplication(Core::getFacadeApplication());
-        $this->errors  = new \Concrete\Core\Error\Error();
-        $this->session = $this->app->make('session');
+        $this->bControllerExtensionInit();
     }
 
     public function on_before_render()
@@ -59,6 +58,7 @@ class Controller extends BlockController
         $this->set('formTypes', $attFormTypeLst->getArray());
         $this->set('actionTypes', ActionTypeFactory::get());
         $this->requireAsset('css', 'mesch/attribute_form/backend');
+        $this->requireAsset('redactor');
     }
 
     public function edit()
