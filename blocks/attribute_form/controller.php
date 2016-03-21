@@ -2,15 +2,17 @@
 
 namespace Concrete\Package\AttributeForms\Block\AttributeForm;
 
-use Concrete\Core\Validation\CSRF\Token;
-use Concrete\Package\AttributeForms\Entity\AttributeFormType;
+use Concrete\Core\Block\BlockController;
+use Concrete\Package\AttributeForms\Controller\BlockControllerExtension;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
+use Concrete\Package\AttributeForms\Entity\AttributeFormType;
 use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
+use Concrete\Package\AttributeForms\Form\ActionType\Factory as ActionTypeFactory;
 use Concrete\Package\AttributeForms\MeschApp;
-use Concrete\Core\Block\BlockController;
-use UserInfo,
+use Concrete\Core\User\UserInfo,
+    Database,
     Events,
     Config,
     Core;
@@ -23,9 +25,7 @@ class Controller extends BlockController
     protected $btInterfaceHeight = "365";
     protected $helpers           = ['form'];
 
-    /** @var \Concrete\Core\Error\Error */
-    private $errors;
-    private $success_msg = array();
+    use BlockControllerExtension;
 
     public function getBlockTypeName()
     {
@@ -40,44 +40,31 @@ class Controller extends BlockController
     public function __construct($obj = null)
     {
         parent::__construct($obj);
-        $this->errors      = new \Concrete\Core\Error\Error();
+        $this->setApplication(Core::getFacadeApplication());
+        $this->bControllerExtensionInit();
     }
 
     public function on_before_render()
     {
         parent::on_before_render();
-
-        $session = Core::make('session');
-        if ($session->getFlashBag()->has('custom_message')) {
-            $value = $session->getFlashBag()->get('custom_message');
-            foreach ($value as $message) {
-                $this->set($message[0], $message[1]);
-            }
-        } else {
-            $this->set('success_msg', $this->success_msg);
-        }
-
-        if ($session->getFlashBag()->has('custom_error')) {
-            $value = $session->getFlashBag()->get('custom_error');
-            foreach ($value as $message) {
-                $this->set($message[0], $message[1]);
-            }
-        } else {
-            $this->set('errors', $this->errors);
-        }
+        $this->prepareSessionSets();
     }
     
     public function add()
     {
         $attFormTypeLst = new AttributeFormTypeList();
         $attFormTypeLst->sortByFormName();
-        $formTypes      = $attFormTypeLst->getArray();
-        $this->set('formTypes', $formTypes);
+
+        $this->set('formTypes', $attFormTypeLst->getArray());
+        $this->set('actionTypes', ActionTypeFactory::get());
+        $this->requireAsset('css', 'mesch/attribute_form/backend');
+        $this->requireAsset('redactor');
     }
 
     public function edit()
     {
         $this->add();
+        $this->set('customActions', $this->getCustomFormActions());
     }
 
     public function view()
@@ -88,13 +75,35 @@ class Controller extends BlockController
             return;
         }
 
-        $token = new Token();
+        $token = $this->app->make('token');
         $this->set('aftID', $this->aftID);
         $this->set('attributes', $formType->getDecodedAttributes());
         $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
         $this->set('token', $token->generate('attribute_form_'.$this->bID));
     }
 
+    public function duplicate($newBID)
+    {
+        parent::duplicate($newBID);
+        $db = Database::connection();
+        $qb = $db->createQueryBuilder()->insert('btAttributeFormAction')->values(array(
+            'bID' => ':bID', 'actionName' => ':actionName',
+            'actionType' => ':actionType', 'actionData' => ':actionData'
+        ));
+
+        $r = $this->getCustomFormActions();
+        foreach ($r as $row) {
+            $qbc = clone $qb;
+            $qbc->setParameters(array(
+                'bID' => $newBID,
+                'actionName' => $row['actionName'],
+                'actionType' => $row['actionType'],
+                'actionData' => $row['actionData'],
+                'executionOrder' => $row['executionOrder']
+            ))->execute();
+        }
+    }
+    
     public function save($data)
     {
         if (!isset($data['submitText'])) {
@@ -120,6 +129,49 @@ class Controller extends BlockController
         }
 
         parent::save($data);
+
+        $db = Database::connection();
+        $db->delete('btAttributeFormAction', ['bID' => $this->bID]);
+        if(is_array($data['customActions'])){
+            for ($i = 0; $i < count($data['customActions']); $i++) {
+                $at = ActionTypeFactory::getByHandle($data['actionType'][$i]);
+                $actionData = $at->getParsedData($data, $data['actionID'][$i]);
+                $db->insert('btAttributeFormAction',[
+                    'bID' => $this->bID,
+                    'actionName' => $data['actionName'][$i],
+                    'actionType' => $data['actionType'][$i],
+                    'actionData' => $actionData,
+                    'executionOrder' => $i
+                ]);
+            }
+        }
+    }
+
+    public function delete()
+    {
+        $qb = Database::connection()->createQueryBuilder();
+        $qb->delete('btAttributeFormAction')->where($qb->expr()->eq('bID', ':bID'))
+            ->setParameter('bID', $this->bID)->execute();
+
+        parent::delete();
+    }
+
+    public function validate($args)
+    {
+        if (is_array($args['customActions'])) {
+            for ($i = 0; $i < count($args['customActions']); $i++) {
+                $actionName = trim($args['actionName'][$i]);
+                if (empty($actionName)) {
+                    $this->errors->add(t('The Action Name cannot be empty'));
+                }
+                $actionType = ActionTypeFactory::getByHandle($args['actionType'][$i]);
+                $e = $actionType->validateForm($args, $args['actionID'][$i]);
+                if ($e instanceof \Concrete\Core\Error\Error) {
+                    $this->errors->add($e);
+                }
+            }
+        }
+        return $this->errors;
     }
 
     public function action_submit($bID = false)
@@ -132,14 +184,14 @@ class Controller extends BlockController
 
         Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
 
-        $ip = Core::make('helper/validation/ip');
+        $ip = $this->app->make('helper/validation/ip');
         if ($ip->isBanned()) {
             $this->errors->add($ip->getErrorMessage());
             return;
         }
 
         // check CSRF token
-        $token = new Token();
+        $token = $this->app->make('token');
         if (!$token->validate('attribute_form_'.$this->bID, $this->post('_token'))) {
             throw new \Exception('Invalid token');
         }
@@ -176,7 +228,7 @@ class Controller extends BlockController
         }
         
         // create new form entry
-        $af    = new AttributeForm();
+        $af = new AttributeForm();
         $af->setTypeID($aftID);
         $af->save();
 
@@ -188,7 +240,7 @@ class Controller extends BlockController
 
         // check SPAM
         $submittedData = $af->getAttributeDataString();
-        $antispam      = Core::make('helper/validation/antispam');
+        $antispam      = $this->app->make('helper/validation/antispam');
         $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
         
         if ($foundSpam) {
@@ -201,6 +253,12 @@ class Controller extends BlockController
         }
 
         if (!$foundSpam) {
+            foreach ($this->getCustomFormActions() as $customAction) {
+                ActionTypeFactory::execute(
+                    $customAction, [$af, ['recipientEmail' => $this->recipientEmail]]
+                );
+            }
+
             if (intval($this->notifyMeOnSubmission) > 0) {
                 $this->sendNotificationMailToAdmin($af);
             }
@@ -210,7 +268,7 @@ class Controller extends BlockController
             }
 
             Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
-            $this->redirectToView(h(t($this->thankyouMsg)));
+            $this->flash('message', h(t($this->thankyouMsg)));
         }
 
         $this->redirectToView();
@@ -281,23 +339,20 @@ class Controller extends BlockController
         @$mh->sendMail();
     }
 
-    private function redirectToView($message = false, $errors = false)
+    /**
+     * Get list of defined form actions
+     * @return array
+     */
+    public function getCustomFormActions()
     {
-        $session = Core::make('session');
+        $db = Database::connection();
+        $qb = $db->createQueryBuilder()->select('*')->from('btAttributeFormAction');
+        $qb->where($qb->expr()->eq('bID', ':bID'))->setParameter('bID', $this->bID)
+           ->orderBy('executionOrder');
 
-        if ($message) {
-            $session->getFlashBag()->add('custom_message', array('success_msg', $message));
-        }
-
-        if ($errors) {
-            $session->getFlashBag()->add('custom_error', array('errors', $errors));
-        }
-
-        $arguments = array($this->getCollectionObject());
-        $url       = call_user_func_array(array('\URL', 'to'), $arguments);
-        $this->redirect($url.'?'.http_build_query($_GET));
+        return $qb->execute()->fetchAll();
     }
-
+    
     /**
      * Use this method to display captcha image since the core tools
      * uses the Default Active Captcha that is set in C5 Settings
@@ -306,7 +361,7 @@ class Controller extends BlockController
      */
     public function diaplayCaptcha($captcha, $aftID)
     {
-        $ci   = Core::make('helper/concrete/urls');
+        $ci   = $this->app->make('helper/concrete/urls');
         $pictureDispURL = $ci->getToolsURL('captcha');
 
         $meschPictureDispURL = \URL::to('/ccm/attribute_forms/tools/captcha/', $aftID);
