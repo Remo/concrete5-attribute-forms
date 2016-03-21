@@ -222,7 +222,7 @@ class Controller extends BlockController
         }
         
         // create new form entry
-        $af    = new AttributeForm();
+        $af = new AttributeForm();
         $af->setTypeID($aftID);
         $af->save();
 
