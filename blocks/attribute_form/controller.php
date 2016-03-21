@@ -247,8 +247,10 @@ class Controller extends BlockController
         }
 
         if (!$foundSpam) {
-            if (!empty($this->customAction)) {
-                ActionTypeFactory::execute($this->customAction, $af, ['recipientEmail' => $this->recipientEmail]);
+            foreach ($this->getCustomFormActions() as $customAction) {
+                ActionTypeFactory::execute(
+                    $customAction, [$af, ['recipientEmail' => $this->recipientEmail]]
+                );
             }
 
             if (intval($this->notifyMeOnSubmission) > 0) {

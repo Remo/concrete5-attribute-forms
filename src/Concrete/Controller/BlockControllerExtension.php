@@ -1,5 +1,5 @@
 <?php
-namespace Concrete\Package\Hosting\Controller;
+namespace Concrete\Package\AttributeForms\Controller;
 
 use Concrete\Core\Error\Error;
 

@@ -2,7 +2,8 @@
 namespace Concrete\Package\AttributeForms\Form\ActionType;
 
 use Concrete\Package\AttributeForms\Form\ActionType\AbstractController;
-use Concrete\Package\AttributeForms\Form\ActionType\View as ActionTypeView;
+use Concrete\Package\AttributeForms\Form\ActionType\View  as ActionTypeView;
+use Concrete\Package\AttributeForms\Form\ActionType\Value as ActionTypeValue;
 use Concrete\Package\AttributeForms\MeschApp;
 use Exception,
     Core;
@@ -92,10 +93,12 @@ class Factory
         return $factory->app->make("mesch/form/action/$handle");
     }
 
-    public static function execute($handle, array $args = array())
+    public static function execute(array $customActionValue, array $args = array())
     {
-        $callable = array(static::getByHandle($handle), 'execute');
-        return call_user_func_array($callable, $args);
+        $value  = new ActionTypeValue($customActionValue);
+        $action = static::getByHandle($value->getActionType());
+        $action->setValue($value);
+        return call_user_func_array(array($action, 'execute'), $args);
     }
 
     public static function render($handle, $view, $value = false, $return = false)
