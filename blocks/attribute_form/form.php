@@ -3,6 +3,7 @@
 	array('atform-options', t('Options')),
         array('atform-extra', t('Additional Actions')),
 ));?>
+
 <div class="ccm-tab-content" id="ccm-tab-content-atform-general">
     <fieldset>
         <legend><?= t('Form Type')?></legend>
@@ -71,8 +72,8 @@
     var CCM_EDITOR_SECURITY_TOKEN = "<?= Core::make('token')->generate('editor'); ?>";
     $(function(){
         ATTR_FORM_BLOCK.init({
-            actionTypes: <?=json_encode($actionTypes);?>,
-            actions: <?=json_encode($customActions);?>,
+            actionTypes: <?= json_encode($actionTypes ? : []); ?>,
+            actions: <?= json_encode($customActions ? : []); ?>,
             confirmMessage: '<?= t('Are you sure?'); ?>'
         });
     });

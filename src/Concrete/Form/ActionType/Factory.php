@@ -32,12 +32,11 @@ class Factory
     }
 
     /**
-     * Register Built-in payment methods
+     * Register Built-in action types
      */
     public function registerDefaults()
     {
         $this->register('mail', MeschApp::pkgHandle());
-        $this->register('mail2', MeschApp::pkgHandle());
     }
     
     /**
