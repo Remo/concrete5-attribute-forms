@@ -13,6 +13,7 @@ abstract class AbstractController extends \Concrete\Core\Controller\AbstractCont
     public function __construct()
     {
         parent::__construct();
+        $this->setApplication(\Core::getFacadeApplication());
         $this->set('controller', $this);
         $this->setValue(new ActionTypeValue());
     }

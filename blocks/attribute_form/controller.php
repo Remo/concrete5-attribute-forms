@@ -178,7 +178,7 @@ class Controller extends BlockController
 
         Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
 
-        $ip = Core::make('helper/validation/ip');
+        $ip = $this->app->make('helper/validation/ip');
         if ($ip->isBanned()) {
             $this->errors->add($ip->getErrorMessage());
             return;
@@ -234,7 +234,7 @@ class Controller extends BlockController
 
         // check SPAM
         $submittedData = $af->getAttributeDataString();
-        $antispam      = Core::make('helper/validation/antispam');
+        $antispam      = $this->app->make('helper/validation/antispam');
         $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
         
         if ($foundSpam) {
@@ -248,21 +248,15 @@ class Controller extends BlockController
 
         if (!$foundSpam) {
             if (!empty($this->customAction)) {
-                ActionTypeFactory::execute($this->customAction, $af);
+                ActionTypeFactory::execute($this->customAction, $af, ['recipientEmail' => $this->recipientEmail]);
             }
 
-            if (!empty($this->mailerAction)) {
-                MailerManager::runAction($this->mailerAction, 
-                    $af, $this->notifyMeOnSubmission,
-                    $this->notifySubmitor, $this->recipientEmail);
-            } else {
-                if (intval($this->notifyMeOnSubmission) > 0) {
-                    $this->sendNotificationMailToAdmin($af);
-                }
+            if (intval($this->notifyMeOnSubmission) > 0) {
+                $this->sendNotificationMailToAdmin($af);
+            }
 
-                if (intval($this->notifySubmitor) > 0) {
-                    $this->sendNotificationsMailToSubmitor($af);
-                }
+            if (intval($this->notifySubmitor) > 0) {
+                $this->sendNotificationsMailToSubmitor($af);
             }
 
             Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
@@ -359,7 +353,7 @@ class Controller extends BlockController
      */
     public function diaplayCaptcha($captcha, $aftID)
     {
-        $ci   = Core::make('helper/concrete/urls');
+        $ci   = $this->app->make('helper/concrete/urls');
         $pictureDispURL = $ci->getToolsURL('captcha');
 
         $meschPictureDispURL = \URL::to('/ccm/attribute_forms/tools/captcha/', $aftID);

@@ -3,6 +3,12 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="form-group">
+            <?= $form->label($controller->field('mailTo'), t('To').'<span class="text-danger required">*</span>'); ?>
+            <?= $form->select($controller->field('mailTo'), $controller->mailTos, $controller->fieldValue('mailTo')); ?>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <div class="form-group">
             <?= $form->label($controller->field('mailSubject'), t('Subject').'<span class="text-danger required">*</span>'); ?>
             <?= $form->text($controller->field('mailSubject'), $controller->fieldValue('mailSubject')); ?>
         </div>
