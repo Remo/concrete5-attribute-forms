@@ -102,6 +102,12 @@ class Controller extends Package
         $al  = AssetList::getInstance();
         $al->register('javascript', 'mesch/attribute_form', 'js/attribute.forms.js', array('minify' => true), $this);
         $al->register('css', 'mesch/attribute_form/backend', 'css/backend.css', array('minify' => true), $this);
+        
+        $al->register('javascript', 'mesch/alert', 'js/mesch.alert.dialog.js', array('minify' => true), $this);
+        $al->registerGroup('mesch/alert', array(
+            array('javascript', 'jquery'),
+            array('javascript', 'mesch/alert'),
+        ));
     }
 
     public function uninstall()
