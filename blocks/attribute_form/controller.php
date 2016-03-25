@@ -68,6 +68,11 @@ class Controller extends BlockController
         $this->set('customActions', $this->getCustomFormActions());
     }
 
+    public function registerViewAssets($outputContent = '')
+    {
+        $this->requireAsset('javascript','bootstrap/alert');
+    }
+    
     public function view()
     {
         $formType = AttributeFormType::getByID($this->aftID);
