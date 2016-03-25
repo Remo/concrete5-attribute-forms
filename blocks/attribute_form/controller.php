@@ -225,15 +225,12 @@ class Controller extends BlockController
         
         Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
         $aft = AttributeFormType::getByID($this->aftID);
-        $formPageHandle = $this->securityCheck($aft, $nextFormPageHandle);
         
+        $formPageHandle = $this->securityCheck($aft, $nextFormPageHandle);
         if ($nextFormPageHandle == 'complete') {
             $activeFormPage = $aft->getFormPage($this->post('formPageHandle'));
-            $this->set('prevFormPage', $aft->getPrevFormPage($activeFormPage->handle));
         } else {
             $activeFormPage = $aft->getFormPage($nextFormPageHandle);
-            $this->set('nextFormPage', $aft->getNextFormPage($activeFormPage->handle));
-            $this->set('prevFormPage', $aft->getPrevFormPage($activeFormPage->handle));
         }
 
         if ($this->errors->has()) {
