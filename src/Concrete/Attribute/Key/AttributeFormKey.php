@@ -6,9 +6,13 @@ use Concrete\Core\Attribute\Key\Key as AttributeKey,
     Concrete\Core\Attribute\Value\ValueList as AttributeValueList,
     Database;
 
+use Concrete\Core\Attribute\Type as AttributeType;
+
 class AttributeFormKey extends AttributeKey
 {
 
+    protected $atObj;
+    
     public function getIndexedSearchTable()
     {
         return 'AttributeFormsIndexAttributes';
@@ -152,4 +156,31 @@ class AttributeFormKey extends AttributeKey
         $db->delete('AttributeFormsAttributeValues', array('akID' => $this->getAttributeKeyID()));
     }
 
+    /**
+     * Returns an attribute type object.
+     * @return AttributeType
+     */
+    public function getAttributeType()
+    {
+        if (!is_object($this->atObj)) {
+            $this->atObj = AttributeType::getByID($this->atID);
+        }
+        return $this->atObj;
+    }
+
+    /**
+     * Renders a view for this attribute key. If no view is default we display it's "view"
+     * Valid views are "view", "form" or a custom view (if the attribute has one in its directory)
+     * Additionally, an attribute does not have to have its own interface. If it doesn't, then whatever
+     * is printed in the corresponding $view function in the attribute's controller is printed out.
+     */
+    public function render($view = 'view', $value = false, $return = false)
+    {
+        $resp = $this->getAttributeType()->render($view, $this, $value, $return);
+        if ($return) {
+            return $resp;
+        } else {
+            print $resp;
+        }
+    }
 }

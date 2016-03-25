@@ -182,12 +182,42 @@ class Controller extends BlockController
         return $this->errors;
     }
 
-    public function action_step($nextFormPageHandle, $bID)
+    public function action_step($step, $bID)
     {
         if ($this->bID != $bID) {
             return false;
         }
 
+        $aft = AttributeFormType::getByID($this->aftID);
+        $this->securityCheck($aft, $step);
+
+        if($this->errors->has()){
+            return $this->goBackToCurrentStep();
+        }
+        
+        $this->session->set('attrFormCurrentStep', $step);
+        $this->set('nextFormPage', $aft->getNextFormPage($step));
+        $this->set('prevFormPage', $aft->getPrevFormPage($step));
+        $this->set('formPage', $aft->getFormPage($step));
+        $this->set('token', $this->app->make('token')->generate('attribute_form_'.$this->bID.'_'.$step));
+        $this->set('aftID', $this->aftID);
+        $this->set('captcha', $this->displayCaptcha ? $aft->getCaptchaLibrary() : false);
+        $akIDs = @unserialize($this->session->get('attrForm'));
+        $this->set('requestArray', is_array($akIDs) ? ['akID' => $akIDs] : false);
+    }
+
+    public function action_step_submit($nextFormPageHandle, $bID)
+    {
+        if ($this->bID != $bID) {
+            return false;
+        }
+
+        // Check if is back to previous request
+        if($this->post('previousBtn')){
+            $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
+            return $this->redirect($this->urlToAction('step', $nextFormPageHandle));
+        }
+        
         Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
         $aft = AttributeFormType::getByID($this->aftID);
         $formPageHandle = $this->securityCheck($aft, $nextFormPageHandle);
@@ -201,64 +231,53 @@ class Controller extends BlockController
             $this->set('prevFormPage', $aft->getPrevFormPage($activeFormPage->handle));
         }
 
-        $this->set('formPage', $activeFormPage);
-        $this->set('token', $this->app->make('token')->generate('attribute_form_'.$this->bID.'_'.$activeFormPage->handle));
-        $this->set('aftID', $this->aftID);
-        $this->set('captcha', $this->displayCaptcha ? $aft->getCaptchaLibrary() : false);
-
         if ($this->errors->has()) {
-            $this->redirectToPrevStep();
+            $this->goBackToCurrentStep();
             return;
         }
         
         $formPage = $aft->getFormPage($formPageHandle);
         if (!$formPage) {
             $this->errors->add(t('Invalid step requested'));
-            $this->redirectToPrevStep();
+            $this->goBackToCurrentStep();
             return;
         }
         
-        if(Request::isPost()){
-            // Check if is back to previous request
-            if(Request::getInstance()->request->has('previousBtn')){
-                $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
-                return;
-            }
-            
-            foreach ($formPage->attributes as $attr) {
-                if ($attr->required) {
-                    $ak = AttributeFormKey::getByID($attr->akID);
-                    $e1 = $ak->validateAttributeForm();
-                    if ($e1 == false) {
-                        $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
-                    } else if ($e1 instanceof \Concrete\Core\Error\Error) {
-                        $this->errors->add($e1);
-                    }
+        foreach ($formPage->attributes as $attr) {
+            if ($attr->required) {
+                $ak = AttributeFormKey::getByID($attr->akID);
+                $e1 = $ak->validateAttributeForm();
+                if ($e1 == false) {
+                    $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                    $this->errors->add($e1);
                 }
             }
-
-            if ($this->errors->has()) {
-                $this->redirectToPrevStep();
-                return;
-            }
-
-            $aks    = $this->post('akID');
-            $afVals = $this->session->get('attrForm');
-            if ($afVals) {
-                $aks = unserialize($afVals) + $aks;
-            }
-
-            if ($nextFormPageHandle != 'complete') {
-                $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
-                $this->session->set('attrForm', serialize($aks));
-            } else {
-                $_POST['akID'] = $aks;
-                $this->saveAttributeForm($aft);
-                $this->session->remove('attrFormCurrentStep');
-                $this->session->remove('attrForm');
-                $this->redirectToView();
-            }
         }
+
+        if ($this->errors->has()) {
+            $this->goBackToCurrentStep();
+            return;
+        }
+
+        $aks    = $this->post('akID');
+        $afVals = $this->session->get('attrForm');
+        if ($afVals) {
+            $aks = unserialize($afVals) + $aks;
+        }
+
+        if ($nextFormPageHandle != 'complete') {
+            $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
+            $this->session->set('attrForm', serialize($aks));
+        } else {
+            $_POST['akID'] = $aks;
+            $this->saveAttributeForm($aft);
+            $this->session->remove('attrFormCurrentStep');
+            $this->session->remove('attrForm');
+            $this->redirectToView();
+        }
+
+        $this->redirect($this->urlToAction('step', $nextFormPageHandle));
     }
 
     private function securityCheck($aft, $nextFormPageHandle)
@@ -269,48 +288,44 @@ class Controller extends BlockController
             return;
         }
 
-        if ($this->displayCaptcha && Request::isPost() && !Request::getInstance()->request->has('previousBtn')) {
-            $captcha = $aft->getCaptchaLibrary();
-            if (!$captcha->check()) {
-                $this->errors->add(t("Incorrect captcha code"));
-                $_REQUEST['ccmCaptchaCode'] = '';
-                return;
+        if (Request::isPost()) {
+            if ($this->displayCaptcha && !$this->post('previousBtn')) {
+                if (!$aft->getCaptchaLibrary()->check()) {
+                    $this->errors->add(t("Incorrect captcha code"));
+                    $_REQUEST['ccmCaptchaCode'] = '';
+                    return;
+                }
             }
-        }
 
-        $formPageHandle = $this->post('formPageHandle');
-        if($formPageHandle){
-            // check CSRF token
-            $token = $this->app->make('token');
-            if (!$token->validate('attribute_form_'.$this->bID.'_'.$formPageHandle, $this->post('af_token'))) {
-                $this->errors->add($token->getErrorMessage());
+            $formPageHandle = $this->post('formPageHandle');
+            if ($formPageHandle) {
+                // check CSRF token
+                $token = $this->app->make('token');
+                if (!$token->validate('attribute_form_'.$this->bID.'_'.$formPageHandle,
+                        $this->post('af_token'))) {
+                    $this->errors->add($token->getErrorMessage());
+                }
             }
-        }else{
+        } else {
             // If page reloaded without post request
             $formPageHandle = $this->session->get('attrFormCurrentStep');
-            if (!$formPageHandle) {
+            if (!$formPageHandle || $formPageHandle != $nextFormPageHandle) {
                 $this->errors->add(t('Invalid step requested'));
-                $this->flashError('errors', $this->errors);
-                $this->redirectToView();
-            } elseif ($formPageHandle != $nextFormPageHandle) {
-                $this->errors->add(t('Invalid step requested'));
-                $this->flashError('errors', $this->errors);
-                $this->redirect($this->urlToAction('step', $formPageHandle));
             }
         }
 
         return $formPageHandle;
     }
 
-    private function redirectToPrevStep()
+    private function goBackToCurrentStep()
     {
         $formPageHandle = $this->post('formPageHandle');
         $this->flashError('errors', $this->errors);
 
-        if(!$formPageHandle){
+        if (!$formPageHandle) {
             $this->session->remove('attrFormCurrentStep');
             $this->redirectToView();
-        }else{
+        } else {
             $this->session->set('attrFormCurrentStep', $formPageHandle);
             $this->redirect($this->urlToAction('step', $formPageHandle));
         }

@@ -1,5 +1,6 @@
 <?php
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
+use Concrete\Package\AttributeForms\Attribute\Value\AttributeFormValue;
 
 if (empty($aftID)) {
     echo t('No form type selected');
@@ -21,6 +22,12 @@ if ($formPage) {
                 foreach ($formPage->attributes as $attribute) {
 
                     $attributeObject = AttributeFormKey::getByID($attribute->akID);
+                    $at = $attributeObject->getAttributeType();
+                    $at->getController()->setRequestArray($requestArray);
+                    
+                    $atVal = new AttributeFormValue();
+                    $atVal->setPropertiesFromArray(array('akID' => $attribute->akID, 'atID' => $at->getAttributeTypeID(), 'attributeType' => $at));
+                    $atVal->setAttributeKey($attributeObject);
                     ?>
                     <div class="form-group row attribute-row" id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
                         <label class="col-sm-4 control-label">
@@ -32,7 +39,7 @@ if ($formPage) {
                             ?>
                         </label>
                         <div class="col-sm-8">
-                            <?php $attributeObject->render('form', false); ?>
+                            <?php $attributeObject->render('search', $atVal); ?>
                         </div>
                     </div>
                     <?php
@@ -61,13 +68,14 @@ if ($formPage) {
         <div class="col-sm-offset-4 col-sm-8">
             <span class="small text-muted">* <?=t('Required fields.');?></span>
             <div class="clearfix">
+                <div class="spacer-row-1"></div>
                 <?php if($prevFormPage): ?>
                 <input type="submit" name="previousBtn" class="btn btn-default" value="<?= t('Previous'); ?>"
-                   onclick="javascript:form.action='<?= $this->action('step', $prevFormPage->handle); ?>';" />
+                   onclick="javascript:form.action='<?= $this->action('step_submit', $prevFormPage->handle); ?>';" />
                 <?php endif; ?>
                 <input type="submit" name="Submit" class="btn btn-default pull-right"
                        value="<?= $nextFormPage ? t('Next') : h(t($submitText)); ?>"
-                       onclick="javascript:form.action='<?= $nextFormPage ? $this->action('step', $nextFormPage->handle) : $this->action('step', 'complete'); ?>';"
+                       onclick="javascript:form.action='<?= $nextFormPage ? $this->action('step_submit', $nextFormPage->handle) : $this->action('step_submit', 'complete'); ?>';"
                    />
             </div>
         </div>
