@@ -2,6 +2,7 @@
 namespace Concrete\Package\AttributeForms\Attribute\Value;
 
 use Concrete\Core\Attribute\Value\Value as AttributeValue;
+use Concrete\Core\Attribute\Type as AttributeType;
 use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Database;
 
