@@ -13,6 +13,7 @@ use Concrete\Package\AttributeForms\Form\ActionType\Factory as ActionTypeFactory
 use Concrete\Package\AttributeForms\MeschApp;
 use Concrete\Core\User\UserInfo,
     Database,
+    Request,
     Events,
     Config,
     Core;
@@ -70,16 +71,23 @@ class Controller extends BlockController
     public function view()
     {
         $formType = AttributeFormType::getByID($this->aftID);
-
         if (!is_object($formType)) {
             return;
         }
 
         $token = $this->app->make('token');
+        if (starts_with($this->getCurrentTemplateName(), 'step_by_step')) {
+            $formPage = $formType->getFirstFormPage();
+            $this->set('formPage', $formPage);
+            $this->set('nextFormPage', $formType->getNextFormPage($formPage->handle));
+            $this->set('token', $token->generate('attribute_form_'.$this->bID.'_'.$formPage->handle));
+        } else {
+            $this->set('attributes', $formType->getDecodedAttributes());
+            $this->set('token', $token->generate('attribute_form_'.$this->bID));
+        }
+
         $this->set('aftID', $this->aftID);
-        $this->set('attributes', $formType->getDecodedAttributes());
         $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
-        $this->set('token', $token->generate('attribute_form_'.$this->bID));
     }
 
     public function duplicate($newBID)
@@ -174,6 +182,140 @@ class Controller extends BlockController
         return $this->errors;
     }
 
+    public function action_step($nextFormPageHandle, $bID)
+    {
+        if ($this->bID != $bID) {
+            return false;
+        }
+
+        Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
+        $aft = AttributeFormType::getByID($this->aftID);
+        $formPageHandle = $this->securityCheck($aft, $nextFormPageHandle);
+        
+        if ($nextFormPageHandle == 'complete') {
+            $activeFormPage = $aft->getFormPage($this->post('formPageHandle'));
+            $this->set('prevFormPage', $aft->getPrevFormPage($activeFormPage->handle));
+        } else {
+            $activeFormPage = $aft->getFormPage($nextFormPageHandle);
+            $this->set('nextFormPage', $aft->getNextFormPage($activeFormPage->handle));
+            $this->set('prevFormPage', $aft->getPrevFormPage($activeFormPage->handle));
+        }
+
+        $this->set('formPage', $activeFormPage);
+        $this->set('token', $this->app->make('token')->generate('attribute_form_'.$this->bID.'_'.$activeFormPage->handle));
+        $this->set('aftID', $this->aftID);
+        $this->set('captcha', $this->displayCaptcha ? $aft->getCaptchaLibrary() : false);
+
+        if ($this->errors->has()) {
+            $this->redirectToPrevStep();
+            return;
+        }
+        
+        $formPage = $aft->getFormPage($formPageHandle);
+        if (!$formPage) {
+            $this->errors->add(t('Invalid step requested'));
+            $this->redirectToPrevStep();
+            return;
+        }
+        
+        if(Request::isPost()){
+            // Check if is back to previous request
+            if(Request::getInstance()->request->has('previousBtn')){
+                $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
+                return;
+            }
+            
+            foreach ($formPage->attributes as $attr) {
+                if ($attr->required) {
+                    $ak = AttributeFormKey::getByID($attr->akID);
+                    $e1 = $ak->validateAttributeForm();
+                    if ($e1 == false) {
+                        $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                    } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                        $this->errors->add($e1);
+                    }
+                }
+            }
+
+            if ($this->errors->has()) {
+                $this->redirectToPrevStep();
+                return;
+            }
+
+            $aks    = $this->post('akID');
+            $afVals = $this->session->get('attrForm');
+            if ($afVals) {
+                $aks = unserialize($afVals) + $aks;
+            }
+
+            if ($nextFormPageHandle != 'complete') {
+                $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
+                $this->session->set('attrForm', serialize($aks));
+            } else {
+                $_POST['akID'] = $aks;
+                $this->saveAttributeForm($aft);
+                $this->session->remove('attrFormCurrentStep');
+                $this->session->remove('attrForm');
+                $this->redirectToView();
+            }
+        }
+    }
+
+    private function securityCheck($aft, $nextFormPageHandle)
+    {
+        $ip = $this->app->make('helper/validation/ip');
+        if ($ip->isBanned()) {
+            $this->errors->add($ip->getErrorMessage());
+            return;
+        }
+
+        if ($this->displayCaptcha && Request::isPost() && !Request::getInstance()->request->has('previousBtn')) {
+            $captcha = $aft->getCaptchaLibrary();
+            if (!$captcha->check()) {
+                $this->errors->add(t("Incorrect captcha code"));
+                $_REQUEST['ccmCaptchaCode'] = '';
+                return;
+            }
+        }
+
+        $formPageHandle = $this->post('formPageHandle');
+        if($formPageHandle){
+            // check CSRF token
+            $token = $this->app->make('token');
+            if (!$token->validate('attribute_form_'.$this->bID.'_'.$formPageHandle, $this->post('af_token'))) {
+                $this->errors->add($token->getErrorMessage());
+            }
+        }else{
+            // If page reloaded without post request
+            $formPageHandle = $this->session->get('attrFormCurrentStep');
+            if (!$formPageHandle) {
+                $this->errors->add(t('Invalid step requested'));
+                $this->flashError('errors', $this->errors);
+                $this->redirectToView();
+            } elseif ($formPageHandle != $nextFormPageHandle) {
+                $this->errors->add(t('Invalid step requested'));
+                $this->flashError('errors', $this->errors);
+                $this->redirect($this->urlToAction('step', $formPageHandle));
+            }
+        }
+
+        return $formPageHandle;
+    }
+
+    private function redirectToPrevStep()
+    {
+        $formPageHandle = $this->post('formPageHandle');
+        $this->flashError('errors', $this->errors);
+
+        if(!$formPageHandle){
+            $this->session->remove('attrFormCurrentStep');
+            $this->redirectToView();
+        }else{
+            $this->session->set('attrFormCurrentStep', $formPageHandle);
+            $this->redirect($this->urlToAction('step', $formPageHandle));
+        }
+    }
+
     public function action_submit($bID = false)
     {
         if ($this->bID != $bID) {
@@ -197,8 +339,7 @@ class Controller extends BlockController
         }
 
         // get objects
-        $aftID = $this->post('aftID');
-        $aft   = AttributeFormType::getByID($aftID);
+        $aft = AttributeFormType::getByID($this->aftID);
 
         if ($this->displayCaptcha) {
             $captcha = $aft->getCaptchaLibrary();
@@ -227,9 +368,15 @@ class Controller extends BlockController
             return;
         }
         
+        $this->saveAttributeForm($aft);
+        $this->redirectToView();
+    }
+
+    protected function saveAttributeForm(AttributeFormType $aft)
+    {
         // create new form entry
         $af = new AttributeForm();
-        $af->setTypeID($aftID);
+        $af->setTypeID($this->aftID);
         $af->save();
 
         // get all attributes of type and save values from form to the database
@@ -242,7 +389,7 @@ class Controller extends BlockController
         $submittedData = $af->getAttributeDataString();
         $antispam      = $this->app->make('helper/validation/antispam');
         $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
-        
+
         if ($foundSpam) {
             if ($aft->getDeleteSpam()) {
                 $af->delete();
@@ -268,12 +415,10 @@ class Controller extends BlockController
             }
 
             Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
-            $this->flash('message', h(t($this->thankyouMsg)));
+            $this->flash('successMsg', h(t($this->thankyouMsg)));
         }
-
-        $this->redirectToView();
     }
-
+    
     private function sendNotificationMailToAdmin(AttributeForm $af)
     {
         $cfg         = MeschApp::getFileConfig();

@@ -181,6 +181,114 @@ class AttributeFormType extends EntityBase
     }
 
     /**
+     * Get form page by handle
+     * @param string $pageHandle urlifyed page name
+     * @return array
+     */
+    public function getFormPage($pageHandle)
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        $formPage           = false;
+        if (is_object($selectedAttributes)) {
+            $txt = \Core::make('helper/text');
+            foreach ($selectedAttributes->formPages as $i => $page) {
+                if ($pageHandle == $txt->urlify($page->name)) {
+                    $formPage         = clone $page;
+                    $formPage->step   = $i + 1;
+                    $formPage->handle = $pageHandle;
+                    break;
+                }
+            }
+        }
+        return $formPage;
+    }
+
+    /**
+     * Get next form page of given handle
+     * @param string $pageHandle urlifyed page name
+     * @return array
+     */
+    public function getNextFormPage($pageHandle)
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        $formPage           = false;
+        if (is_object($selectedAttributes)) {
+            $txt   = \Core::make('helper/text');
+            $found = false;
+            foreach ($selectedAttributes->formPages as $i => $page) {
+                if ($found) {
+                    $formPage         = clone $page;
+                    $formPage->step   = $i + 1;
+                    $formPage->handle = $txt->urlify($page->name);
+                    break;
+                } elseif ($pageHandle == $txt->urlify($page->name)) {
+                    $found = true;
+                }
+            }
+        }
+        return $formPage;
+    }
+
+    /**
+     * Get previous form page of given page handle
+     * @param string $pageHandle urlifyed page name
+     * @return array
+     */
+    public function getPrevFormPage($pageHandle)
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        $formPage           = false;
+        if (is_object($selectedAttributes)) {
+            $txt   = \Core::make('helper/text');
+            $found = false;
+            for ($i = count($selectedAttributes->formPages) - 1; $i >= 0; $i--) {
+                $page = $selectedAttributes->formPages[$i];
+                if ($found) {
+                    $formPage         = clone $page;
+                    $formPage->step   = $i + 1;
+                    $formPage->handle = $txt->urlify($page->name);
+                    break;
+                } elseif ($pageHandle == $txt->urlify($page->name)) {
+                    $found = true;
+                }
+            }
+        }
+        return $formPage;
+    }
+
+    public function getFirstFormPage()
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        $formPage           = false;
+        if (is_object($selectedAttributes) && !empty($selectedAttributes->formPages)) {
+            $formPage         = reset($selectedAttributes->formPages);
+            $formPage->step   = 1;
+            $formPage->handle = \Core::make('helper/text')->urlify($formPage->name);
+        }
+        return $formPage;
+    }
+
+    public function getLastFormPage()
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        $formPage           = false;
+        if (is_object($selectedAttributes) && !empty($selectedAttributes->formPages)) {
+            $formPage         = end($selectedAttributes->formPages);
+            $formPage->step   = count($selectedAttributes->formPages);
+            $formPage->handle = \Core::make('helper/text')->urlify($formPage->name);
+        }
+        return $formPage;
+    }
+
+    public function getFormPages()
+    {
+        $selectedAttributes = json_decode($this->attributes);
+        if (is_object($selectedAttributes)) {
+            return $selectedAttributes->formPages;
+        }
+        return [];
+    }
+    /**
     * @PrePersist
     */
     public function prePersist()

@@ -13,7 +13,7 @@ use Concrete\Core\Backup\ContentImporter,
 class Controller extends Package
 {
     protected $pkgHandle = 'attribute_forms';
-    protected $appVersionRequired = '5.7.5.2';
+    protected $appVersionRequired = '5.7.5.6';
     protected $pkgVersion = '0.9.9.5';
 
     protected $pkgAutoloaderMapCoreExtensions = true;
@@ -117,6 +117,7 @@ class Controller extends Package
         
         $platform = $db->getDatabasePlatform();
         $db->executeQuery($platform->getDropTableSQL('btAttributeForm'));
+        $db->executeQuery($platform->getDropTableSQL('btAttributeFormAction'));
         $db->executeQuery($platform->getDropTableSQL('AttributeFormsAttributeValues'));
         $db->executeQuery($platform->getDropTableSQL('AttributeForms'));
         $db->executeQuery($platform->getDropTableSQL('AttributeFormTypes'));

@@ -9,32 +9,10 @@ if (empty($aftID)) {
 if (!empty($attributes)) {
 ?>
 <br>
-<div class="row">
-    <div class="col-xs-12">
-        <?php if(isset($errors) && $errors->has()): ?>
-            <div class="alert alert-danger">
-                <?php $errors->output(); ?>
-            </div>
-        <?php endif; ?>
-        <?php
-        if(!empty($success_msg)): ?>
-            <div class="alert alert-success">
-                <?php if (is_array($success_msg)): ?>
-                    <ul>
-                        <?php foreach ($success_msg as $msg): ?>
-                            <li><?= $msg; ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <?= $success_msg; ?>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
+<?php $this->inc('elements/header.php'); ?>
 <form method="post" action="<?= $this->action('submit') ?>">
     <input type="hidden" name="aftID" value="<?= $aftID ?>">
-    <input type="hidden" name="_token" id="_token" value="<?= $token; ?>"/>
+    <input type="hidden" name="af_token" id="af_token" value="<?= $token; ?>"/>
 
     <?php foreach ($attributes->formPages as $formPage) { ?>
         <div class="attribute-form-page">
