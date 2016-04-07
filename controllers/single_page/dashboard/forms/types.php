@@ -73,6 +73,19 @@ class Types extends DashboardPageController
         $this->set('attributeForm', $attributeForm);
     }
 
+    public function layout($aftID)
+    {
+        $this->add();
+        $attributeForm = AttributeFormType::getByID($aftID);
+
+        $selectedAttributes = $attributeForm->getLayoutDecodedAttributes(
+            $includeAtHandle = true /* needed to determine attribute options */
+        );
+
+        $this->set('selectedAttributes', $selectedAttributes);
+        $this->set('attributeForm', $attributeForm);
+    }
+
     public function save($aftID = 0)
     {
         $formName       = $this->post('formName');

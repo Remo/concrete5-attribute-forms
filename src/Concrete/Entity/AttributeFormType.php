@@ -156,6 +156,39 @@ class AttributeFormType extends EntityBase
         return $selectedAttributes;
     }
 
+    /**
+     * Get attributes as json object
+     * @param boolean $includeAtHandle include attribute type handle
+     * @return object
+     */
+    public function getLayoutDecodedAttributes($includeAtHandle = false)
+    {
+
+        $selectedAttributes = json_decode($this->attributes);
+
+        // Include attribute type handle
+        if ($includeAtHandle && is_object($selectedAttributes)) {
+            foreach ($selectedAttributes->formPages as $pagess) {
+                foreach ($pagess as $pages) {
+                    if(!empty($pages)) {
+                        foreach ($pages as $page) {
+                            if (!empty($page) && isset($page->attributes)) {
+                                foreach ($page->attributes as $attr) {
+                                    $ak = AttributeFormKey::getByID($attr->akID);
+                                    if (is_object($ak)) {
+                                        $attr->atHandle = $ak->getAttributeTypeHandle();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $selectedAttributes;
+    }
+
     public function getAttributesByAttrType($atHandle, $hasOption = false)
     {
         $selectedAttributes = json_decode($this->attributes);

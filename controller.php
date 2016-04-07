@@ -108,6 +108,10 @@ class Controller extends Package
             array('javascript', 'jquery'),
             array('javascript', 'mesch/alert'),
         ));
+
+        $v = \View::getInstance();
+        $v->addHeaderItem(Core::make('helper/html')->css('jquery.gridmanager.css', $this->pkgHandle));
+        $v->addFooterItem(Core::make('helper/html')->javascript('jquery.gridmanager.js', $this->pkgHandle));
     }
 
     public function uninstall()
