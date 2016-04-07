@@ -170,7 +170,7 @@ class AttributeFormType extends EntityBase
         if ($includeAtHandle && is_object($selectedAttributes)) {
             foreach ($selectedAttributes->formPages as $pagess) {
                 foreach ($pagess as $pages) {
-                    if(!empty($pages)) {
+                    if(!empty($pages) && is_array($pages)) {
                         foreach ($pages as $page) {
                             if (!empty($page) && isset($page->attributes)) {
                                 foreach ($page->attributes as $attr) {
