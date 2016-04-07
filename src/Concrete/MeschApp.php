@@ -76,4 +76,5 @@ class MeschApp
     {
         return self::pkg()->getFileConfig();
     }
+
 }

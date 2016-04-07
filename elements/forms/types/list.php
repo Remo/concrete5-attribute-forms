@@ -5,7 +5,7 @@
         </div>
     </div>
     <div class="panel-body">
-        <table class="table table-bordered">
+        <table id="mesch-ftypes-list" class="table table-bordered">
             <thead>
             <tr>
                 <th><?= t('Name') ?></th>
@@ -17,11 +17,17 @@
             if(count($formTypes) > 0):
                 foreach ($formTypes as $formType): ?>
                     <tr>
-                        <td><?= $formType->getFormName() ?></td>
+                        <td class="form-type-name"><?= $formType->getFormName() ?></td>
                         <td>
-                            <a class="btn btn-primary"
-                               href="<?= $view->action('edit', $formType->getID()) ?>"><?= t('Edit') ?>
-                            </a>
+                            <div class="btn-toolbar pull-right">
+                                <a class="btn btn-primary" href="<?= $view->action('edit', $formType->getID()) ?>">
+                                    <?= t('Edit') ?>
+                                </a>
+                                <a class="btn btn-danger delete-form-type" 
+                                   href="<?= $view->action('delete', $formType->getID(), Core::make('token')->generate('delete_ft')) ?>">
+                                    <?= t('Delete') ?>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 <?php
@@ -51,3 +57,14 @@
         </a>
     </div>
 </div>
+<script type="text/javascript">
+    $(function () {
+        attributeFormsApp.initFormTypesList({
+            deleteFType: {
+                msg:    <?=json_encode(t('Are you sure you want to remove this Form Type?'));?>,
+                ok:     <?=json_encode(t('Ok'));?>,
+                cancel: <?=json_encode(t('Cancel'));?>
+            }
+        });
+    });
+</script>

@@ -13,5 +13,6 @@ class Provider extends CoreServiceProvider
     public function register()
     {
         $this->app->bind('helper/excel/export', '\Concrete\Package\AttributeForms\Service\Excel\Export');
+        $this->app->bind('mesch/atf/string', '\Concrete\Package\AttributeForms\Service\AttributeFormString');
     }
 }

@@ -7,6 +7,8 @@ use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Package\AttributeForms\Entity\AttributeFormType;
 use Concrete\Core\Page\Controller\DashboardPageController;
 use Concrete\Core\Captcha\Library as SystemCaptchaLibrary;
+use Database,
+    Core;
 
 class Types extends DashboardPageController
 {
@@ -22,6 +24,8 @@ class Types extends DashboardPageController
             $this->set('formTypesPagination', $pagination->renderDefaultView());
             $this->requireAsset('css', 'core/frontend/pagination');
         }
+        $this->requireAsset('mesch/alert');
+        $this->requireAsset('javascript', 'mesch/attribute_form');
     }
 
     protected function getAttributeKeys()
@@ -92,6 +96,36 @@ class Types extends DashboardPageController
         }else{
             $this->flash("message", t('Form type added'));
         }
+        $this->redirect($this->action(''));
+    }
+
+    public function delete($aftID, $ccmToken)
+    {
+        $token = Core::make('token');
+        if(!$token->validate('delete_ft', $ccmToken)){
+            $this->error->add($token->getErrorMessage());
+            $this->flash("error", $this->error);
+            $this->redirect($this->action(''));
+            exit();
+        }
+
+        $formType = AttributeFormType::getByID($aftID);
+        
+        // Check if requested form type is already in use
+        $qb = Database::connection()->createQueryBuilder();
+        $qb->select('count(*)')->from('btAttributeForm')->where($qb->expr()->eq('aftID', ':aftID'))
+            ->setParameter('aftID', $aftID);
+
+        $num = $qb->execute()->fetchColumn();
+        if($num > 0){
+            $this->error->add(t('The Form Type "%s" is already in use, please update or delete related blocks and try again.', $formType->getFormName()));
+            $this->flash("error", $this->error);
+            $this->redirect($this->action(''));
+            exit();
+        }
+
+        $formType->delete();
+        $this->flash("message", t('Form type deleted'));
         $this->redirect($this->action(''));
     }
 }
