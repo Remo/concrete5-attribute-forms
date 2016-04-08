@@ -1175,7 +1175,6 @@
             },
             initFormTypesView: function (params) {
                 this.initRedactor();
-
                 // setup underscore template
                 _.templateSettings.variable = "rc";
                 this.templateAttributes = _.template(
@@ -1422,8 +1421,8 @@
             },
             updateFormData: function(){
                 // save JSON in form
-                var canvas=gm.$el.find("#" + gm.options.canvasId);
-                $(".attributes").val(JSON.stringify(this.data.attributesData));
+                $(".layout_attributes").val(JSON.stringify(this.data.attributesData));
+
             }
         };
         /*Array.prototype.move = function (from, to) {

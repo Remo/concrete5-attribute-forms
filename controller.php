@@ -14,7 +14,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'attribute_forms';
     protected $appVersionRequired = '5.7.5.2';
-    protected $pkgVersion = '0.9.9.5';
+    protected $pkgVersion = '0.9.9.7';
 
     protected $pkgAutoloaderMapCoreExtensions = true;
     
@@ -109,9 +109,11 @@ class Controller extends Package
             array('javascript', 'mesch/alert'),
         ));
 
+
         $v = \View::getInstance();
         $v->addHeaderItem(Core::make('helper/html')->css('jquery.gridmanager.css', $this->pkgHandle));
         $v->addFooterItem(Core::make('helper/html')->javascript('jquery.gridmanager.js', $this->pkgHandle));
+
     }
 
     public function uninstall()

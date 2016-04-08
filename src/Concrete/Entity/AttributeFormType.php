@@ -33,6 +33,16 @@ class AttributeFormType extends EntityBase
     protected $attributes;
 
     /**
+     * @Column(type="text",  nullable=true)
+     */
+    protected $layoutAttributes;
+
+    /**
+     * @Column(type="text",  nullable=true)
+     */
+    protected $attributesHtml;
+
+    /**
      * @Column(type="boolean")
      */
     protected $deleteSpam;
@@ -65,6 +75,16 @@ class AttributeFormType extends EntityBase
     public function getAttributes()
     {
         return $this->attributes;
+    }
+
+    public function getLayoutAttributes()
+    {
+        return $this->layoutAttributes;
+    }
+
+    public function getAttributesHtml()
+    {
+        return $this->attributesHtml;
     }
 
     public function getCaptchaLibraryHandle()
@@ -101,6 +121,16 @@ class AttributeFormType extends EntityBase
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    public function setLayoutAttributes($attributes)
+    {
+        $this->layoutAttributes = $attributes;
+    }
+
+    public function setAttributesHtml($attributes)
+    {
+        $this->attributesHtml = $attributes;
     }
 
     public function setCaptchaLibraryHandle($captchaLibraryHandle)
@@ -163,8 +193,7 @@ class AttributeFormType extends EntityBase
      */
     public function getLayoutDecodedAttributes($includeAtHandle = false)
     {
-
-        $selectedAttributes = json_decode($this->attributes);
+        $selectedAttributes = json_decode($this->layoutAttributes);
 
         // Include attribute type handle
         if ($includeAtHandle && is_object($selectedAttributes)) {

@@ -81,8 +81,11 @@ class Types extends DashboardPageController
         $selectedAttributes = $attributeForm->getLayoutDecodedAttributes(
             $includeAtHandle = true /* needed to determine attribute options */
         );
-
+        $attributesHtml = $attributeForm->getAttributesHtml(
+            $includeAtHandle = true /* needed to determine attribute options */
+        );
         $this->set('selectedAttributes', $selectedAttributes);
+        $this->set('attributesHtml', $attributesHtml);
         $this->set('attributeForm', $attributeForm);
     }
 
@@ -102,6 +105,26 @@ class Types extends DashboardPageController
         $attributeFormType->setDeleteSpam($deleteSpam);
         $attributeFormType->setCaptchaLibraryHandle($captchaLibrary);
         $attributeFormType->setAttributes($this->post('attributes'));
+        $attributeFormType->save();
+
+        if ($aftID > 0) {
+            $this->flash("message", t('Form type updated'));
+        }else{
+            $this->flash("message", t('Form type added'));
+        }
+        $this->redirect($this->action(''));
+    }
+
+    public function saveLayout($aftID = 0)
+    {
+        if ($aftID > 0) {
+            $attributeFormType = AttributeFormType::getByID($aftID);
+        } else {
+            $attributeFormType = new AttributeFormType();
+        }
+
+        $attributeFormType->setAttributesHtml($this->post('attributes_html'));
+        $attributeFormType->setLayoutAttributes($this->post('layout_attributes'));
         $attributeFormType->save();
 
         if ($aftID > 0) {
