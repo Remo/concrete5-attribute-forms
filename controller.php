@@ -109,10 +109,9 @@ class Controller extends Package
             array('javascript', 'mesch/alert'),
         ));
 
+        $al->register('css', 'mesch/gridmanagercss', 'css/jquery.gridmanager.css', array('minify' => true), $this);
+        $al->register('javascript', 'mesch/gridmanager', 'js/jquery.gridmanager.js', array('minify' => true), $this);
 
-        $v = \View::getInstance();
-        $v->addHeaderItem(Core::make('helper/html')->css('jquery.gridmanager.css', $this->pkgHandle));
-        $v->addFooterItem(Core::make('helper/html')->javascript('jquery.gridmanager.js', $this->pkgHandle));
 
     }
 

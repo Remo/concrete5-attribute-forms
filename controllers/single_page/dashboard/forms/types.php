@@ -87,6 +87,8 @@ class Types extends DashboardPageController
         $this->set('selectedAttributes', $selectedAttributes);
         $this->set('attributesHtml', $attributesHtml);
         $this->set('attributeForm', $attributeForm);
+        $this->requireAsset('javascript', 'mesch/gridmanager');
+        $this->requireAsset('css', 'mesch/gridmanagercss');
     }
 
     public function save($aftID = 0)

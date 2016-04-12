@@ -393,6 +393,17 @@
 
             // Add new column to existing row
             }).on("click", "a.gm-addColumn", function(){
+
+               var existedColumnId = [];
+               $($(this).closest('.row-fluid').find('.column')).map(function(){
+                   existedColumnId.push($(this).attr('data-column-id'));
+               });
+               var maxValueInColumnId = Math.max.apply(Math, existedColumnId);
+
+               if(maxValueInColumnId > 0) {
+                   generateColumnId = maxValueInColumnId + 1;
+               }
+
                 $(this).parent().after(gm.createCol(2));
                 gm.switchLayoutMode(gm.options.layoutDefaultMode);
                 gm.reset();
@@ -799,15 +810,26 @@
          * @param {array} colWidths - array of css class integers, i.e [2,4,5]
          * @returns row
          */
-        var generateRowId = 0;
+        var existedRowId = [];
+        $($('#mycanvas').find('.row-fluid')).map(function(){
+            existedRowId.push($(this).attr('data-row-id'));
+        });
+        var maxValueInRowId = Math.max.apply(Math, existedRowId);
+        if(maxValueInRowId >= 0){
+            var generateRowId = maxValueInRowId+1;
+        }else
+        {
+            var generateRowId = 0;
+        }
         gm.createRow = function(colWidths){
           var row= $("<div/>", {"class": gm.options.rowClass + " " + gm.options.gmEditClass, "data-row-id": generateRowId });
              $.each(colWidths, function(i, val){
                 row.append(gm.createCol(val));
               });
+                generateColumnId = 0;
                 generateRowId++;
                 gm.log("++ Created Row");
-            generateRowId
+
           return row;
         };
 
@@ -944,7 +966,10 @@
           * @param {integer} size - width of the column to create, i.e 6
           * @returns null
           */
-         var generateColumnId = 0;
+
+         if(!generateColumnId) {
+             var generateColumnId = 0;
+         }
          gm.createCol =  function(size){
          var col= $("<div/>")
             .addClass(gm.options.colClass)
@@ -1005,16 +1030,59 @@
               gm.resetCommentTags(col);
               e.preventDefault();
             });
+            $(col).on('click', '.gm-removeAttr', function(e) {
+                gm.resetCommentTags(col);
+                gm.attributeFormsApp.removeAttributes({
+                    attributeKeys: '',
+                    selectedAttributes: '',
+                    attributeOptions: '',
+                    attributeDiv: $(this).closest('.list-group-item'),
+                    dataRowId: $(this).closest('.row-fluid').data('row-id'),
+                    dataColumnId: $(this).closest('.column').data('column-id')
+                });
+                $(this).closest('.list-group-item').remove();
+                e.preventDefault();
+            });
+
             $(col).sortable({
-              items: '.'+gm.options.contentDraggableClass,
-              axis: 'y',
+              //items: '.'+gm.options.contentDraggableClass,
+              //axis: 'y',
               placeholder: gm.options.rowSortingClass,
               handle: "."+gm.options.controlMove,
-              forcePlaceholderSize: true, opacity: 0.7, revert: true,
+              forcePlaceholderSize: true, opacity: 1, revert: 'invalid',
               tolerance: "pointer",
               cursor: "move",
               stop: function(e, ui) {
                 gm.resetCommentTags($(ui.item).parent());
+                  $(ui.item).closest('.list-group-item').attr('data-page-index',$(ui.item).closest('.row-fluid').data('row-id')+''+$(ui.item).closest('.column').data('column-id')).css( "width", "100%" ).append('<a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span>&nbsp;</a>');
+                  $(ui.item).parent().find('.list-group-item').each(function(i, el){
+                      $(this).attr('data-sort-order',i);
+                  });
+
+
+                  if($.type(gm.attributeFormsApp.data) == 'undefined') {
+
+                      gm.attributeFormsApp.initFormTypesView({
+                          attributeKeys: '',
+                          selectedAttributes: '',
+                          attributeOptions: '',
+                          attributeDiv: $(ui.item).closest('.list-group-item'),
+                          dataRowId: $(ui.item).closest('.row-fluid').data('row-id'),
+                          dataColumnId: $(ui.item).closest('.column').data('column-id')
+                      });
+
+                  }else{
+
+                      gm.attributeFormsApp.dropAttributes({
+                          attributeKeys: '',
+                          selectedAttributes: '',
+                          attributeOptions: '',
+                          attributeDiv: $(ui.item).closest('.list-group-item'),
+                          dataRowId: $(ui.item).closest('.row-fluid').data('row-id'),
+                          dataColumnId: $(ui.item).closest('.column').data('column-id')
+                      });
+
+                  }
               }
              });
           });
@@ -1149,30 +1217,9 @@
 
 
 
-        gm.generateRandomId = function() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)+'-'+Math.floor((1 + Math.random()) * 0x10000)
-                    .toString(16)
-                    .substring(1);
-        };
 
         gm.attributeFormsApp = {
-            initFormTypesList: function (params) {
-                $('#mesch-ftypes-list').on('click', '.delete-form-type',function(e){
-                    var $thiz = $(this);
-                    var ftypeName = $thiz.closest('tr').find('.form-type-name').text();
-                    MeschAlertDialog.confirm('', params.deleteFType.msg+'<br/>"'+ftypeName+'"',
-                        params.deleteFType.ok,
-                        params.deleteFType.cancel,
-                        function(){
-                            window.location.href = $thiz.attr('href');
-                        }
-                    );
 
-                    return false;
-                });
-            },
             initFormTypesView: function (params) {
                 this.initRedactor();
                 // setup underscore template
@@ -1193,104 +1240,41 @@
                         formPages: []
                     };
                 }
-                gm.attributeFormsApp.renderAttributes(params.buttn);
-                //gm.attributeFormsApp.renderAttributes();
+
+                var newAttributeName = $.trim(params.attributeDiv.text()),
+                    newAttributeValue = params.attributeDiv.data('value'),
+                    atHandle = params.attributeDiv.data('athandle'),
+                    pageIndex = params.attributeDiv.data("page-index"),
+                    dataColumnId = params.dataColumnId,
+                    dataRowId = params.dataRowId;
+
+                if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
+                }
+                if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) !== 'object' ) {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = {};
+                }
+                gm.attributeFormsApp.data.dataColumnId = dataColumnId;
+                gm.attributeFormsApp.data.dataRowId = dataRowId;
+
+                if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) === false) {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex] = Array();
+                }
+
+                if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) !='undefined') {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].push({
+                        akName: newAttributeName,
+                        akID: newAttributeValue,
+                        atHandle: atHandle,
+                        required: false
+                    });
+
+                }
+
+                gm.attributeFormsApp.renderAttributes(params);
 
                 // attribute actions
-                $(params.buttn).find(".attributes-container").on("click", ".new-page-add", function (event) {
-                    event.preventDefault();
-                    var newPageName = $(this).closest("tr").find("input[name=new-page]").val();
-                    var dataColumnId = $(this).closest('.column').data("column-id");
-                    var dataRowId = $(this).closest('.row-fluid').data("row-id");
-
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                    }
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = Array();
-                    }
-                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                    gm.attributeFormsApp.data.dataRowId = dataRowId;
-
-                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId].push({name: newPageName, attributes: []});
-                    gm.attributeFormsApp.renderClosestAttributes(this);
-                });
-
-                $(params.buttn).find(".attributes-container").on("click", ".remove-page", function (event) {
-                    var index = $(this).closest('tr.form-page').data("index");
-                    var dataColumnId = $(this).closest('.column').data("column-id");
-                    var dataRowId = $(this).closest('.row-fluid').data("row-id");
-
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                    }
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = Array();
-                    }
-                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                    gm.attributeFormsApp.data.dataRowId = dataRowId;
-
-                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId].splice(index, 1);
-                    gm.attributeFormsApp.renderClosestAttributes(this);
-                });
-
-                $(params.buttn).find(".attributes-container").on("click", ".new-attribute-add", function (event) {
-                    event.preventDefault();
-                    var $newAttribute = $(this).closest("tr").find("select option:selected"),
-                        newAttributeName = $newAttribute.text(),
-                        newAttributeValue = $newAttribute.val(),
-                        atHandle = $newAttribute.data('athandle'),
-                        pageIndex = $(this).closest('tr.form-page').data("index");
-
-
-
-
-                    var dataColumnId = $(this).closest('.column').data("column-id");
-                    var dataRowId = $(this).closest('.row-fluid').data("row-id");
-
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                    }
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = Array();
-                    }
-                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                    gm.attributeFormsApp.data.dataRowId = dataRowId;
-
-                    if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) !='undefined') {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].attributes.push({
-                            akName: newAttributeName,
-                            akID: newAttributeValue,
-                            atHandle: atHandle,
-                            required: false
-                        });
-                    }
-                    gm.attributeFormsApp.renderClosestAttributes(this);
-                });
-
-                $(params.buttn).find(".attributes-container").on("click", ".remove-attribute", function (event) {
-                    var pageIndex = $(this).closest('tr.form-page').data("index"),
-                        index = $(this).closest('tr.form-page-attribute').data("index");
-
-
-                    var dataColumnId = $(this).closest('.column').data("column-id");
-                    var dataRowId = $(this).closest('.row-fluid').data("row-id");
-
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                    }
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = Array();
-                    }
-                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                    gm.attributeFormsApp.data.dataRowId = dataRowId;
-
-                    if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) !='undefined') {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].attributes.splice(index, 1);
-                    }
-                    gm.attributeFormsApp.renderClosestAttributes(this);
-                });
-
+                /*
                 $(params.buttn).find(".attributes-container").on("change", ".attribute-required", function (event) {
                     var pageIndex = $(this).closest('tr.form-page').data("index"),
                         index = $(this).closest('tr.form-page-attribute').data("index");
@@ -1360,7 +1344,71 @@
                     }else{
                         gm.attributeFormsApp.updateFormData();
                     }
-                });
+                });*/
+            },
+            initDynamicDataView: function (params) {
+                this.initRedactor();
+                // setup underscore template
+                _.templateSettings.variable = "rc";
+                this.templateAttributes = _.template(
+                    $("script.attributes-template").html()
+                );
+                this.data = {
+                    attributeKeys: params.attributeKeys,
+                    attributesData: params.selectedAttributes,
+                    attributeOptions: params.attributeOptions,
+                    dataRowId: params.dataRowId,
+                    dataColumnId: params.dataColumnId
+                };
+
+                if(!this.data.attributesData){
+                    this.data.attributesData = {
+                        formPages: []
+                    };
+                }
+
+                gm.attributeFormsApp.renderClosestAttributes(params);
+            },
+            dropAttributes: function(element) {
+                var newAttributeName = $.trim(element.attributeDiv.text()),
+                    newAttributeValue = element.attributeDiv.data('value'),
+                    atHandle = element.attributeDiv.data('athandle'),
+                    pageIndex = element.attributeDiv.data("page-index"),
+                    dataColumnId = element.dataColumnId,
+                    dataRowId = element.dataRowId;
+
+                if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
+                }
+                if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) !== 'object') {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = {};
+                }
+                gm.attributeFormsApp.data.dataColumnId = dataColumnId;
+                gm.attributeFormsApp.data.dataRowId = dataRowId;
+
+                if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) === false) {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex] = Array();
+                }
+
+                if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) !='undefined') {
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].push({
+                        akName: newAttributeName,
+                        akID: newAttributeValue,
+                        atHandle: atHandle,
+                        required: false
+                    });
+
+                }
+
+                gm.attributeFormsApp.renderClosestAttributes(this);
+            },
+            removeAttributes: function(element) {
+                var pageIndex = element.attributeDiv.data("page-index"),
+                    dataColumnId = element.dataColumnId,
+                    dataRowId = element.dataRowId;
+
+                gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].splice(dataRowId+''+dataColumnId);
+                gm.attributeFormsApp.renderClosestAttributes(this);
             },
             initRedactor: function () {
                 $('.ccm-advanced-editor').redactor({
@@ -1369,58 +1417,19 @@
             },
             renderAttributes: function(element) {
                 //$("." +gm.options.gmEditClass).find(".attributes-container").html(this.templateAttributes(this.data));
-                $(element).find(".attributes-container").html(this.templateAttributes(this.data));
-                // make attribute list sortable
-                /*gm.$el.find(".form-pages").sortable({
-                    start: function(event, ui) {
-                        ui.item.startPos = ui.item.index();
-                    },
-                    stop: function(event, ui) {
-                        gm.attributeFormsApp.data.attributesData.formPages.move(ui.item.startPos, ui.item.index());
-                        gm.attributeFormsApp.renderClosestAttributes(this);
-                    }
-                });
+                $(element).find(".attributes-container:last").html(this.templateAttributes(this.data));
 
-                gm.$el.find(".form-page-attributes").sortable({
-                    start: function(event, ui) {
-                        ui.item.startPos = ui.item.index();
-                    },
-                    stop: function(event, ui) {
-                        var pageIndex = ui.item.closest('tr.form-page').data("index");
-                        gm.attributeFormsApp.data.attributesData.formPages[pageIndex].attributes.move(ui.item.startPos, ui.item.index());
-                        gm.attributeFormsApp.renderClosestAttributes(this);
-                    }
-                });*/
                 this.updateFormData();
             },
             renderClosestAttributes: function(element) {
                 //console.log(this.data);
-                $(element).closest(".attributes-container").html(this.templateAttributes(this.data));
+                $('#mycanvas').find("[data-row-id='" + element.dataRowId + "']").find("[data-column-id='" + element.dataColumnId + "']").find('.gm-tools.clearfix:first-child').after(this.templateAttributes(this.data));
                 // make attribute list sortable
-                gm.$el.find(".form-pages").sortable({
-                    start: function(event, ui) {
-                        ui.item.startPos = ui.item.index();
-                    },
-                    stop: function(event, ui) {
-                        gm.attributeFormsApp.data.attributesData.formPages[this.data.dataRowId][this.data.dataColumnId].move(ui.item.startPos, ui.item.index());
-                        gm.attributeFormsApp.renderClosestAttributes(this);
-                    }
-                });
-
-                gm.$el.find(".form-page-attributes").sortable({
-                    start: function(event, ui) {
-                        ui.item.startPos = ui.item.index();
-                    },
-                    stop: function(event, ui) {
-                        var pageIndex = ui.item.closest('tr.form-page').data("index");
-                        gm.attributeFormsApp.data.attributesData.formPages[this.data.dataRowId][this.data.dataColumnId][pageIndex].attributes.move(ui.item.startPos, ui.item.index());
-                        gm.attributeFormsApp.renderClosestAttributes(this);
-                    }
-                });
                 this.updateFormData();
             },
             updateFormData: function(){
                 // save JSON in form
+                //console.log(JSON.stringify(this.data.attributesData));
                 $(".layout_attributes").val(JSON.stringify(this.data.attributesData));
 
             }
