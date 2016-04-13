@@ -449,6 +449,7 @@
                gm.log($(this).closest("." +gm.options.colSelector));
                $(this).closest("." +gm.options.gmEditClass).animate({opacity: 'hide', height: 'hide'}, 400, function(){
                   $(this).remove();
+                  $('#mycanvas').trigger('click');
                  // Check for multiple editable regions and merge?
 
                 });
@@ -1054,7 +1055,23 @@
               cursor: "move",
               stop: function(e, ui) {
                 gm.resetCommentTags($(ui.item).parent());
-                  $(ui.item).closest('.list-group-item').attr('data-page-index',$(ui.item).closest('.row-fluid').data('row-id')+''+$(ui.item).closest('.column').data('column-id')).css( "width", "100%" ).append('<a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span>&nbsp;</a>');
+                  gm.attributeFormsApp.data.attributeOptions;
+                  var rowId = $(ui.item).closest('.row-fluid').data('row-id'),
+                      columnID = $(ui.item).closest('.column').data('column-id'),
+                      attributeOptionHtml = '';
+                  if(gm.attributeFormsApp.data.attributeOptions[$(ui.item).closest('.list-group-item').data('athandle')]){
+                      $.each(gm.attributeFormsApp.data.attributeOptions[$(ui.item).closest('.list-group-item').data('athandle')] , function( optKey, opt ){
+                          console.log(opt);
+                          var optText = opt["text"];
+
+                          attributeOptionHtml = '<label class="control-label" style="font-weight:normal;">'+
+                          '<input type="checkbox" data-name="'+optKey+'" class="attribute-option" value="1" />'+
+                          '<span>'+optText+'</span>'+
+                          '</label> <br>';
+                      });
+                  }
+                  $(ui.item).closest('.list-group-item').attr('data-page-index',rowId+''+columnID).removeAttr( "style")
+                          .append('<br><span>'+attributeOptionHtml+'<input type="checkbox" class="attribute-required" value="1" /> Mandatory &nbsp;&nbsp;&nbsp;<a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span>&nbsp;</a></span>');
                   $(ui.item).parent().find('.list-group-item').each(function(i, el){
                       $(this).attr('data-sort-order',i);
                   });
@@ -1067,8 +1084,8 @@
                           selectedAttributes: '',
                           attributeOptions: '',
                           attributeDiv: $(ui.item).closest('.list-group-item'),
-                          dataRowId: $(ui.item).closest('.row-fluid').data('row-id'),
-                          dataColumnId: $(ui.item).closest('.column').data('column-id')
+                          dataRowId: rowId,
+                          dataColumnId: columnID
                       });
 
                   }else{
@@ -1078,8 +1095,8 @@
                           selectedAttributes: '',
                           attributeOptions: '',
                           attributeDiv: $(ui.item).closest('.list-group-item'),
-                          dataRowId: $(ui.item).closest('.row-fluid').data('row-id'),
-                          dataColumnId: $(ui.item).closest('.column').data('column-id')
+                          dataRowId: rowId,
+                          dataColumnId: columnID
                       });
 
                   }
@@ -1272,79 +1289,6 @@
                 }
 
                 gm.attributeFormsApp.renderAttributes(params);
-
-                // attribute actions
-                /*
-                $(params.buttn).find(".attributes-container").on("change", ".attribute-required", function (event) {
-                    var pageIndex = $(this).closest('tr.form-page').data("index"),
-                        index = $(this).closest('tr.form-page-attribute').data("index");
-
-                    var dataColumnId = $(this).closest('.column').data("column-id");
-                    var dataRowId = $(this).closest('.row-fluid').data("row-id");
-
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                    }
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = Array();
-                    }
-                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                    gm.attributeFormsApp.data.dataRowId = dataRowId;
-
-                    gm.attributeFormsApp.data
-                        .attributesData
-                        .formPages[dataRowId][dataColumnId][pageIndex]
-                        .attributes[index].required = $(this).is(':checked');
-                    gm.attributeFormsApp.updateFormData();
-                });
-
-                $(params.buttn).find(".attributes-container").on("change", ".attribute-option", function (event) {
-                    var pageIndex = $(this).closest('tr.form-page').data("index"),
-                        index = $(this).closest('tr.form-page-attribute').data("index");
-
-                    var dataColumnId = $(this).closest('.column').data("column-id");
-                    var dataRowId = $(this).closest('.row-fluid').data("row-id");
-
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                    }
-                    if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) === false) {
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = Array();
-                    }
-                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                    gm.attributeFormsApp.data.dataRowId = dataRowId;
-
-
-                    var attr = gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].attributes[index];
-                    var options = attr.options ? attr.options : {};
-
-
-                    var optionKey = $(this).data('name');
-                    var isUnique  = gm.attributeFormsApp.data.attributeOptions[attr.atHandle][optionKey].unique;
-                    if($(this).is(':checked') && isUnique){
-                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId].forEach(function(page, i) {
-                            page.attributes.forEach(function(attribute, j){
-                                if(attribute.options){
-                                    gm.attributeFormsApp.data
-                                        .attributesData
-                                        .formPages[dataRowId][dataColumnId][i]
-                                        .attributes[j]
-                                        .options[optionKey] = false;
-                                }
-                            });
-                        });
-                    }
-                    options[optionKey] = $(this).is(':checked');
-                    gm.attributeFormsApp.data.attributesData
-                        .formPages[dataRowId][dataColumnId][pageIndex]
-                        .attributes[index]
-                        .options = options;
-                    if($(this).is(':checked') && isUnique){
-                        gm.attributeFormsApp.renderClosestAttributes(this);
-                    }else{
-                        gm.attributeFormsApp.updateFormData();
-                    }
-                });*/
             },
             initDynamicDataView: function (params) {
                 this.initRedactor();
@@ -1370,44 +1314,47 @@
                 gm.attributeFormsApp.renderClosestAttributes(params);
             },
             dropAttributes: function(element) {
-                var newAttributeName = $.trim(element.attributeDiv.text()),
+
+                var newAttributeName = $.trim(element.attributeDiv.text().replace('Use as email subject  Mandatory','').replace('Reply to this email address').replace('Mandatory','')),
                     newAttributeValue = element.attributeDiv.data('value'),
                     atHandle = element.attributeDiv.data('athandle'),
                     pageIndex = element.attributeDiv.data("page-index"),
                     dataColumnId = element.dataColumnId,
                     dataRowId = element.dataRowId;
 
-                if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
-                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
-                }
-                if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) !== 'object') {
-                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = {};
-                }
-                gm.attributeFormsApp.data.dataColumnId = dataColumnId;
-                gm.attributeFormsApp.data.dataRowId = dataRowId;
+                if($.type(pageIndex) != 'undefined') {
+                    if ($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
+                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
+                    }
+                    if ($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) !== 'object') {
+                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = {};
+                    }
+                    gm.attributeFormsApp.data.dataColumnId = dataColumnId;
+                    gm.attributeFormsApp.data.dataRowId = dataRowId;
 
-                if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) === false) {
-                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex] = Array();
+                    if ($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) === false) {
+                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex] = Array();
+                    }
+
+                    if ($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) != 'undefined') {
+                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].push({
+                            akName: newAttributeName,
+                            akID: newAttributeValue,
+                            atHandle: atHandle,
+                            required: false
+                        });
+
+                    }
+
+                    gm.attributeFormsApp.renderClosestAttributes(this);
                 }
-
-                if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex]) !='undefined') {
-                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].push({
-                        akName: newAttributeName,
-                        akID: newAttributeValue,
-                        atHandle: atHandle,
-                        required: false
-                    });
-
-                }
-
-                gm.attributeFormsApp.renderClosestAttributes(this);
             },
             removeAttributes: function(element) {
                 var pageIndex = element.attributeDiv.data("page-index"),
                     dataColumnId = element.dataColumnId,
                     dataRowId = element.dataRowId;
 
-                gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex].splice(dataRowId+''+dataColumnId);
+                delete gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex];
                 gm.attributeFormsApp.renderClosestAttributes(this);
             },
             initRedactor: function () {
@@ -1416,20 +1363,21 @@
                 });
             },
             renderAttributes: function(element) {
-                //$("." +gm.options.gmEditClass).find(".attributes-container").html(this.templateAttributes(this.data));
                 $(element).find(".attributes-container:last").html(this.templateAttributes(this.data));
 
                 this.updateFormData();
             },
             renderClosestAttributes: function(element) {
-                //console.log(this.data);
-                $('#mycanvas').find("[data-row-id='" + element.dataRowId + "']").find("[data-column-id='" + element.dataColumnId + "']").find('.gm-tools.clearfix:first-child').after(this.templateAttributes(this.data));
+                if($('#mycanvas').find("[data-row-id='" + element.dataRowId + "']").find("[data-column-id='" + element.dataColumnId + "']").find('p').text() == '') {
+                    $('#mycanvas').find("[data-row-id='" + element.dataRowId + "']").find("[data-column-id='" + element.dataColumnId + "']").find('.gm-tools.clearfix:first-child').after(this.templateAttributes(this.data));
+                }else{
+                    $('#mycanvas').find("[data-row-id='" + element.dataRowId + "']").find("[data-column-id='" + element.dataColumnId + "']").find('.gm-editable-region.gm-content-draggable').after(this.templateAttributes(this.data));
+                }
                 // make attribute list sortable
                 this.updateFormData();
             },
             updateFormData: function(){
                 // save JSON in form
-                //console.log(JSON.stringify(this.data.attributesData));
                 $(".layout_attributes").val(JSON.stringify(this.data.attributesData));
 
             }
