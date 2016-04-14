@@ -16,7 +16,7 @@ use Concrete\Core\User\UserInfo,
     Events,
     Config,
     Core;
-    
+use Concrete\Core\Attribute\Key\CollectionKey as AttributeCollectionKey;
 
 class Controller extends BlockController
 {
@@ -68,6 +68,25 @@ class Controller extends BlockController
     }
 
     public function view()
+    {
+        $formType = AttributeFormType::getByID($this->aftID);
+
+        if (!is_object($formType)) {
+            return;
+        }
+
+        $token = $this->app->make('token');
+        $this->set('aftID', $this->aftID);
+        $this->set('attributes', $formType->getDecodedAttributes());
+        $this->set('layoutAttributes', $formType->getLayoutDecodedAttributes());
+        $this->set('attributesHtml', $formType->getAttributesHtml());
+        $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
+        $this->set('token', $token->generate('attribute_form_'.$this->bID));
+        $this->requireAsset('javascript', 'mesch/gridmanager');
+        $this->requireAsset('css', 'mesch/gridmanagercss');
+    }
+
+    public function customLayout()
     {
         $formType = AttributeFormType::getByID($this->aftID);
 
@@ -274,6 +293,114 @@ class Controller extends BlockController
         $this->redirectToView();
     }
 
+    public function action_layoutSubmit($bID = false)
+    {
+        if ($this->bID != $bID) {
+            return false;
+        }
+
+        $this->view();
+
+        Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
+
+        $ip = $this->app->make('helper/validation/ip');
+        if ($ip->isBanned()) {
+            $this->errors->add($ip->getErrorMessage());
+            return;
+        }
+
+        // check CSRF token
+        $token = $this->app->make('token');
+        if (!$token->validate('attribute_form_'.$this->bID, $this->post('_token'))) {
+            throw new \Exception('Invalid token');
+        }
+
+        // get objects
+        $aftID = $this->post('aftID');
+        $aft   = AttributeFormType::getByID($aftID);
+
+        if ($this->displayCaptcha) {
+            $captcha = $aft->getCaptchaLibrary();
+            if (!$captcha->check()) {
+                $this->errors->add(t("Incorrect captcha code"));
+                $_REQUEST['ccmCaptchaCode'] = '';
+            }
+        }
+
+        $attributes = $aft->getLayoutDecodedAttributes();
+
+        foreach ($attributes->formPages as $row => $formPageRow){
+            foreach ($formPageRow as $col => $formPageCol) {
+                foreach ((array)$formPageCol as $key => $formPage) {
+                    foreach ($formPage as $attr) {
+
+                        if ($attr->required) {
+                            $ak = AttributeFormKey::getByID($attr->akID);
+                            $e1 = $ak->validateAttributeForm();
+
+                            if ($e1 == false) {
+                                $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                            } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                                $this->errors->add($e1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if($this->errors->has()){
+            echo $this->errors->has();die;
+            return;
+        }
+
+        // create new form entry
+        $af = new AttributeForm();
+        $af->setTypeID($aftID);
+        $af->save();
+
+        // get all attributes of type and save values from form to the database
+        $attributeObjs = $aft->getAttributeObjects();
+        foreach ($attributeObjs as $akID => $ak) {
+            $af->setAttribute($ak, false);
+        }
+
+        // check SPAM
+        $submittedData = $af->getAttributeDataString();
+        $antispam      = $this->app->make('helper/validation/antispam');
+        $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
+
+        if ($foundSpam) {
+            if ($aft->getDeleteSpam()) {
+                $af->delete();
+            } else {
+                $af->markAsSpam();
+                $af->save();
+            }
+        }
+
+        if (!$foundSpam) {
+            foreach ($this->getCustomFormActions() as $customAction) {
+                ActionTypeFactory::execute(
+                    $customAction, [$af, ['recipientEmail' => $this->recipientEmail]]
+                );
+            }
+
+            if (intval($this->notifyMeOnSubmission) > 0) {
+                $this->sendNotificationMailToAdmin($af);
+            }
+
+            if (intval($this->notifySubmitor) > 0) {
+                $this->sendNotificationsMailToSubmitor($af);
+            }
+
+            Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
+            $this->flash('message', h(t($this->thankyouMsg)));
+        }
+
+        $this->redirectToView();
+    }
+
     private function sendNotificationMailToAdmin(AttributeForm $af)
     {
         $cfg         = MeschApp::getFileConfig();
@@ -371,5 +498,11 @@ class Controller extends BlockController
         $captchaDisplay = ob_get_clean();
         
         print str_replace($pictureDispURL, $meschPictureDispURL, $captchaDisplay);
+    }
+
+
+    public function action_renderAttributes($Id){
+        $attributeObject = AttributeFormKey::getByID($this->post('attributeKeyId'));
+        return new \Symfony\Component\HttpFoundation\Response($attributeObject->render('form', false));
     }
 }

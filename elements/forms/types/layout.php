@@ -37,9 +37,6 @@ defined('C5_EXECUTE') or die('Access Denied.');
     </div>
 </form>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-<!-- Optional theme -->
-<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">-->
 <script type="text/template" class="attributes-template">
 
         <% if(rc.attributesData.formPages[rc.dataRowId]){ %>
@@ -116,9 +113,6 @@ defined('C5_EXECUTE') or die('Access Denied.');
                $('#mycanvas-hidden').find('#gm-controls').remove().html();
                $('#mycanvas-hidden').find('.gm-tools.clearfix').remove().html();
 
-               //$('#mycanvas-hidden').find('.row-fluid').removeAttr('style');
-               //$('#mycanvas-hidden').find('.column').html('<p>'+labelText+'</p>');
-
                $('#mycanvas-hidden').find('.row-fluid').each(function(){
                   $(this).removeAttr('style');
                   $(this).find('.column').each(function(){
@@ -139,10 +133,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                $('#mycanvas-hidden').html($(this).find('#gm-canvas').html());
                $('#mycanvas-hidden').find('#gm-controls').remove().html();
                $('#mycanvas-hidden').find('.gm-tools.clearfix').remove().html();
-               //var labelText = $('#mycanvas-hidden').find('.gm-editable-region.gm-content-draggable').find('p').html();
-               //$('#mycanvas-hidden').find('.gm-editable-region.gm-content-draggable').remove().html();
-               //$('#mycanvas-hidden').find('.row-fluid').removeAttr('style');
-               //$('#mycanvas-hidden').find('.column').html('<p>'+labelText+'</p>');
+
                $('#mycanvas-hidden').find('.row-fluid').each(function(){
                    $(this).removeAttr('style');
                    $(this).find('.column').each(function(){
@@ -262,7 +253,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
 
 
-
+       /******Trigger click to fill hidden field****/
        $('#mycanvas').trigger('click');
     });
 
