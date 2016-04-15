@@ -350,7 +350,6 @@ class Controller extends BlockController
         }
 
         if($this->errors->has()){
-            echo $this->errors->has();die;
             return;
         }
 
