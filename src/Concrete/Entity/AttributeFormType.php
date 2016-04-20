@@ -38,11 +38,6 @@ class AttributeFormType extends EntityBase
     protected $layoutAttributes;
 
     /**
-     * @Column(type="text",  nullable=true)
-     */
-    protected $attributesHtml;
-
-    /**
      * @Column(type="boolean")
      */
     protected $deleteSpam;
@@ -80,11 +75,6 @@ class AttributeFormType extends EntityBase
     public function getLayoutAttributes()
     {
         return $this->layoutAttributes;
-    }
-
-    public function getAttributesHtml()
-    {
-        return $this->attributesHtml;
     }
 
     public function getCaptchaLibraryHandle()
@@ -126,11 +116,6 @@ class AttributeFormType extends EntityBase
     public function setLayoutAttributes($attributes)
     {
         $this->layoutAttributes = $attributes;
-    }
-
-    public function setAttributesHtml($attributes)
-    {
-        $this->attributesHtml = $attributes;
     }
 
     public function setCaptchaLibraryHandle($captchaLibraryHandle)

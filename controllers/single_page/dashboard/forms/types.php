@@ -125,7 +125,6 @@ class Types extends DashboardPageController
             $attributeFormType = new AttributeFormType();
         }
 
-        $attributeFormType->setAttributesHtml($this->post('attributes_html'));
         $attributeFormType->setLayoutAttributes($this->post('layout_attributes'));
         $attributeFormType->save();
 

@@ -5,7 +5,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
       action="<?= $view->action('savelayout', isset($attributeForm) ? $attributeForm->getID() : false) ?>">
 
     <input type="hidden" name="layout_attributes" class="layout_attributes" value="<?php  json_encode($selectedAttributes); ?>">
-    <input type="hidden" name="attributes_html" class="attributes_html">
+
 
     <div class="row panel panel-default panel-shadow">
         <div class="panel-heading">
@@ -87,7 +87,6 @@ defined('C5_EXECUTE') or die('Access Denied.');
             </div>
         </div>
 
-        <div id="mycanvas-hidden" style="display: none;"></div>
     </div>
     <div class="ccm-dashboard-form-actions-wrapper">
         <div class="ccm-dashboard-form-actions">
@@ -125,7 +124,6 @@ defined('C5_EXECUTE') or die('Access Denied.');
                                 <% }); %>
                             <% } %>
 
-
                             <input type="checkbox" class="attribute-required" value="1" <%- attribute.required?'checked="checked"':'' %>/> <?= t('Mandatory') ?>&nbsp;&nbsp;&nbsp;
                             <a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span></a>
                         </span>
@@ -149,34 +147,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
        }).data('gridmanager');
        gm.attributeFormsApp.attributeOptions = <?= json_encode($attributeOptions) ?>;
        gm.attributeFormsApp.attributeKeys = <?= json_encode($attributeKeys) ?>;
-       //console.log(gm.attributeFormsApp);
-        /**Load data if exist**/
-       /*var dataRowId, dataColumnId,rowClass,columnClass;
-        /*$('#mycanvas #gm-canvas .row-fluid').each(function(){
 
-           if($.type($(this).data('row-id')) != "undefined"){
-               dataRowId = $(this).data('row-id');
-               rowClass = $(this).attr('class');
-
-               $(this).find('.column').each(function(){
-                   if($.type($(this).data('column-id')) != "undefined"){
-                       dataColumnId = $(this).data('column-id');
-                       columnClass = $(this).attr('class');
-
-                       gm.attributeFormsApp.initDynamicDataView({
-                           attributeKeys: <?= json_encode($attributeKeys) ?>,
-                           selectedAttributes: <?= json_encode($selectedAttributes) ?>,
-                           attributeOptions: <?= json_encode($attributeOptions) ?>,
-                           buttn:$(this).find('.gm-custom_attribute_callback').parent().parent(),
-                           dataRowId:dataRowId,
-                           dataColumnId:dataColumnId,
-                           rowClass : rowClass,
-                           columnClass :  columnClass
-                       });
-                   }
-               });
-           }
-       });*/
 
        gm.attributeFormsApp.initDynamicDataView({
            attributeKeys: '',
@@ -187,50 +158,6 @@ defined('C5_EXECUTE') or die('Access Denied.');
            dataColumnId:'',
            rowClass : '',
            columnClass :  ''
-       });
-       // To remove unwanted html element and comments
-       $('#mycanvas').on({
-           click :function(){
-               $('#mycanvas-hidden').html($(this).find('#gm-canvas').html());
-               $('#mycanvas-hidden').find('#gm-controls').remove().html();
-               $('#mycanvas-hidden').find('.gm-tools.clearfix').remove().html();
-
-               $('#mycanvas-hidden').find('.row-fluid').each(function(){
-                  $(this).removeAttr('style');
-                  $(this).find('.column').each(function(){
-                      var labelText = $(this).find('p').html();
-                      $(this).find('.gm-editable-region.gm-content-draggable').remove().html();
-                      $(this).html('');
-                      if($.type(labelText) != 'undefined'){
-                          $(this).html('<p>'+labelText+'</p>');
-                      }
-                  });
-               });
-
-               //add value to hidden field
-               $('.attributes_html').val($('#mycanvas-hidden').html());
-
-           },
-           keyup :function(){
-               $('#mycanvas-hidden').html($(this).find('#gm-canvas').html());
-               $('#mycanvas-hidden').find('#gm-controls').remove().html();
-               $('#mycanvas-hidden').find('.gm-tools.clearfix').remove().html();
-
-               $('#mycanvas-hidden').find('.row-fluid').each(function(){
-                   $(this).removeAttr('style');
-                   $(this).find('.column').each(function(){
-                       var labelText = $(this).find('p').html();
-                       $(this).find('.gm-editable-region.gm-content-draggable').remove().html();
-                       $(this).html('');
-                       if($.type(labelText) != 'undefined'){
-                           $(this).html('<p>'+labelText+'</p>');
-                       }
-                   });
-               });
-               //add value to hidden field
-               $('.attributes_html').val($('#mycanvas-hidden').html());
-
-           }
        });
 
 
@@ -302,7 +229,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                dataColumnId = $(this).closest('.column').data('column-id'),
                sortOrderId = $(this).closest('.list-group-item').data('sort-order'),
                pageIndex = dataRowId+''+dataColumnId;
-console.log(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex][sortOrderId]);
+
            var attr = gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex][sortOrderId];
            var options = attr.options ? attr.options : {};
 
