@@ -15,7 +15,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
         </div>
         <div  class="col-md-9 col-sm-9 col-xs-9" id="mycanvas">
 
-            <?= isset($attributesHtml)? '' : '' ?>
+
 
             <?php if($selectedAttributes->formPages){ ?>
                 <?php

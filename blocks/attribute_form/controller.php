@@ -78,7 +78,6 @@ class Controller extends BlockController
         $this->set('aftID', $this->aftID);
         $this->set('attributes', $formType->getDecodedAttributes());
         $this->set('layoutAttributes', $formType->getLayoutDecodedAttributes());
-        $this->set('attributesHtml', $formType->getAttributesHtml());
         $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
         $this->set('token', $token->generate('attribute_form_'.$this->bID));
     }

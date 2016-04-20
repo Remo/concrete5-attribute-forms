@@ -81,11 +81,8 @@ class Types extends DashboardPageController
         $selectedAttributes = $attributeForm->getLayoutDecodedAttributes(
             $includeAtHandle = true /* needed to determine attribute options */
         );
-        $attributesHtml = $attributeForm->getAttributesHtml(
-            $includeAtHandle = true /* needed to determine attribute options */
-        );
+
         $this->set('selectedAttributes', $selectedAttributes);
-        $this->set('attributesHtml', $attributesHtml);
         $this->set('attributeForm', $attributeForm);
         $this->requireAsset('javascript', 'mesch/gridmanager');
         $this->requireAsset('css', 'mesch/gridmanagercss');
