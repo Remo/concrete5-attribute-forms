@@ -13,6 +13,8 @@
             </tr>
             </thead>
             <tbody>
+            <?php
+            $attributes = array_merge($attributes, $layoutAttributes);?>
             <?php foreach ($attributes as $attribute) { ?>
                 <tr>
                     <th>

@@ -1055,13 +1055,17 @@
               cursor: "move",
               stop: function(e, ui) {
                 gm.resetCommentTags($(ui.item).parent());
-                  gm.attributeFormsApp.data.attributeOptions;
+
                   var rowId = $(ui.item).closest('.row-fluid').data('row-id'),
+                      rowClass = $(ui.item).closest('.row-fluid').attr('class'),
                       columnID = $(ui.item).closest('.column').data('column-id'),
+                      columnClass = $(ui.item).closest('.column').attr('class'),
                       attributeOptionHtml = '';
-                  if(gm.attributeFormsApp.data.attributeOptions[$(ui.item).closest('.list-group-item').data('athandle')]){
+                  if(!gm.attributeFormsApp.data.attributeOptions){
+                      gm.attributeFormsApp.data.attributeOptions = gm.attributeFormsApp.attributeOptions;
+                  }
+                  if($.type(gm.attributeFormsApp.data) != 'undefined' && gm.attributeFormsApp.data.attributeOptions[$(ui.item).closest('.list-group-item').data('athandle')]){
                       $.each(gm.attributeFormsApp.data.attributeOptions[$(ui.item).closest('.list-group-item').data('athandle')] , function( optKey, opt ){
-                          console.log(opt);
                           var optText = opt["text"];
 
                           attributeOptionHtml = '<label class="control-label" style="font-weight:normal;">'+
@@ -1080,23 +1084,27 @@
                   if($.type(gm.attributeFormsApp.data) == 'undefined') {
 
                       gm.attributeFormsApp.initFormTypesView({
-                          attributeKeys: '',
+                          attributeKeys: gm.attributeFormsApp.attributeKeys,
                           selectedAttributes: '',
-                          attributeOptions: '',
+                          attributeOptions: gm.attributeFormsApp.attributeOptions,
                           attributeDiv: $(ui.item).closest('.list-group-item'),
                           dataRowId: rowId,
-                          dataColumnId: columnID
+                          dataColumnId: columnID,
+                          rowClass: rowClass,
+                          columnClass: columnClass
                       });
 
                   }else{
 
                       gm.attributeFormsApp.dropAttributes({
-                          attributeKeys: '',
+                          attributeKeys: gm.attributeFormsApp.attributeKeys,
                           selectedAttributes: '',
-                          attributeOptions: '',
+                          attributeOptions: gm.attributeFormsApp.attributeOptions,
                           attributeDiv: $(ui.item).closest('.list-group-item'),
                           dataRowId: rowId,
-                          dataColumnId: columnID
+                          dataColumnId: columnID,
+                          rowClass: rowClass,
+                          columnClass: columnClass
                       });
 
                   }
@@ -1249,7 +1257,9 @@
                     attributesData: params.selectedAttributes,
                     attributeOptions: params.attributeOptions,
                     dataRowId: params.dataRowId,
-                    dataColumnId: params.dataColumnId
+                    dataColumnId: params.dataColumnId,
+                    rowClass : params.rowClass,
+                    columnClass :  params.columnClass
                 };
 
                 if(!this.data.attributesData){
@@ -1263,14 +1273,20 @@
                     atHandle = params.attributeDiv.data('athandle'),
                     pageIndex = params.attributeDiv.data("page-index"),
                     dataColumnId = params.dataColumnId,
-                    dataRowId = params.dataRowId;
+                    dataRowId = params.dataRowId,
+                    rowClass = params.rowClass,
+                    columnClass =  params.columnClass;
 
                 if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
                     gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
                 }
+
                 if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) !== 'object' ) {
                     gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = {};
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass'] = Array();
                 }
+                gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass'] = columnClass;
+
                 gm.attributeFormsApp.data.dataColumnId = dataColumnId;
                 gm.attributeFormsApp.data.dataRowId = dataRowId;
 
@@ -1314,21 +1330,32 @@
                 gm.attributeFormsApp.renderClosestAttributes(params);
             },
             dropAttributes: function(element) {
+                gm.attributeFormsApp.data.attributeKeys = element.attributeKeys;
+                gm.attributeFormsApp.data.attributeOptions = element.attributeOptions;
 
                 var newAttributeName = $.trim(element.attributeDiv.text().replace('Use as email subject  Mandatory','').replace('Reply to this email address').replace('Mandatory','')),
                     newAttributeValue = element.attributeDiv.data('value'),
                     atHandle = element.attributeDiv.data('athandle'),
                     pageIndex = element.attributeDiv.data("page-index"),
                     dataColumnId = element.dataColumnId,
-                    dataRowId = element.dataRowId;
+                    dataRowId = element.dataRowId,
+                    rowClass = element.rowClass,
+                    columnClass =  element.columnClass;
 
                 if($.type(pageIndex) != 'undefined') {
                     if ($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
                         gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
                     }
+
                     if ($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) !== 'object') {
                         gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId] = {};
                     }
+
+                    if ($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass']) === false) {
+                        gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass'] = Array();
+                    }
+                    gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass'] = columnClass;
+
                     gm.attributeFormsApp.data.dataColumnId = dataColumnId;
                     gm.attributeFormsApp.data.dataRowId = dataRowId;
 
@@ -1350,6 +1377,7 @@
                 }
             },
             removeAttributes: function(element) {
+
                 var pageIndex = element.attributeDiv.data("page-index"),
                     dataColumnId = element.dataColumnId,
                     dataRowId = element.dataRowId;

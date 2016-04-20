@@ -16,7 +16,6 @@ use Concrete\Core\User\UserInfo,
     Events,
     Config,
     Core;
-use Concrete\Core\Attribute\Key\CollectionKey as AttributeCollectionKey;
 
 class Controller extends BlockController
 {
@@ -82,8 +81,6 @@ class Controller extends BlockController
         $this->set('attributesHtml', $formType->getAttributesHtml());
         $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
         $this->set('token', $token->generate('attribute_form_'.$this->bID));
-        $this->requireAsset('javascript', 'mesch/gridmanager');
-        $this->requireAsset('css', 'mesch/gridmanagercss');
     }
 
     public function customLayout()
@@ -228,15 +225,17 @@ class Controller extends BlockController
         }
         
         $attributes = $aft->getDecodedAttributes();
-        foreach ($attributes->formPages as $formPage){
-            foreach ($formPage->attributes as $attr) {
-                if ($attr->required) {
-                    $ak = AttributeFormKey::getByID($attr->akID);
-                    $e1 = $ak->validateAttributeForm();
-                    if ($e1 == false) {
-                        $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
-                    } else if ($e1 instanceof \Concrete\Core\Error\Error) {
-                        $this->errors->add($e1);
+        if($attributes) {
+            foreach ($attributes->formPages as $formPage) {
+                foreach ($formPage->attributes as $attr) {
+                    if ($attr->required) {
+                        $ak = AttributeFormKey::getByID($attr->akID);
+                        $e1 = $ak->validateAttributeForm();
+                        if ($e1 == false) {
+                            $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                        } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                            $this->errors->add($e1);
+                        }
                     }
                 }
             }
@@ -272,6 +271,7 @@ class Controller extends BlockController
         }
 
         if (!$foundSpam) {
+
             foreach ($this->getCustomFormActions() as $customAction) {
                 ActionTypeFactory::execute(
                     $customAction, [$af, ['recipientEmail' => $this->recipientEmail]]
@@ -285,7 +285,6 @@ class Controller extends BlockController
             if (intval($this->notifySubmitor) > 0) {
                 $this->sendNotificationsMailToSubmitor($af);
             }
-
             Events::dispatch('post_attribute_forms_submit', new AttributeFormEvent($this, $af));
             $this->flash('message', h(t($this->thankyouMsg)));
         }
@@ -330,18 +329,23 @@ class Controller extends BlockController
         $attributes = $aft->getLayoutDecodedAttributes();
 
         foreach ($attributes->formPages as $row => $formPageRow){
-            foreach ($formPageRow as $col => $formPageCol) {
-                foreach ((array)$formPageCol as $key => $formPage) {
-                    foreach ($formPage as $attr) {
+            if(is_array($formPageRow)) {
+                foreach ($formPageRow as $col => $formPageCol) {
+                    if (is_object($formPageCol)) {
+                        foreach ((array)$formPageCol as $key => $formPage) {
+                            if (is_array($formPage)) {
+                                foreach ($formPage as $attr) {
+                                    if ($attr->required) {
+                                        $ak = AttributeFormKey::getByID($attr->akID);
+                                        $e1 = $ak->validateAttributeForm();
 
-                        if ($attr->required) {
-                            $ak = AttributeFormKey::getByID($attr->akID);
-                            $e1 = $ak->validateAttributeForm();
-
-                            if ($e1 == false) {
-                                $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
-                            } else if ($e1 instanceof \Concrete\Core\Error\Error) {
-                                $this->errors->add($e1);
+                                        if ($e1 == false) {
+                                            $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                                        } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                                            $this->errors->add($e1);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -359,17 +363,19 @@ class Controller extends BlockController
         $af->save();
 
         // get all attributes of type and save values from form to the database
-        $attributeObjs = $aft->getAttributeObjects();
+        $attributeObjs = $aft->getLayoutAttributeObjects();
+
         foreach ($attributeObjs as $akID => $ak) {
             $af->setAttribute($ak, false);
         }
 
         // check SPAM
-        $submittedData = $af->getAttributeDataString();
+        $submittedData = $af->getLayoutAttributeDataString();
         $antispam      = $this->app->make('helper/validation/antispam');
         $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
 
         if ($foundSpam) {
+
             if ($aft->getDeleteSpam()) {
                 $af->delete();
             } else {
@@ -497,11 +503,5 @@ class Controller extends BlockController
         $captchaDisplay = ob_get_clean();
         
         print str_replace($pictureDispURL, $meschPictureDispURL, $captchaDisplay);
-    }
-
-
-    public function action_renderAttributes($Id){
-        $attributeObject = AttributeFormKey::getByID($this->post('attributeKeyId'));
-        return new \Symfony\Component\HttpFoundation\Response($attributeObject->render('form', false));
     }
 }
