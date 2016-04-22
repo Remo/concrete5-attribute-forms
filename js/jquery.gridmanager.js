@@ -1005,8 +1005,53 @@
               elem = null;
           $(('.'+gm.options.gmToolClass+':last'),container)
           .before(elem = $('<div>').addClass(gm.options.gmEditRegion+' '+gm.options.contentDraggableClass)
-            .append(gm.options.controlContentElem+'<div class="'+gm.options.gmContentRegion+'"><p>New Contents</p></div>')).before(cTagClose).prev().before(cTagOpen);
+            .append(gm.options.controlContentElem+'<div class="'+gm.options.gmContentRegion+'"><p class="editable-label list-group-item" data-page-index="'+$(btn).closest('.row-fluid').data('row-id')+''+$(btn).closest('.column').data('column-id')+'" data-sort-order="">New Contents</p></div>')).before(cTagClose).prev().before(cTagOpen);
           gm.initNewContentElem(elem);
+
+            var rowId = $(btn).closest('.row-fluid').data('row-id'),
+                rowClass = $(btn).closest('.row-fluid').attr('class'),
+                columnID = $(btn).closest('.column').data('column-id'),
+                columnClass = $(btn).closest('.column').attr('class'),
+                attributeOptionHtml = '';
+            $(btn).parents().find("[data-row-id='" + rowId + "']").find("[data-column-id='" + columnID + "']").find('.gm-editable-region.gm-content-draggable .list-group-item').each(function(i, el){
+                $(this).attr('data-sort-order',i);
+            });
+            if(!gm.attributeFormsApp.data.attributeOptions){
+                gm.attributeFormsApp.data.attributeOptions = gm.attributeFormsApp.attributeOptions;
+            }
+
+            if($.type(gm.attributeFormsApp.data) == 'undefined') {
+
+                gm.attributeFormsApp.initFormTypesView({
+                    attributeKeys: gm.attributeFormsApp.attributeKeys,
+                    selectedAttributes: '',
+                    attributeOptions: gm.attributeFormsApp.attributeOptions,
+                    attributeDiv: $(btn).parents().find("[data-row-id='" + rowId + "']").find("[data-column-id='" + columnID + "']").find('.gm-editable-region.gm-content-draggable p'),
+                    dataRowId: rowId,
+                    dataColumnId: columnID,
+                    rowClass: rowClass,
+                    columnClass: columnClass,
+                    label:1
+                });
+
+            }else{
+                gm.attributeFormsApp.dropAttributes({
+                    attributeKeys: gm.attributeFormsApp.attributeKeys,
+                    selectedAttributes: '',
+                    attributeOptions: gm.attributeFormsApp.attributeOptions,
+                    attributeDiv: $(btn).parents().find("[data-row-id='" + rowId + "']").find("[data-column-id='" + columnID + "']").find('.gm-editable-region.gm-content-draggable p'),
+                    dataRowId: rowId,
+                    dataColumnId: columnID,
+                    rowClass: rowClass,
+                    columnClass: columnClass,
+                    label:1
+                });
+
+            }
+
+
+
+
         };
 
           /*
@@ -1276,7 +1321,7 @@
                     dataRowId = params.dataRowId,
                     rowClass = params.rowClass,
                     columnClass =  params.columnClass;
-
+                if(params.label){ var label = element.label; }else{ var label = 0; }
                 if($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
                     gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
                 }
@@ -1299,7 +1344,8 @@
                         akName: newAttributeName,
                         akID: newAttributeValue,
                         atHandle: atHandle,
-                        required: false
+                        required: false,
+                        label:label
                     });
 
                 }
@@ -1330,6 +1376,7 @@
                 gm.attributeFormsApp.renderClosestAttributes(params);
             },
             dropAttributes: function(element) {
+
                 gm.attributeFormsApp.data.attributeKeys = element.attributeKeys;
                 gm.attributeFormsApp.data.attributeOptions = element.attributeOptions;
 
@@ -1342,7 +1389,9 @@
                     rowClass = element.rowClass,
                     columnClass =  element.columnClass;
 
+                if(element.label){ var label = element.label; }else{ var label = 0; }
                 if($.type(pageIndex) != 'undefined') {
+
                     if ($.isArray(gm.attributeFormsApp.data.attributesData.formPages[dataRowId]) === false) {
                         gm.attributeFormsApp.data.attributesData.formPages[dataRowId] = Array();
                     }
@@ -1368,7 +1417,8 @@
                             akName: newAttributeName,
                             akID: newAttributeValue,
                             atHandle: atHandle,
-                            required: false
+                            required: false,
+                            label:label
                         });
 
                     }

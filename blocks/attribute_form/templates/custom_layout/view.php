@@ -52,20 +52,24 @@ if (!empty($layoutAttributes)) {
                             <?php
                             if (is_array($formPage) && !empty($formPage)) {
                                 foreach ($formPage as $attribute) {
-                                    $attributeObject = AttributeFormKey::getByID($attribute->akID);
-                                    ?>
-                                    <div class="form-group row attribute-row"
-                                         id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
-                                         <div class="">
-                                            <?php
-                                            if ($attribute->required) {
-                                                echo '<span class="text-danger">*</span>';
-                                            }
-                                            ?>
-                                            <?php $attributeObject->render('form', false); ?>
-                                         </div>
-                                    </div>
-                                    <?php
+                                    if($attribute->label){
+                                        echo "<label class='control-label'>".$attribute->akName."</label>";
+                                    }else {
+                                        $attributeObject = AttributeFormKey::getByID($attribute->akID);
+                                        ?>
+                                        <div class="form-group attribute-row"
+                                             id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
+                                            <div class="">
+                                                <?php
+                                                if ($attribute->required) {
+                                                    echo '<span class="text-danger">*</span>';
+                                                }
+                                                ?>
+                                                <?php $attributeObject->render('form', false); ?>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
                                 }
                             }
                             ?>

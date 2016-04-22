@@ -365,7 +365,9 @@ class Controller extends BlockController
         $attributeObjs = $aft->getLayoutAttributeObjects();
 
         foreach ($attributeObjs as $akID => $ak) {
-            $af->setAttribute($ak, false);
+            if($akID) {
+                $af->setAttribute($ak, false);
+            }
         }
 
         // check SPAM

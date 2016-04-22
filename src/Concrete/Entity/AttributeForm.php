@@ -193,7 +193,9 @@ class AttributeForm extends EntityBase
         $aft = AttributeFormType::getByID($this->getTypeID());
         $attributes = $aft->getLayoutAttributeObjects();
         foreach ($attributes as $attribute) {
-            $ret .= sprintf('%s: %s', $attribute->getAttributeKeyDisplayName(), $this->getAttribute($attribute, 'display'));
+            if($attribute) {
+                $ret .= sprintf('%s: %s', $attribute->getAttributeKeyDisplayName(), $this->getAttribute($attribute, 'display'));
+            }
         }
         return $ret;
     }
