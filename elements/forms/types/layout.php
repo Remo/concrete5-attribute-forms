@@ -252,17 +252,18 @@ defined('C5_EXECUTE') or die('Access Denied.');
            }
 
            if($(this).is(':checked') && isUnique){
-               gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId].forEach(function(page, i) {
-                   page.attributes.forEach(function(attribute, j){
-                       if(attribute.options){
-                           gm.attributeFormsApp.data
-                               .attributesData
-                               .formPages[dataRowId][dataColumnId][i]
-                               .attributes[j]
-                               .options[optionKey] = false;
+
+               if($.type(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]) == 'object') {
+                   $.each( gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId], function( i , page) {
+                       if(i != 'columnClass'){
+                           $.each( page, function( j , attribute) {
+                               if (attribute.options) {
+                                   attribute.options[optionKey] = false;
+                               }
+                           });
                        }
                    });
-               });
+               }
            }
            options[optionKey] = $(this).is(':checked');
            gm.attributeFormsApp.data.attributesData

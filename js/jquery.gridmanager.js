@@ -1380,7 +1380,7 @@
                 gm.attributeFormsApp.data.attributeKeys = element.attributeKeys;
                 gm.attributeFormsApp.data.attributeOptions = element.attributeOptions;
 
-                var newAttributeName = $.trim(element.attributeDiv.text().replace('Use as email subject  Mandatory','').replace('Reply to this email address').replace('Mandatory','')),
+                var newAttributeName = $.trim(element.attributeDiv.text().replace('Use as email subject  Mandatory','').replace('Reply to this email address','').replace('Mandatory','')),
                     newAttributeValue = element.attributeDiv.data('value'),
                     atHandle = element.attributeDiv.data('athandle'),
                     pageIndex = element.attributeDiv.data("page-index"),

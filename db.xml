@@ -44,4 +44,12 @@
         <field name="uncheckedActions" type="text"></field>
         <field name="indentation" type="integer"></field>
     </table>
+    <table name="atEmailSettings">
+        <field name="akID" type="integer" size="10">
+            <unsigned/>
+            <key/>
+            <default value="0"/>
+        </field>
+        <field name="akEmailPlaceholder" type="string" size="255"/>
+    </table>
 </schema>
