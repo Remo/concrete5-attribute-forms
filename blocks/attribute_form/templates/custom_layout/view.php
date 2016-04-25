@@ -40,7 +40,7 @@ if (!empty($layoutAttributes)) {
         if($formPageRow){
         ?>
 
-    <div class="row-fluid" data-row-id="<?= $row; ?>">
+    <div class="row" data-row-id="<?= $row; ?>">
         <?php foreach ($formPageRow as $col => $formPageCol) {?>
         <div class="<?= $formPageCol->columnClass; ?>" data-column-id="<?= $col; ?>">
 
@@ -99,8 +99,9 @@ if (!empty($layoutAttributes)) {
         </div>
     </div>
     <?php  endif; ?>
+    <div class="clearfix"></div>
     <div class="row">
-        <div class="col-sm-offset-4 col-sm-8">
+        <div class=" col-sm-12">
             <span class="small text-muted">* <?=t('Required fields.');?></span>
             <input type="submit" name="Submit" class="btn btn-primary pull-right" value="<?= h(t($submitText)); ?>" />
         </div>
@@ -141,6 +142,17 @@ if (!empty($layoutAttributes)) {
         .se-pre-con img{
             margin-top: 25%;
             clear: both;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 15px;
+            padding: 5px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="search"], input[type="url"], input[type="password"], .ui-autocomplete-input, textarea, .uneditable-input{
+            webkit-border-radius: 0px;
+            -moz-border-radius: 0px;
+            border-radius: 0px;
         }
     </style>
     <?php

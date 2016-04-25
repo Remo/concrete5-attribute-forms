@@ -29,9 +29,9 @@ defined('C5_EXECUTE') or die('Access Denied.');
                                 if (is_array($formPage)) {
                                     foreach ($formPage as $i => $attr) {
                                         if($attr->label){
-                                            echo '<p class="editable-label list-group-item" data-page-index="' . $key . '">'.$attr->akName.'</p>';
+                                            echo '<!--gm-editable-region--><p class="editable-label list-group-item" data-page-index="' . $key . '">'.$attr->akName.'</p><!--/gm-editable-region-->';
                                         }else{
-                                            echo '<div data-value="' . $attr->akID . '" data-athandle="' . $attr->atHandle . '" class="list-group-item ui-draggable ui-draggable-handle" data-page-index="' . $key . '" data-sort-order="" >';
+                                            echo '<!--gm-editable-region--><div data-value="' . $attr->akID . '" data-athandle="' . $attr->atHandle . '" class="list-group-item ui-draggable ui-draggable-handle" data-page-index="' . $key . '" data-sort-order="" >';
                                             echo $attr->akName;
                                             echo '<br>';
                                             echo "<span>";
@@ -63,7 +63,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
 
                                             echo '</span>';
 
-                                            echo '</div>';
+                                            echo '</div><!--/gm-editable-region-->';
                                         }
 
                                     }
@@ -208,6 +208,23 @@ defined('C5_EXECUTE') or die('Access Denied.');
            delete gm.attributeFormsApp.data.attributesData.formPages[rowId][columnId].columnClass;
            delete gm.attributeFormsApp.data.attributesData.formPages[rowId][columnId];
            gm.attributeFormsApp.renderClosestAttributes(this);
+       });
+
+       /*******Remove element/attribute and bind click*******/
+       $('#mycanvas').find('a.gm-delete.fa.fa-times').bind('click', function(e) {
+
+           gm.attributeFormsApp.removeEditableArea({
+               attributeKeys: '',
+               selectedAttributes: '',
+               attributeOptions: '',
+               attributeDiv: $(this).closest('.list-group-item'),
+               dataRowId: $(this).closest('.row-fluid').data('row-id'),
+               dataColumnId: $(this).closest('.column').data('column-id'),
+               sortOrder:$(this).closest('.'+gm.options.gmEditRegion).find('.list-group-item').data('sort-order')
+           });
+           $(this).closest('.'+gm.options.gmEditRegion).remove();
+           //$(this).closest('.list-group-item').remove();
+           e.preventDefault();
        });
 
        /******Add sort order****/

@@ -1072,7 +1072,7 @@
 
           $.each(parentCols, function(i, col) {
             $(col).on('click', '.gm-delete', function(e) {
-              $(this).closest('.'+gm.options.gmEditRegion).remove();
+              //$(this).closest('.'+gm.options.gmEditRegion).remove();
               gm.resetCommentTags(col);
               e.preventDefault();
             });
@@ -1086,6 +1086,7 @@
                     dataRowId: $(this).closest('.row-fluid').data('row-id'),
                     dataColumnId: $(this).closest('.column').data('column-id')
                 });
+                $(this).closest('.'+gm.options.gmEditRegion).remove();
                 $(this).closest('.list-group-item').remove();
                 e.preventDefault();
             });
@@ -1287,7 +1288,9 @@
 
 
 
-
+        /**
+         * Attribute form - init & render and load
+         */
         gm.attributeFormsApp = {
 
             initFormTypesView: function (params) {
@@ -1430,9 +1433,20 @@
 
                 var pageIndex = element.attributeDiv.data("page-index"),
                     dataColumnId = element.dataColumnId,
+                    sortOrder = element.attributeDiv.data("sort-order"),
                     dataRowId = element.dataRowId;
 
-                delete gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex];
+                delete gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex][sortOrder];
+                gm.attributeFormsApp.renderClosestAttributes(this);
+            },
+            removeEditableArea: function(element) {
+
+                var dataColumnId = element.dataColumnId,
+                    dataRowId = element.dataRowId,
+                    sortOrder = element.sortOrder,
+                    pageIndex = dataRowId+''+dataColumnId;
+
+                delete gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex][sortOrder];
                 gm.attributeFormsApp.renderClosestAttributes(this);
             },
             initRedactor: function () {
