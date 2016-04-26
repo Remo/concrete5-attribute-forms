@@ -28,44 +28,45 @@ defined('C5_EXECUTE') or die('Access Denied.');
                             foreach ((array)$formPageCol as $key => $formPage) {
                                 if (is_array($formPage)) {
                                     foreach ($formPage as $i => $attr) {
-                                        if($attr->label){
-                                            echo '<!--gm-editable-region--><p class="editable-label list-group-item" data-page-index="' . $key . '">'.$attr->akName.'</p><!--/gm-editable-region-->';
-                                        }else{
-                                            echo '<!--gm-editable-region--><div data-value="' . $attr->akID . '" data-athandle="' . $attr->atHandle . '" class="list-group-item ui-draggable ui-draggable-handle" data-page-index="' . $key . '" data-sort-order="" >';
-                                            echo $attr->akName;
-                                            echo '<br>';
-                                            echo "<span>";
-                                            foreach ($attributeOptions as $opts => $optKeys) {
+                                        if($attr) {
+                                            if ($attr->label) {
+                                                echo '<!--gm-editable-region--><p class="editable-label list-group-item" data-page-index="' . $key . '">' . $attr->akName . '</p><!--/gm-editable-region-->';
+                                            } else {
+                                                echo '<!--gm-editable-region--><div data-value="' . $attr->akID . '" data-athandle="' . $attr->atHandle . '" class="list-group-item ui-draggable ui-draggable-handle" data-page-index="' . $key . '" data-sort-order="" >';
+                                                echo $attr->akName;
+                                                echo '<br>';
+                                                echo "<span>";
+                                                foreach ($attributeOptions as $opts => $optKeys) {
 
-                                                if ($opts == $formPage[$i]->atHandle) {
-                                                    foreach ($optKeys as $optKey => $opt) {
-                                                        $optText = $opt['text'];
-                                                        if (!$formPage[$i]->options) {
-                                                            $formPage[$i]->options = (object)[];
-                                                            $formPage[$i]->options->$optKey = false;
+                                                    if ($opts == $formPage[$i]->atHandle) {
+                                                        foreach ($optKeys as $optKey => $opt) {
+                                                            $optText = $opt['text'];
+                                                            if (!$formPage[$i]->options) {
+                                                                $formPage[$i]->options = (object)[];
+                                                                $formPage[$i]->options->$optKey = false;
+                                                            }
+                                                            echo '<label class="control-label" style="font-weight:normal;">';
+                                                            if ($formPage[$i]->options->$optKey) {
+                                                                echo '<input type="checkbox" data-name="' . $optKey . '" class="attribute-option" value="1" checked="checked" />';
+                                                            } else {
+                                                                echo '<input type="checkbox" data-name="' . $optKey . '" class="attribute-option" value="1"  />';
+                                                            }
+                                                            echo '<span>' . $optText . '</span></label> <br>';
                                                         }
-                                                        echo '<label class="control-label" style="font-weight:normal;">';
-                                                        if ($formPage[$i]->options->$optKey) {
-                                                            echo '<input type="checkbox" data-name="' . $optKey . '" class="attribute-option" value="1" checked="checked" />';
-                                                        } else {
-                                                            echo '<input type="checkbox" data-name="' . $optKey . '" class="attribute-option" value="1"  />';
-                                                        }
-                                                        echo '<span>' . $optText . '</span></label> <br>';
                                                     }
                                                 }
-                                            }
-                                            if ($attr->required) {
-                                                echo '<input type="checkbox" class="attribute-required" value="1" checked="checked" /> ' . t('Mandatory') . '&nbsp;&nbsp;&nbsp';
-                                            } else {
-                                                echo '<input type="checkbox" class="attribute-required" value="1" /> ' . t('Mandatory') . '&nbsp;&nbsp;&nbsp';
-                                            }
-                                            echo '<a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span></a>';
+                                                if ($attr->required) {
+                                                    echo '<input type="checkbox" class="attribute-required" value="1" checked="checked" /> ' . t('Mandatory') . '&nbsp;&nbsp;&nbsp';
+                                                } else {
+                                                    echo '<input type="checkbox" class="attribute-required" value="1" /> ' . t('Mandatory') . '&nbsp;&nbsp;&nbsp';
+                                                }
+                                                echo '<a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span></a>';
 
-                                            echo '</span>';
+                                                echo '</span>';
 
-                                            echo '</div><!--/gm-editable-region-->';
+                                                echo '</div><!--/gm-editable-region-->';
+                                            }
                                         }
-
                                     }
                                 }
                             }
