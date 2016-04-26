@@ -1122,10 +1122,18 @@
                   }
                   $(ui.item).closest('.list-group-item').attr('data-page-index',rowId+''+columnID).removeAttr( "style")
                           .append('<br><span>'+attributeOptionHtml+'<input type="checkbox" class="attribute-required" value="1" /> Mandatory &nbsp;&nbsp;&nbsp;<a title="Remove Attribute" class="pull-right gm-removeAttr"><span class="fa fa-trash-o"></span>&nbsp;</a></span>');
+
+
+                  var old_index = $(ui.item).find('.gm-content').find('.list-group-item').attr('data-sort-order');
+
                   $(ui.item).parent().find('.list-group-item').each(function(i, el){
                       $(this).attr('data-sort-order',i);
                   });
 
+                  var new_index = $(ui.item).find('.gm-content').find('.list-group-item').attr('data-sort-order');
+                  if($.type(old_index) != 'undefined' && $.type(new_index) != 'undefined') {
+                      gm.reOrderElament(old_index, new_index, rowId, columnID);
+                  }
 
                   if($.type(gm.attributeFormsApp.data) == 'undefined') {
 
@@ -1285,6 +1293,23 @@
 
 
 
+
+        /**
+         * Re-order element on drag 'n' drop
+         */
+        gm.reOrderElament = function (old_index, new_index, rowId, columnID) {
+            var reOrderObject = gm.attributeFormsApp.data.attributesData.formPages[rowId][columnID][rowId+''+columnID];
+
+            if (new_index >= reOrderObject.length) {
+                var k = new_index - reOrderObject.length;
+                while ((k--) + 1) {
+                    reOrderObject.push(undefined);
+                }
+            }
+            reOrderObject.splice(new_index, 0, reOrderObject.splice(old_index, 1)[0]);
+
+            gm.attributeFormsApp.updateFormData();
+        };
 
 
 
