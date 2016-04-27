@@ -426,6 +426,16 @@
                        col.switchClass(t.colClass, gm.options.currentClassMode + t.colWidth, 200);
                    }
 
+              /**Update class for attribute data**/
+              var dataRowId = $(this).closest('.row-fluid').data('row-id'),
+                  dataColumnId = $(this).closest('.column').data('column-id'),
+                  classAttr = $(this).closest('.column').attr('class');
+
+              if(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass']){
+                  gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass'] = classAttr.replace(t.colClass,gm.options.currentClassMode + t.colWidth);
+              }
+              gm.attributeFormsApp.updateFormData();
+
             // Increase Column Size
             }).on("click", "a.gm-colIncrease", function(){
                var col = $(this).closest("." +gm.options.gmEditClass);
@@ -434,6 +444,16 @@
                     t.colWidth=(parseInt(t.colWidth, 10) + parseInt(gm.options.colResizeStep, 10));
                     col.switchClass(t.colClass, gm.options.currentClassMode + t.colWidth, 200);
                 }
+
+               /**Update class for attribute data**/
+               var dataRowId = $(this).closest('.row-fluid').data('row-id'),
+                   dataColumnId = $(this).closest('.column').data('column-id'),
+                   classAttr = $(this).closest('.column').attr('class');
+
+               if(gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass']){
+                   gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId]['columnClass'] = classAttr.replace(t.colClass,gm.options.currentClassMode + t.colWidth);
+               }
+               gm.attributeFormsApp.updateFormData();
 
             // Reset all teh things
             }).on("click", "a.gm-resetgrid", function(){
