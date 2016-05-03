@@ -15,3 +15,4 @@ Since version 5.7 of concrete5 hasn't been on the market for very long the list 
 * https://github.com/Remo/concrete5-attribute-masked-input An attribute where you can restrict the input using a format mask
 * https://github.com/Remo/concrete5-attribute-multi-text An attribute where you can ask for multiple values in a single attribute. Useful to group similar things.
 * https://github.com/Remo/attribute-free-form An attribute for advanced users who are comfortable with HTML. Allows you to create a custom form in an attribute right in the user interface.
+* https://github.com/avdevs/concrete5-attribute-radio-button An attribute allowing you to add radio buttons to your form
