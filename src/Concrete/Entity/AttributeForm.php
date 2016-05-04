@@ -267,7 +267,7 @@ class AttributeForm extends EntityBase
             // Is this avID in use ?
             if (is_object($av)) {
                 $cnt = $db->fetchColumn("select count(avID) from AttributeFormsAttributeValues where avID = ?",
-                    $av->getAttributeValueID());
+                    array($av->getAttributeValueID()));
             }
 
             if ((!is_object($av)) || ($cnt > 1)) {
