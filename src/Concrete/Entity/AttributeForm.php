@@ -187,6 +187,19 @@ class AttributeForm extends EntityBase
         return $ret;
     }
 
+    public function getLayoutAttributeDataString()
+    {
+        $ret = '';
+        $aft = AttributeFormType::getByID($this->getTypeID());
+        $attributes = $aft->getLayoutAttributeObjects();
+        foreach ($attributes as $attribute) {
+            if($attribute) {
+                $ret .= sprintf('%s: %s', $attribute->getAttributeKeyDisplayName(), $this->getAttribute($attribute, 'display'));
+            }
+        }
+        return $ret;
+    }
+
     public function getAttribute($ak, $displayMode = false)
     {
         if (!is_object($ak)) {
@@ -254,7 +267,7 @@ class AttributeForm extends EntityBase
             // Is this avID in use ?
             if (is_object($av)) {
                 $cnt = $db->fetchColumn("select count(avID) from AttributeFormsAttributeValues where avID = ?",
-                    $av->getAttributeValueID());
+                    array($av->getAttributeValueID()));
             }
 
             if ((!is_object($av)) || ($cnt > 1)) {

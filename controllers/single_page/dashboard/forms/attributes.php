@@ -38,7 +38,7 @@ class Attributes extends DashboardPageController
         $cnt = $type->getController();
         $e = $cnt->validateKey($this->post());
         if ($e->has()) {
-            $this->set('error', $e);
+            $this->flash('error', $e);
         } else {
             $type = AttributeType::getByID($this->post('atID'));
             AttributeFormKey::add($type, $this->post());
@@ -71,7 +71,9 @@ class Attributes extends DashboardPageController
         $cnt->setAttributeKey($key);
         $e = $cnt->validateKey($this->post());
         if ($e->has()) {
-            $this->set('error', $e);
+            $this->flash('error', $e);
+            $this->set('key', $key);
+            $this->set('type', $type);
         } else {
             AttributeType::getByID($this->post('atID'));
             $key->update($this->post());

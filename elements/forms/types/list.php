@@ -20,6 +20,9 @@
                         <td class="form-type-name"><?= $formType->getFormName() ?></td>
                         <td>
                             <div class="btn-toolbar pull-right">
+                                <a class="btn btn-primary" href="<?= $view->action('layout', $formType->getID()) ?>">
+                                    <?= t('Custom Layout') ?>
+                                </a>
                                 <a class="btn btn-primary" href="<?= $view->action('edit', $formType->getID()) ?>">
                                     <?= t('Edit') ?>
                                 </a>
@@ -27,6 +30,7 @@
                                    href="<?= $view->action('delete', $formType->getID(), Core::make('token')->generate('delete_ft')) ?>">
                                     <?= t('Delete') ?>
                                 </a>
+
                             </div>
                         </td>
                     </tr>

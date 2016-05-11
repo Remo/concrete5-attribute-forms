@@ -17,16 +17,16 @@ if (!empty($attributes)) {
             </div>
         <?php endif; ?>
         <?php
-        if(!empty($success_msg)): ?>
+        if(!empty($message)): ?>
             <div class="alert alert-success">
-                <?php if (is_array($success_msg)): ?>
+                <?php if (is_array($message)): ?>
                     <ul>
-                        <?php foreach ($success_msg as $msg): ?>
+                        <?php foreach ($message as $msg): ?>
                             <li><?= $msg; ?></li>
                         <?php endforeach; ?>
                     </ul>
                 <?php else: ?>
-                    <?= $success_msg; ?>
+                    <?= $message; ?>
                 <?php endif; ?>
             </div>
         <?php endif; ?>

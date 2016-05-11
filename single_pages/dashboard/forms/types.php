@@ -5,6 +5,7 @@ $taskElements = array(
     'view' => 'forms/types/list',
     'add' => 'forms/types/form',
     'edit' => 'forms/types/form',
+    'layout' => 'forms/types/layout',
 );
 
 $element = $taskElements[$this->controller->getTask()];

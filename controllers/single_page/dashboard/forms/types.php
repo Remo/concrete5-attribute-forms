@@ -73,6 +73,21 @@ class Types extends DashboardPageController
         $this->set('attributeForm', $attributeForm);
     }
 
+    public function layout($aftID)
+    {
+        $this->add();
+        $attributeForm = AttributeFormType::getByID($aftID);
+
+        $selectedAttributes = $attributeForm->getLayoutDecodedAttributes(
+            $includeAtHandle = true /* needed to determine attribute options */
+        );
+
+        $this->set('selectedAttributes', $selectedAttributes);
+        $this->set('attributeForm', $attributeForm);
+        $this->requireAsset('javascript', 'mesch/gridmanager');
+        $this->requireAsset('css', 'mesch/gridmanagercss');
+    }
+
     public function save($aftID = 0)
     {
         $formName       = $this->post('formName');
@@ -89,6 +104,25 @@ class Types extends DashboardPageController
         $attributeFormType->setDeleteSpam($deleteSpam);
         $attributeFormType->setCaptchaLibraryHandle($captchaLibrary);
         $attributeFormType->setAttributes($this->post('attributes'));
+        $attributeFormType->save();
+
+        if ($aftID > 0) {
+            $this->flash("message", t('Form type updated'));
+        }else{
+            $this->flash("message", t('Form type added'));
+        }
+        $this->redirect($this->action(''));
+    }
+
+    public function saveLayout($aftID = 0)
+    {
+        if ($aftID > 0) {
+            $attributeFormType = AttributeFormType::getByID($aftID);
+        } else {
+            $attributeFormType = new AttributeFormType();
+        }
+
+        $attributeFormType->setLayoutAttributes($this->post('layout_attributes'));
         $attributeFormType->save();
 
         if ($aftID > 0) {

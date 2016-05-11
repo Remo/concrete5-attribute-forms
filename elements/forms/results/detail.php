@@ -13,16 +13,22 @@
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($attributes as $attribute) { ?>
-                <tr>
-                    <th>
-                        <?= $attribute->getAttributeKeyDisplayName() ?>
-                    </th>
-                    <td>
-                        <?= $af->getAttribute($attribute, 'display') ?>
-                    </td>
-                </tr>
-            <?php } ?>
+            <?php
+            $attributes = array_merge($attributes, $layoutAttributes);?>
+
+            <?php foreach ($attributes as $attribute) {
+                if($attribute) { ?>
+                    <tr>
+                        <th>
+                            <?= $attribute->getAttributeKeyDisplayName() ?>
+                        </th>
+                        <td>
+                            <?= $af->getAttribute($attribute, 'display') ?>
+                        </td>
+                    </tr>
+                    <?php
+                }
+            } ?>
             </tbody>
         </table>
     </div>

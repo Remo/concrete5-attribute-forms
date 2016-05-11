@@ -33,6 +33,11 @@ class AttributeFormType extends EntityBase
     protected $attributes;
 
     /**
+     * @Column(type="text",  nullable=true)
+     */
+    protected $layoutAttributes;
+
+    /**
      * @Column(type="boolean")
      */
     protected $deleteSpam;
@@ -65,6 +70,11 @@ class AttributeFormType extends EntityBase
     public function getAttributes()
     {
         return $this->attributes;
+    }
+
+    public function getLayoutAttributes()
+    {
+        return $this->layoutAttributes;
     }
 
     public function getCaptchaLibraryHandle()
@@ -101,6 +111,11 @@ class AttributeFormType extends EntityBase
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    public function setLayoutAttributes($attributes)
+    {
+        $this->layoutAttributes = $attributes;
     }
 
     public function setCaptchaLibraryHandle($captchaLibraryHandle)
@@ -148,6 +163,40 @@ class AttributeFormType extends EntityBase
                     $ak = AttributeFormKey::getByID($attr->akID);
                     if (is_object($ak)) {
                         $attr->atHandle = $ak->getAttributeTypeHandle();
+                    }
+                }
+            }
+        }
+
+        return $selectedAttributes;
+    }
+
+    /**
+     * Get attributes as json object
+     * @param boolean $includeAtHandle include attribute type handle
+     * @return object
+     */
+    public function getLayoutDecodedAttributes($includeAtHandle = false)
+    {
+        $selectedAttributes = json_decode($this->layoutAttributes);
+
+        // Include attribute type handle
+        if ($includeAtHandle && is_object($selectedAttributes)) {
+            foreach ($selectedAttributes->formPages as $pagess) {
+                if($pagess) {
+                    foreach ($pagess as $pages) {
+                        if (!empty($pages) && is_array($pages)) {
+                            foreach ($pages as $page) {
+                                if (!empty($page) && isset($page->attributes)) {
+                                    foreach ($page->attributes as $attr) {
+                                        $ak = AttributeFormKey::getByID($attr->akID);
+                                        if (is_object($ak)) {
+                                            $attr->atHandle = $ak->getAttributeTypeHandle();
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -212,6 +261,36 @@ class AttributeFormType extends EntityBase
             foreach ($decodedAttrs->formPages as $page){
                 foreach ($page->attributes as $attr){
                     $attrObjs[$attr->akID] = AttributeFormKey::getByID($attr->akID);
+                }
+            }
+        }
+        return $attrObjs;
+    }
+
+
+    /**
+     * Return all used attribute keys
+     * @return AttributeFormKey[]
+     */
+    public function getLayoutAttributeObjects()
+    {
+        $decodedAttrs = $this->getLayoutDecodedAttributes();
+        $attrObjs = array();
+
+        if($decodedAttrs){
+            foreach ($decodedAttrs->formPages as $row => $formPageRow){
+                if(is_array($formPageRow)) {
+                    foreach ($formPageRow as $col => $formPageCol) {
+                        if (is_object($formPageCol)) {
+                            foreach ((array)$formPageCol as $key => $formPage) {
+                                if (is_array($formPage)) {
+                                    foreach ($formPage as $attr) {
+                                        $attrObjs[$attr->akID] = AttributeFormKey::getByID($attr->akID);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

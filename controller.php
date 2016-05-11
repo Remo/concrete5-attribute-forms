@@ -14,7 +14,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'attribute_forms';
     protected $appVersionRequired = '5.7.5.2';
-    protected $pkgVersion = '0.9.9.5';
+    protected $pkgVersion = '0.9.9.9';
 
     protected $pkgAutoloaderMapCoreExtensions = true;
     
@@ -108,6 +108,11 @@ class Controller extends Package
             array('javascript', 'jquery'),
             array('javascript', 'mesch/alert'),
         ));
+
+        $al->register('css', 'mesch/gridmanagercss', 'css/jquery.gridmanager.css', array('minify' => true), $this);
+        $al->register('javascript', 'mesch/gridmanager', 'js/jquery.gridmanager.js', array('minify' => true), $this);
+
+
     }
 
     public function uninstall()
