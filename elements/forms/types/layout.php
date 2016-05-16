@@ -299,7 +299,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
        $(document).on('blur keyup paste input', '[contenteditable]', function(){
            var dataRowId = $(this).closest('.row-fluid').data('row-id'),
                dataColumnId = $(this).closest('.column').data('column-id'),
-               sortOrderId = $(this).find('p').closest('.list-group-item').data('sort-order'),
+               sortOrderId = $(this).find('p').closest('.list-group-item').attr('data-sort-order'),
                pageIndex = dataRowId+''+dataColumnId;
 
            var attr = gm.attributeFormsApp.data.attributesData.formPages[dataRowId][dataColumnId][pageIndex][sortOrderId];

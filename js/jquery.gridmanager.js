@@ -723,7 +723,49 @@
                 handle: ".gm-moveRow",
                 forcePlaceholderSize: true,   opacity: 0.7,  revert: true,
                 tolerance: "pointer",
-                cursor: "move"
+                cursor: "move",
+                  stop: function(e, ui) {
+                      gm.resetCommentTags($(ui.item).parent());
+
+                      var rowId = $(ui.item).closest('.row-fluid').data('row-id'),
+                          columnID = $(ui.item).closest('.column').data('column-id');
+
+                      var old_index = $(ui.item).closest('.row-fluid').attr('data-row-id');
+
+                      $(ui.item).parent().find('.row-fluid').each(function(i, el){
+
+                          var oldRowId = $(this).attr('data-row-id');
+
+                          $(this).attr('data-row-id',i);
+
+                          $(this).find('.column').each(function(j, el){
+
+                              var oldColumn = $(this).attr('data-column-id');
+
+                              var oldRowObject = gm.attributeFormsApp.data.attributesData.formPages[oldRowId];
+
+                              delete gm.attributeFormsApp.data.attributesData.formPages[oldRowId];
+
+                              var oldColumnObject = oldRowObject[oldColumn][oldRowId + '' + oldColumn];
+
+                              delete oldRowObject[oldColumn][oldRowId + '' + oldColumn];
+
+                              oldRowObject[oldColumn][i + '' + oldColumn] = oldColumnObject;
+                              gm.attributeFormsApp.data.attributesData.formPages[oldRowId] = oldRowObject;
+
+                              $(this).find('.list-group-item').attr('data-page-index',i + '' + oldColumn);
+
+                          });
+
+                      });
+
+                      var new_index = $(ui.item).closest('.row-fluid').attr('data-row-id');
+                      if($.type(old_index) != 'undefined' && $.type(new_index) != 'undefined') {
+                          var type = 'row';
+                          gm.reOrderElament(old_index, new_index, rowId, columnID, type);
+                      }
+
+                  }
                });
               /*
               Make columns sortable
@@ -737,7 +779,40 @@
                   forcePlaceholderSize: true,   opacity: 0.7,  revert: true,
                   tolerance: "pointer",
                   containment: $(val),
-                  cursor: "move"
+                  cursor: "move",
+                  stop: function(e, ui) {
+                      gm.resetCommentTags($(ui.item).parent());
+
+                      var rowId = $(ui.item).closest('.row-fluid').data('row-id'),
+                          columnID = $(ui.item).closest('.column').data('column-id');
+
+                      var old_index = $(ui.item).closest('.column').attr('data-column-id');
+
+                      $(ui.item).parent().find('.column').each(function(i, el){
+
+                          var oldColumn = $(this).attr('data-column-id');
+
+                          $(this).attr('data-column-id',i);
+
+                          var oldColumnObject = gm.attributeFormsApp.data.attributesData.formPages[rowId][oldColumn][rowId + '' + oldColumn];
+
+                          delete gm.attributeFormsApp.data.attributesData.formPages[rowId][oldColumn][rowId + '' + oldColumn];
+
+                          gm.attributeFormsApp.data.attributesData.formPages[rowId][oldColumn][rowId + '' + i] = (oldColumnObject);
+
+                          $(this).find('.list-group-item').attr('data-page-index',rowId + '' + i);
+
+                      });
+
+                      var new_index = $(ui.item).closest('.column').attr('data-column-id');
+
+                      if($.type(old_index) != 'undefined' && $.type(new_index) != 'undefined') {
+                          var type = 'col';
+                          gm.reOrderElament(old_index, new_index, rowId, columnID, type);
+                      }
+
+
+                  }
                 });
               });
               /* Make rows sortable
@@ -1151,8 +1226,10 @@
                   });
 
                   var new_index = $(ui.item).find('.gm-content').find('.list-group-item').attr('data-sort-order');
+
                   if($.type(old_index) != 'undefined' && $.type(new_index) != 'undefined') {
-                      gm.reOrderElament(old_index, new_index, rowId, columnID);
+                      var type = null;
+                      gm.reOrderElament(old_index, new_index, rowId, columnID, type );
                   }
 
                   if($.type(gm.attributeFormsApp.data) == 'undefined') {
@@ -1317,17 +1394,43 @@
         /**
          * Re-order element on drag 'n' drop
          */
-        gm.reOrderElament = function (old_index, new_index, rowId, columnID) {
-            var reOrderObject = gm.attributeFormsApp.data.attributesData.formPages[rowId][columnID][rowId+''+columnID];
+        gm.reOrderElament = function (old_index, new_index, rowId, columnID, type) {
+            if(type == 'row'){
 
-            if (new_index >= reOrderObject.length) {
-                var k = new_index - reOrderObject.length;
-                while ((k--) + 1) {
-                    reOrderObject.push(undefined);
+                var reOrderObject = gm.attributeFormsApp.data.attributesData.formPages;
+
+                if (new_index >= reOrderObject.length) {
+                    var k = new_index - reOrderObject.length;
+                    while ((k--) + 1) {
+                        reOrderObject.push(undefined);
+                    }
                 }
-            }
-            reOrderObject.splice(new_index, 0, reOrderObject.splice(old_index, 1)[0]);
+                reOrderObject.splice(new_index, 0, reOrderObject.splice(old_index, 1)[0]);
 
+            }else if(type == 'col'){
+
+                var reOrderObject = gm.attributeFormsApp.data.attributesData.formPages[rowId];
+                if (new_index >= reOrderObject.length) {
+                    var k = new_index - reOrderObject.length;
+                    while ((k--) + 1) {
+                        reOrderObject.push(undefined);
+                    }
+                }
+                reOrderObject.splice(new_index, 0, reOrderObject.splice(old_index, 1)[0]);
+
+            }else {
+
+                var reOrderObject = gm.attributeFormsApp.data.attributesData.formPages[rowId][columnID][rowId + '' + columnID];
+
+                if (new_index >= reOrderObject.length) {
+                    var k = new_index - reOrderObject.length;
+                    while ((k--) + 1) {
+                        reOrderObject.push(undefined);
+                    }
+                }
+                reOrderObject.splice(new_index, 0, reOrderObject.splice(old_index, 1)[0]);
+
+            }
             gm.attributeFormsApp.updateFormData();
         };
 
