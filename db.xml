@@ -40,6 +40,7 @@
             <default value="0"/>
             <notnull/>
         </field>
+        <field name="akLabelText" type="string" size="255"/>
         <field name="checkedActions" type="text"></field>
         <field name="uncheckedActions" type="text"></field>
         <field name="indentation" type="integer"></field>

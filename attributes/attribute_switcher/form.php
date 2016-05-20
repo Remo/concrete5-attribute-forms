@@ -5,7 +5,7 @@ $akID = $this->getAttributeKey()->getAttributeKeyID();
     <label>
         <?php
         $cb = Core::make('helper/form')->checkbox($this->field('value'), 1, $checked);
-        print $cb . ' <span>' . t('Yes') . '</span>';
+        print $cb . ' <span>' . $akLabelText . '</span>';
         ?>
     </label>
 

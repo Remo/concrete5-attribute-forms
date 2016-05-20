@@ -30,7 +30,7 @@ defined('C5_EXECUTE') or die('Access Denied.');
                                     foreach ($formPage as $i => $attr) {
                                         if($attr) {
                                             if ($attr->label) {
-                                                echo '<!--gm-editable-region--><p class="editable-label list-group-item" data-page-index="' . $key . '">' . $attr->akName . '</p><!--/gm-editable-region-->';
+                                                echo '<!--gm-editable-region--><p class="editable-label list-group-item" data-page-index="' . $key . '">' . htmlspecialchars($attr->akName) . '</p><!--/gm-editable-region-->';
                                             } else {
                                                 echo '<!--gm-editable-region--><div data-value="' . $attr->akID . '" data-athandle="' . $attr->atHandle . '" class="list-group-item ui-draggable ui-draggable-handle" data-page-index="' . $key . '" data-sort-order="" >';
                                                 echo $attr->akName;
