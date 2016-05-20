@@ -14,7 +14,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'attribute_forms';
     protected $appVersionRequired = '5.7.5.2';
-    protected $pkgVersion = '0.9.9.9';
+    protected $pkgVersion = '0.9.9.10';
 
     protected $pkgAutoloaderMapCoreExtensions = true;
     

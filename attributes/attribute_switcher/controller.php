@@ -31,6 +31,7 @@ class Controller extends AttributeTypeController
         $this->load();
         $type = $akey->addChild('type');
         $type->addAttribute('checked', $this->akCheckedByDefault);
+        $type->addAttribute('akLabelText', $this->akLabelText);
         return $akey;
     }
 
@@ -38,6 +39,7 @@ class Controller extends AttributeTypeController
     {
         if (isset($akey->type)) {
             $data['akCheckedByDefault'] = $akey->type['checked'];
+            $data['akLabelText'] = $akey->type['akLabelText'];
             $this->saveKey($data);
         }
     }
@@ -56,17 +58,19 @@ class Controller extends AttributeTypeController
         }
 
         $db = Database::connection();
-        $row = $db->fetchAssoc('select akCheckedByDefault, checkedActions, uncheckedActions, indentation from atAttributeSwitcherSettings where akID = ?', array($ak->getAttributeKeyID()));
+        $row = $db->fetchAssoc('select akCheckedByDefault, akLabelText, checkedActions, uncheckedActions, indentation from atAttributeSwitcherSettings where akID = ?', array($ak->getAttributeKeyID()));
         if(is_array($row)){
             $this->akCheckedByDefault = $row['akCheckedByDefault'];
             $this->akCheckedActions = $row['checkedActions'];
             $this->akUncheckedActions = $row['uncheckedActions'];
             $this->indentation = $row['indentation'];
+            $this->akLabelText = $row['akLabelText'];
         }
         $this->set('indentation', $this->indentation);
         $this->set('akCheckedByDefault', $this->akCheckedByDefault);
         $this->set('akCheckedActions', json_decode($this->akCheckedActions, true));
         $this->set('akUncheckedActions', json_decode($this->akUncheckedActions, true));
+        $this->set('akLabelText', $this->akLabelText);
     }
 
     public function form()
@@ -126,7 +130,7 @@ class Controller extends AttributeTypeController
     {
         $this->load();
         $db = Database::connection();
-        $db->insert('atAttributeSwitcherSettings', array('akID' => $newAK->getAttributeKeyID(), 'akCheckedByDefault' => $this->akCheckedByDefault));
+        $db->insert('atAttributeSwitcherSettings', array('akID' => $newAK->getAttributeKeyID(), 'akCheckedByDefault' => $this->akCheckedByDefault, 'akLabelText' => $this->akLabelText));
     }
 
     public function saveKey($data)
@@ -134,6 +138,7 @@ class Controller extends AttributeTypeController
         $ak = $this->getAttributeKey();
         $db = Database::connection();
         $akCheckedByDefault = $data['akCheckedByDefault'];
+        $akLabelText = $data['akLabelText'];
 
         if ($data['akCheckedByDefault'] != 1) {
             $akCheckedByDefault = 0;
@@ -150,6 +155,7 @@ class Controller extends AttributeTypeController
             'checkedActions' => $checkedActions,
             'uncheckedActions' => $uncheckedActions,
             'indentation' => $indentation,
+            'akLabelText' => $akLabelText,
         ), array('akID'), true);
     }
 

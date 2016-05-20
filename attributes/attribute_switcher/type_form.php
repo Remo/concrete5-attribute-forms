@@ -11,6 +11,14 @@
         <label><?= t("Indentation") ?></label>
         <?= $form->number('indentation', $indentation) ?>
     </div>
+
+    <div class="form-group">
+
+        <?php echo $form->label( 'akLabelText', t('Label Text') )?>
+
+        <?php echo $form->text( 'akLabelText' , $akLabelText )?>
+    </div>
+
     <div class="form-group">
         <label><?= t("Attributes") ?></label>
 
