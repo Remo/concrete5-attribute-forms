@@ -14,9 +14,9 @@
             </thead>
             <tbody>
             <?php
-            $attributes = array_merge($attributes, $layoutAttributes);?>
-
-            <?php foreach ($attributes as $attribute) {
+            $attributes = $attributes + $layoutAttributes;
+            
+            foreach ($attributes as $attribute) {
                 if($attribute) { ?>
                     <tr>
                         <th>
