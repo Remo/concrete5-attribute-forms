@@ -23,6 +23,7 @@ class Controller extends BlockController
     protected $btInterfaceWidth  = "500";
     protected $btInterfaceHeight = "365";
     protected $helpers           = ['form'];
+    protected $btCacheBlockRecord = false;
 
     use BlockControllerExtension;
 
