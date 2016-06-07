@@ -13,6 +13,7 @@ if (!empty($attributes)) {
     <div class="col-xs-12">
         <?php if(isset($errors) && $errors->has()): ?>
             <div class="alert alert-danger">
+                <?=t('Please correct the following errors:')?>
                 <?php $errors->output(); ?>
             </div>
         <?php endif; ?>
