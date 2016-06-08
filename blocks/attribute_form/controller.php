@@ -10,7 +10,6 @@ use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
 use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
 use Concrete\Package\AttributeForms\Form\ActionType\Factory as ActionTypeFactory;
-use Concrete\Package\AttributeForms\MeschApp;
 use Concrete\Core\User\UserInfo,
     Database,
     Events,
@@ -410,8 +409,8 @@ class Controller extends BlockController
 
     private function sendNotificationMailToAdmin(AttributeForm $af)
     {
-        $cfg         = MeschApp::getFileConfig();
-        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.form_block.address'));
+        $fromAddress = Config::get("concrete.email.attribute_form.address");
+        $fromName    = Config::get("concrete.email.attribute_form.name");
 
         if (empty($fromAddress) || !strstr($fromAddress, '@')) {
             $fromAddress = UserInfo::getByID(USER_SUPER_ID)->getUserEmail();
@@ -422,7 +421,7 @@ class Controller extends BlockController
 
         $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
         $mh->to($this->recipientEmail);
-        $mh->from($fromAddress);
+        $mh->from($fromAddress, $fromName);
 
         foreach ($attrs as $akID => $attr) {
             $replyTo = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
@@ -437,17 +436,20 @@ class Controller extends BlockController
 
     private function sendNotificationsMailToSubmitor(AttributeForm $af)
     {
-        $cfg         = MeschApp::getFileConfig();
-        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.default.address'));
-        $fromName    = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
+        $fromAddress = Config::get("concrete.email.attribute_form.address");
+        $fromName    = Config::get("concrete.email.attribute_form.name");
 
+        if (empty($fromAddress) || !strstr($fromAddress, '@')) {
+            $fromAddress = UserInfo::getByID(USER_SUPER_ID)->getUserEmail();
+        }
+        
         $aft   = $af->getTypeObj();
         $attrs = $aft->getAttributesByAttrType('email', 'send_notification_from');
 
         if (empty($attrs)) {
             return false;
         }
-
+        
         $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
         $mh->from($fromAddress, $fromName);
 
