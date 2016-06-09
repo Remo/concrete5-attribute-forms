@@ -84,7 +84,7 @@ class AttributeFormType extends EntityBase
 
     public function getCaptchaLibrary()
     {
-        if (!empty($this->getCaptchaLibraryHandle())) {
+        if (!empty($this->captchaLibraryHandle)) {
             $captcha = SystemCaptchaLibrary::getByHandle($this->getCaptchaLibraryHandle());
         } else {
             $captcha = SystemCaptchaLibrary::getActive();
