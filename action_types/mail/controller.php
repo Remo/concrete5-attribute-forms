@@ -56,8 +56,8 @@ class Controller extends AbstractController
     private function sendNotificationMailToAdmin(AttributeForm $af, $data)
     {
         $afs = $this->app->make('mesch/atf/string', [$af]);
-        $cfg         = MeschApp::getFileConfig();
-        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.form_block.address'));
+        $fromAddress = Config::get("concrete.email.attribute_form.address");
+        $fromName    = Config::get("concrete.email.attribute_form.name");
 
         if (empty($fromAddress) || !strstr($fromAddress, '@')) {
             $fromAddress = $this->app->make('Concrete\Core\User\UserInfoFactory')->getByID(USER_SUPER_ID)->getUserEmail();
@@ -68,7 +68,7 @@ class Controller extends AbstractController
 
         $mh = $this->app->make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
         $mh->to($data['recipientEmail']);
-        $mh->from($fromAddress);
+        $mh->from($fromAddress, $fromName);
 
         foreach ($attrs as $akID => $attr) {
             $replyTo = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
@@ -83,9 +83,12 @@ class Controller extends AbstractController
     private function sendNotificationsMailToSubmitor(AttributeForm $af)
     {
         $afs = $this->app->make('mesch/atf/string', [$af]);
-        $cfg         = MeschApp::getFileConfig();
-        $fromAddress = $cfg->get("mesch.email.address", Config::get('concrete.email.default.address'));
-        $fromName    = $cfg->get("mesch.email.name", Config::get('concrete.email.default.name'));
+        $fromAddress = Config::get("concrete.email.attribute_form.address");
+        $fromName    = Config::get("concrete.email.attribute_form.name");
+
+        if (empty($fromAddress) || !strstr($fromAddress, '@')) {
+            $fromAddress = $this->app->make('Concrete\Core\User\UserInfoFactory')->getByID(USER_SUPER_ID)->getUserEmail();
+        }
 
         $aft   = $af->getTypeObj();
         $attrs = $aft->getAttributesByAttrType('email', 'send_notification_from');
@@ -96,6 +99,7 @@ class Controller extends AbstractController
 
         $mh = $this->app->make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
         $mh->from($fromAddress, $fromName);
+        $mh->replyto($fromAddress, $fromName);
 
         foreach ($attrs as $akID => $attr) {
             $toEmailAddress = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');

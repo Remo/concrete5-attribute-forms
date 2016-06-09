@@ -452,6 +452,7 @@ class Controller extends BlockController
         
         $mh = Core::make('helper/mail'); /* @var $mh \Concrete\Core\Mail\Service */
         $mh->from($fromAddress, $fromName);
+        $mh->replyto($fromAddress, $fromName);
 
         foreach ($attrs as $akID => $attr) {
             $toEmailAddress = $af->getAttribute(AttributeFormKey::getByID($akID), 'display');
