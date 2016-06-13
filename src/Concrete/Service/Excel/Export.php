@@ -114,7 +114,8 @@ class Export
 
         $this->phpExcel->setActiveSheetIndex($this->tabid);
         $activeSheet = $this->phpExcel->getActiveSheet();
-        $activeSheet->setTitle($tabName, false);
+        // Maximum 31 characters allowed in sheet title
+        $activeSheet->setTitle(substr($tabName, 0, 30), false);
 
         $rowCount = $this->startRow;
         $contentStartRow = $this->startRow;
