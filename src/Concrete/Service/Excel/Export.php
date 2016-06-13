@@ -57,7 +57,7 @@ class Export
             $fileName .= '.xlsx';
         }
         // Redirect output to a client’s web browser (Excel2007)
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8');
         header('Content-Disposition: attachment;filename="'.$fileName.'"');
         header("Content-Title: " . $this->phpExcel->getActiveSheet()->getTitle());
         header('Cache-Control: max-age=0');
