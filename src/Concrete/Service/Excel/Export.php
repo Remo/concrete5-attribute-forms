@@ -56,8 +56,10 @@ class Export
         if (!ends_with($fileName, '.xlsx')) {
             $fileName .= '.xlsx';
         }
+        
+        header('Content-Encoding: UTF-16LE');
         // Redirect output to a client’s web browser (Excel2007)
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-16LE');
         header('Content-Disposition: attachment;filename="'.$fileName.'"');
         header("Content-Title: " . $this->phpExcel->getActiveSheet()->getTitle());
         header('Cache-Control: max-age=0');
