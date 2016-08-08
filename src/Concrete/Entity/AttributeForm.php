@@ -310,4 +310,37 @@ class AttributeForm extends EntityBase
         return $submittedDataHtml;
     }
 
+
+
+    public function getLayoutAsHtml()
+    {
+        $aft = $this->getTypeObj();
+        $configHtmLawed = array('safe'=>1);
+        $submittedDataHtml = '<table>';
+        foreach ($aft->getLayoutAttributeObjects() as $ak) {
+            $label = $ak->getAttributeKeyDisplayName();
+            $value = $this->getAttribute($ak, 'display');
+
+            $submittedDataHtml .= '<tr><th>' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th><td>' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
+        }
+        $submittedDataHtml .= '</table>';
+
+        return $submittedDataHtml;
+    }
+
+    public function getLayoutAsText()
+    {
+        $aft = $this->getTypeObj();
+
+        $submittedData = '';
+        foreach ($aft->getLayoutAttributeObjects() as $ak) {
+            $label = $ak->getAttributeKeyDisplayName();
+            $value = $this->getAttribute($ak, 'display');
+
+            $submittedData .= h($label) . "\r\n";
+            $submittedData .= h($value) ."\r\n"."\r\n";
+        }
+
+        return $submittedData;
+    }
 }
