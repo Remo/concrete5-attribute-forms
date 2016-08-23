@@ -87,14 +87,12 @@ class Controller extends BlockController
             $this->set('token', $token->generate('attribute_form_'.$this->bID.'_'.$formPage->handle));
         } else {
             $this->set('attributes', $formType->getDecodedAttributes());
+            $this->set('layoutAttributes', $formType->getLayoutDecodedAttributes());
             $this->set('token', $token->generate('attribute_form_'.$this->bID));
         }
 
         $this->set('aftID', $this->aftID);
-        $this->set('attributes', $formType->getDecodedAttributes());
-        $this->set('layoutAttributes', $formType->getLayoutDecodedAttributes());
         $this->set('captcha', $this->displayCaptcha ? $formType->getCaptchaLibrary() : false);
-        $this->set('token', $token->generate('attribute_form_'.$this->bID));
     }
 
     public function customLayout()
@@ -320,8 +318,7 @@ class Controller extends BlockController
             if ($formPageHandle) {
                 // check CSRF token
                 $token = $this->app->make('token');
-                if (!$token->validate('attribute_form_'.$this->bID.'_'.$formPageHandle,
-                        $this->post('af_token'))) {
+                if (!$token->validate('attribute_form_'.$this->bID.'_'.$formPageHandle, $this->post('af_token'))) {
                     $this->errors->add($token->getErrorMessage());
                 }
             }
@@ -341,6 +338,9 @@ class Controller extends BlockController
         $formPageHandle = $this->post('formPageHandle');
         $this->flashError('errors', $this->errors);
 
+        $aks    = $this->post('akID');
+        $this->session->set('attrForm', serialize($aks));
+        
         if (!$formPageHandle) {
             $this->session->remove('attrFormCurrentStep');
             $this->redirectToView();
