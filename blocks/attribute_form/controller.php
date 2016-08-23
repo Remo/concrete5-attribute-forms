@@ -12,6 +12,7 @@ use Concrete\Package\AttributeForms\Form\Event\Form as AttributeFormEvent;
 use Concrete\Package\AttributeForms\Form\ActionType\Factory as ActionTypeFactory;
 use Concrete\Core\User\UserInfo,
     Database,
+    Request,
     Events,
     Config,
     Core;
@@ -66,15 +67,29 @@ class Controller extends BlockController
         $this->set('customActions', $this->getCustomFormActions());
     }
 
+    public function registerViewAssets($outputContent = '')
+    {
+        $this->requireAsset('javascript','bootstrap/alert');
+    }
+    
     public function view()
     {
         $formType = AttributeFormType::getByID($this->aftID);
-
         if (!is_object($formType)) {
             return;
         }
 
         $token = $this->app->make('token');
+        if (starts_with($this->getCurrentTemplateName(), 'step_by_step')) {
+            $formPage = $formType->getFirstFormPage();
+            $this->set('formPage', $formPage);
+            $this->set('nextFormPage', $formType->getNextFormPage($formPage->handle));
+            $this->set('token', $token->generate('attribute_form_'.$this->bID.'_'.$formPage->handle));
+        } else {
+            $this->set('attributes', $formType->getDecodedAttributes());
+            $this->set('token', $token->generate('attribute_form_'.$this->bID));
+        }
+
         $this->set('aftID', $this->aftID);
         $this->set('attributes', $formType->getDecodedAttributes());
         $this->set('layoutAttributes', $formType->getLayoutDecodedAttributes());
@@ -189,6 +204,152 @@ class Controller extends BlockController
         return $this->errors;
     }
 
+    public function action_step($step, $bID)
+    {
+        if ($this->bID != $bID) {
+            return false;
+        }
+
+        $aft = AttributeFormType::getByID($this->aftID);
+        $this->securityCheck($aft, $step);
+
+        if($this->errors->has()){
+            return $this->goBackToCurrentStep();
+        }
+        
+        $this->session->set('attrFormCurrentStep', $step);
+        $this->set('nextFormPage', $aft->getNextFormPage($step));
+        $this->set('prevFormPage', $aft->getPrevFormPage($step));
+        $this->set('formPage', $aft->getFormPage($step));
+        $this->set('token', $this->app->make('token')->generate('attribute_form_'.$this->bID.'_'.$step));
+        $this->set('aftID', $this->aftID);
+        $this->set('captcha', $this->displayCaptcha ? $aft->getCaptchaLibrary() : false);
+        $akIDs = @unserialize($this->session->get('attrForm'));
+        $this->set('requestArray', is_array($akIDs) ? ['akID' => $akIDs] : false);
+    }
+
+    public function action_step_submit($nextFormPageHandle, $bID)
+    {
+        if ($this->bID != $bID) {
+            return false;
+        }
+
+        // Check if is back to previous request
+        if($this->post('previousBtn')){
+            $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
+            return $this->redirect($this->urlToAction('step', $nextFormPageHandle));
+        }
+        
+        Events::dispatch('pre_attribute_forms_submit', new AttributeFormEvent($this));
+        $aft = AttributeFormType::getByID($this->aftID);
+        
+        $formPageHandle = $this->securityCheck($aft, $nextFormPageHandle);
+        if ($nextFormPageHandle == 'complete') {
+            $activeFormPage = $aft->getFormPage($this->post('formPageHandle'));
+        } else {
+            $activeFormPage = $aft->getFormPage($nextFormPageHandle);
+        }
+
+        if ($this->errors->has()) {
+            $this->goBackToCurrentStep();
+            return;
+        }
+        
+        $formPage = $aft->getFormPage($formPageHandle);
+        if (!$formPage) {
+            $this->errors->add(t('Invalid step requested'));
+            $this->goBackToCurrentStep();
+            return;
+        }
+        
+        foreach ($formPage->attributes as $attr) {
+            if ($attr->required) {
+                $ak = AttributeFormKey::getByID($attr->akID);
+                $e1 = $ak->validateAttributeForm();
+                if ($e1 == false) {
+                    $this->errors->add(t('The field "%s" is required', $ak->getAttributeKeyDisplayName()));
+                } else if ($e1 instanceof \Concrete\Core\Error\Error) {
+                    $this->errors->add($e1);
+                }
+            }
+        }
+
+        if ($this->errors->has()) {
+            $this->goBackToCurrentStep();
+            return;
+        }
+
+        $aks    = $this->post('akID');
+        $afVals = $this->session->get('attrForm');
+        if ($afVals) {
+            $aks = unserialize($afVals) + $aks;
+        }
+
+        if ($nextFormPageHandle != 'complete') {
+            $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
+            $this->session->set('attrForm', serialize($aks));
+        } else {
+            $_POST['akID'] = $aks;
+            $this->saveAttributeForm($aft);
+            $this->session->remove('attrFormCurrentStep');
+            $this->session->remove('attrForm');
+            $this->redirectToView();
+        }
+
+        $this->redirect($this->urlToAction('step', $nextFormPageHandle));
+    }
+
+    private function securityCheck($aft, $nextFormPageHandle)
+    {
+        $ip = $this->app->make('helper/validation/ip');
+        if ($ip->isBanned()) {
+            $this->errors->add($ip->getErrorMessage());
+            return;
+        }
+
+        if (Request::isPost()) {
+            if ($this->displayCaptcha && !$this->post('previousBtn')) {
+                if (!$aft->getCaptchaLibrary()->check()) {
+                    $this->errors->add(t("Incorrect captcha code"));
+                    $_REQUEST['ccmCaptchaCode'] = '';
+                    return;
+                }
+            }
+
+            $formPageHandle = $this->post('formPageHandle');
+            if ($formPageHandle) {
+                // check CSRF token
+                $token = $this->app->make('token');
+                if (!$token->validate('attribute_form_'.$this->bID.'_'.$formPageHandle,
+                        $this->post('af_token'))) {
+                    $this->errors->add($token->getErrorMessage());
+                }
+            }
+        } else {
+            // If page reloaded without post request
+            $formPageHandle = $this->session->get('attrFormCurrentStep');
+            if (!$formPageHandle || $formPageHandle != $nextFormPageHandle) {
+                $this->errors->add(t('Invalid step requested'));
+            }
+        }
+
+        return $formPageHandle;
+    }
+
+    private function goBackToCurrentStep()
+    {
+        $formPageHandle = $this->post('formPageHandle');
+        $this->flashError('errors', $this->errors);
+
+        if (!$formPageHandle) {
+            $this->session->remove('attrFormCurrentStep');
+            $this->redirectToView();
+        } else {
+            $this->session->set('attrFormCurrentStep', $formPageHandle);
+            $this->redirect($this->urlToAction('step', $formPageHandle));
+        }
+    }
+
     public function action_submit($bID = false)
     {
         if ($this->bID != $bID) {
@@ -244,9 +405,15 @@ class Controller extends BlockController
             return;
         }
         
+        $this->saveAttributeForm($aft);
+        $this->redirectToView();
+    }
+
+    protected function saveAttributeForm(AttributeFormType $aft)
+    {
         // create new form entry
         $af = new AttributeForm();
-        $af->setTypeID($aftID);
+        $af->setTypeID($this->aftID);
         $af->save();
 
         // get all attributes of type and save values from form to the database
@@ -259,7 +426,7 @@ class Controller extends BlockController
         $submittedData = $af->getAttributeDataString();
         $antispam      = $this->app->make('helper/validation/antispam');
         $foundSpam     = !$antispam->check($submittedData, 'attribute_form');
-        
+
         if ($foundSpam) {
             if ($aft->getDeleteSpam()) {
                 $af->delete();
@@ -406,7 +573,7 @@ class Controller extends BlockController
 
         $this->redirectToView();
     }
-
+    
     private function sendNotificationMailToAdmin(AttributeForm $af)
     {
         $fromAddress = Config::get("concrete.email.attribute_form.address");

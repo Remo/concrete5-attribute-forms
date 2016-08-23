@@ -9,30 +9,7 @@ if (empty($aftID)) {
 if (!empty($attributes)) {
 ?>
 <br>
-<div class="row">
-    <div class="col-xs-12">
-        <?php if(isset($errors) && $errors->has()): ?>
-            <div class="alert alert-danger">
-                <?=t('Please correct the following errors:')?>
-                <?php $errors->output(); ?>
-            </div>
-        <?php endif; ?>
-        <?php
-        if(!empty($message)): ?>
-            <div class="alert alert-success">
-                <?php if (is_array($message)): ?>
-                    <ul>
-                        <?php foreach ($message as $msg): ?>
-                            <li><?= $msg; ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <?= $message; ?>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
+<?php $this->inc('elements/header.php'); ?>
 <form method="post" action="<?= $this->action('submit') ?>">
     <input type="hidden" name="aftID" value="<?= $aftID ?>">
     <input type="hidden" name="_token" id="_token" value="<?= $token; ?>"/>

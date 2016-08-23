@@ -2,6 +2,7 @@
 namespace Concrete\Package\AttributeForms\Attribute\Value;
 
 use Concrete\Core\Attribute\Value\Value as AttributeValue;
+use Concrete\Core\Attribute\Type as AttributeType;
 use Concrete\Package\AttributeForms\Entity\AttributeForm;
 use Database;
 
@@ -11,6 +12,8 @@ class AttributeFormValue extends AttributeValue
      * @var AttributeForm
      */
     private $item;
+
+    protected $attributeType;
 
     public function setAttributeForm(AttributeForm $object)
     {
@@ -41,5 +44,17 @@ class AttributeFormValue extends AttributeValue
         if ($num < 1) {
             parent::delete();
         }
+    }
+
+    /**
+     * Returns an attribute type object.
+     * @return AttributeType
+     */
+    public function getAttributeTypeObject()
+    {
+        if (!is_object($this->attributeType)) {
+            $this->attributeType = AttributeType::getByID($this->atID);
+        }
+        return $this->attributeType;
     }
 }

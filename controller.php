@@ -122,6 +122,7 @@ class Controller extends Package
         
         $platform = $db->getDatabasePlatform();
         $db->executeQuery($platform->getDropTableSQL('btAttributeForm'));
+        $db->executeQuery($platform->getDropTableSQL('btAttributeFormAction'));
         $db->executeQuery($platform->getDropTableSQL('AttributeFormsAttributeValues'));
         $db->executeQuery($platform->getDropTableSQL('AttributeForms'));
         $db->executeQuery($platform->getDropTableSQL('AttributeFormTypes'));

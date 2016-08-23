@@ -51,6 +51,15 @@ trait BlockControllerExtension
         $this->session->getFlashBag()->add('custom_error', array($key, $value));
     }
 
+    public function getCurrentTemplateName()
+    {
+        $blockObject = $this->getBlockObject();
+        if (is_object($blockObject) && !empty($blockObject->getBlockFilename())) {
+            return str_replace('.php', '', $blockObject->getBlockFilename());
+        }
+        return 'view';
+    }
+
     protected function urlToAction()
     {
         $c = $this->getCollectionObject();
