@@ -1,6 +1,5 @@
 <?php
 use Concrete\Package\AttributeForms\Attribute\Key\AttributeFormKey;
-use Concrete\Package\AttributeForms\Attribute\Value\AttributeFormValue;
 
 if (empty($aftID)) {
     echo t('No form type selected');
@@ -10,7 +9,7 @@ if ($formPage) {
 ?>
 <br>
 <?php $this->inc('elements/header.php'); ?>
-<form method="post" action="">
+<form id="attribute-form-block-b<?=$bID;?>" method="post" action="" data-destroy="false">
     <input type="hidden" name="af_token" id="af_token" value="<?= $token; ?>"/>
     <input type="hidden" name="formPageHandle" value="<?= $formPage->handle; ?>"/>
     <div class="attribute-form-page">
@@ -20,15 +19,7 @@ if ($formPage) {
             <?php
             if (is_array($formPage->attributes) && !empty($formPage->attributes)) {
                 foreach ($formPage->attributes as $attribute) {
-
-                    $attributeObject = AttributeFormKey::getByID($attribute->akID);
-                    $at = $attributeObject->getAttributeType();
-                    $at->getController()->setRequestArray($requestArray);
-                    
-                    $atVal = new AttributeFormValue();
-                    $atVal->setPropertiesFromArray(array('akID' => $attribute->akID, 'atID' => $at->getAttributeTypeID(), 'attributeType' => $at));
-                    $atVal->setAttributeKey($attributeObject);
-                    ?>
+                    $attributeObject = AttributeFormKey::getByID($attribute->akID); ?>
                     <div class="form-group row attribute-row" id="attribute-key-id-<?= $attributeObject->getAttributeKeyID() ?>">
                         <label class="col-xs-12 control-label">
                             <?= $attributeObject->getAttributeKeyDisplayName(); ?>
@@ -39,7 +30,7 @@ if ($formPage) {
                             ?>
                         </label>
                         <div class="col-xs-12">
-                            <?php $attributeObject->render('search', $atVal); ?>
+                            <?php $attributeObject->render('form', false); ?>
                         </div>
                     </div>
                     <?php
@@ -81,5 +72,27 @@ if ($formPage) {
         </div>
     </div>
 </form>
+<script type="text/javascript">
+    $(function(){
+        <?php if(!empty($message)): ?>
+            for ( var i = localStorage.length - 1; i >= 0; i-- ) {
+                if ( 'undefined' === typeof Array.indexOf && -1 !== localStorage.key(i).indexOf('garlic:attribute-form-block-b<?=$bID;?>:') ) {
+                  localStorage.removeItem( localStorage.key(i) );
+                }
+            }
+        <?php endif; ?>
+        $('#attribute-form-block-b<?=$bID;?>').garlic({
+            onRetrieve: function ( elem, retrievedValue ) {
+                if(elem.hasClass('hasDatepicker')){
+                    var id = elem.attr('id').replace("_pub", "");
+                    $('#'+id).val(retrievedValue);
+                }
+            },
+            getPath: function ( $elem ) {
+                return 'garlic:attribute-form-block-b<?=$bID;?>:'+$elem.attr( 'id' );
+            }
+        });
+    });
+</script>
     <?php
 }

@@ -338,9 +338,6 @@ class Controller extends BlockController
         $formPageHandle = $this->post('formPageHandle');
         $this->flashError('errors', $this->errors);
 
-        $aks    = $this->post('akID');
-        $this->session->set('attrForm', serialize($aks));
-        
         if (!$formPageHandle) {
             $this->session->remove('attrFormCurrentStep');
             $this->redirectToView();
