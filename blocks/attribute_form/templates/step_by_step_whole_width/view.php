@@ -74,7 +74,7 @@ if ($formPage) {
 </form>
 <script type="text/javascript">
     $(function(){
-        <?php if(!empty($message)): ?>
+        <?php if(isset($message)): ?>
             for ( var i = localStorage.length - 1; i >= 0; i-- ) {
                 if ( 'undefined' === typeof Array.indexOf && -1 !== localStorage.key(i).indexOf('garlic:attribute-form-block-b<?=$bID;?>:') ) {
                   localStorage.removeItem( localStorage.key(i) );
