@@ -82,6 +82,7 @@ if ($formPage) {
             }
         <?php endif; ?>
         $('#attribute-form-block-b<?=$bID;?>').garlic({
+            excluded:'input[type="file"], input[type="hidden"], input[type="submit"]',
             onRetrieve: function ( elem, retrievedValue ) {
                 if(elem.hasClass('hasDatepicker')){
                     var id = elem.attr('id').replace("_pub", "");
