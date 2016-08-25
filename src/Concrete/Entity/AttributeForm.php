@@ -304,6 +304,7 @@ class AttributeForm extends EntityBase
             $value = $this->getAttribute($ak, 'display');
             if($ak->getAttributeTypeHandle() == 'email'){
                 $value = str_replace('@', '<span>@</span>', $value);
+                $value = str_replace('.', '<span>.</span>', $value);
             }
             $submittedDataHtml .= '<tr><th align="right">' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th><td>' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
         }
