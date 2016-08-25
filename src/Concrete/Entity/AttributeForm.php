@@ -303,7 +303,7 @@ class AttributeForm extends EntityBase
             $label = $ak->getAttributeKeyDisplayName();
             $value = $this->getAttribute($ak, 'display');
 
-            $submittedDataHtml .= '<tr><th>' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th><td>' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
+            $submittedDataHtml .= '<tr><th align="right">' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th><td>' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
         }
         $submittedDataHtml .= '</table>';
 
