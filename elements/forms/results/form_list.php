@@ -27,7 +27,10 @@
                         <td><?= $form->getIsSpam() ? t('Yes') : t('No') ?></td>
                     <?php } ?>
                     <td>
-                        <a class="btn btn-primary pull-right"
+                        <a class="btn btn-danger pull-right"
+                           href="<?= $view->action('delete', $form->getID()) ?>"><?= t('Delete') ?>
+                        </a>
+                        <a class="btn btn-primary pull-right" style="margin-right: 5px;"
                            href="<?= $view->action('detail', $form->getID()) ?>"><?= t('Show') ?>
                         </a>
                     </td>

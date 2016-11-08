@@ -7,7 +7,9 @@ use Concrete\Package\AttributeForms\AttributeFormList;
 use Concrete\Package\AttributeForms\AttributeFormTypeList;
 use Concrete\Core\Page\Controller\DashboardPageController;
     
-use Core;
+use Core,
+    Page,
+    URL;
 
 class Results extends DashboardPageController
 {
@@ -76,6 +78,20 @@ class Results extends DashboardPageController
         $excelExport->addTabContent($sheetName, $headers, $data);
         $excelExport->download("form_entries_{$aftID}");
         die();
+    }
+    
+    public function delete($afID)
+    {
+        $af = AttributeForm::getByID($afID);
+        $aft = $af->getTypeObj();
+        $attributes = $aft->getAttributeObjects();
+        foreach ($attributes as $afk) {
+            $afk->removeAttributeValue($afID);
+        }
+        $af->postRemove();
+        
+        // return to the entries
+        $this->redirect(URL::to(Page::getCurrentPage()) . '/entries/' . $aft->getID());
     }
 
     public function detail($afID)
