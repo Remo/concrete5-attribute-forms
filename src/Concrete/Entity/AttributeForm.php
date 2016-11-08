@@ -174,6 +174,7 @@ class AttributeForm extends EntityBase
         }
 
         $db->delete('AttributeFormsIndexAttributes', array('afID' => $this->getID()));
+        $db->delete('AttributeForms', array('afID' => $this->getID()));
     }
 
     public function getAttributeDataString()

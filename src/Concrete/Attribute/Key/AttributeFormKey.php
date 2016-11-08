@@ -2,6 +2,7 @@
 namespace Concrete\Package\AttributeForms\Attribute\Key;
 
 use Concrete\Core\Attribute\Key\Key as AttributeKey,
+    Concrete\Core\Attribute\Value\Value,
     Concrete\Package\AttributeForms\Attribute\Value\AttributeFormValue,
     Concrete\Core\Attribute\Value\ValueList as AttributeValueList,
     Database;
@@ -166,6 +167,37 @@ class AttributeFormKey extends AttributeKey
             $this->atObj = AttributeType::getByID($this->atID);
         }
         return $this->atObj;
+    }
+    
+    /**
+     * Removes the attribute value from a particular attribute forms ID from following tables:
+     * - AttributeValues
+     * - AttributeFormsAttributeValues
+     * 
+     * @param int $afID     attribute forms ID
+     */
+    public function removeAttributeValue($afID)
+    {
+        $db = Database::connection();
+
+        $qb = $db->createQueryBuilder();
+        $subQb = $db->createQueryBuilder();
+        
+        $avID = $db->fetchColumn('Select avID from AttributeFormsAttributeValues where afID=? and akID=?', array($afID, $this->getAttributeKeyID()));
+        $avObj = Value::getByID($avID);
+        $avObj->delete();
+        
+        $qb->delete('AttributeValues')->where(
+            $qb->expr()->comparison('avID',  'IN', '(' . $subQb->select('atfv.avID')
+                                        ->from('AttributeFormsAttributeValues', 'atfv')
+                                        ->where($subQb->expr()->eq('atfv.afID', $afID))
+                                        ->andWhere($subQb->expr()->eq('atfv.akID', $this->getAttributeKeyID()))
+                                        ->getSQL() . ')'
+                )
+        );
+        $db->query($qb->getSQL());
+
+        $db->delete('AttributeFormsAttributeValues', array('afID' => $afID, 'akID' => $this->getAttributeKeyID()));
     }
 
     /**
