@@ -49,7 +49,7 @@ class Export
      */
     public function download($fileName)
     {
-        ob_clean();
+        ob_end_clean();
         set_time_limit(0);
         $this->setFileProprietes();
 
