@@ -158,4 +158,13 @@ if (!empty($layoutAttributes)) {
         }
     </style>
     <?php
-}
+} ?>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($('.alert').is(':visible')) {
+            $('html, body').animate({
+                scrollTop: $(".alert").offset().top
+            }, 2000);
+        }
+    });
+</script>
