@@ -69,4 +69,11 @@ if (!empty($attributes)) {
     </div>
 </form>
     <?php
-}
+} ?>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($('.alert').is(':visible')) {
+            window.scrollTo(0, $(".alert").offset().top);
+        }
+    });
+</script>

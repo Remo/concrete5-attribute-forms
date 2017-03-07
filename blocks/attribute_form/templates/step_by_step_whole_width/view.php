@@ -93,6 +93,9 @@ if ($formPage) {
                 return 'garlic:attribute-form-block-b<?=$bID;?>:'+$elem.attr( 'id' );
             }
         });
+        if ($('.alert').is(':visible')) {
+            window.scrollTo(0, $(".alert").offset().top);
+        }
     });
 </script>
     <?php
