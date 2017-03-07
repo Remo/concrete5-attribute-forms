@@ -94,9 +94,7 @@ if ($formPage) {
             }
         });
         if ($('.alert').is(':visible')) {
-            $('html, body').animate({
-                scrollTop: $(".alert").offset().top
-            }, 20);
+            window.scrollTo(0, $(".alert").offset().top);
         }
     });
 </script>

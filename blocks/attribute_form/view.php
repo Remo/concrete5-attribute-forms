@@ -73,9 +73,7 @@ if (!empty($attributes)) {
 <script type="text/javascript">
     $(document).ready(function () {
         if ($('.alert').is(':visible')) {
-            $('html, body').animate({
-                scrollTop: $(".alert").offset().top
-            }, 2000);
+            window.scrollTo(0, $(".alert").offset().top);
         }
     });
 </script>
