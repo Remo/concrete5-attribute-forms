@@ -307,8 +307,8 @@ class AttributeForm extends EntityBase
                 $value = str_replace('@', '<span>@</span>', $value);
                 $value = str_replace('.', '<span>.</span>', $value);
             }
-            $submittedDataHtml .= '<tr><th align="left">' . HtmLawed::htmLawed($label, $configHtmLawed) . '</th></tr>'
-                    . '<tr><td style="padding-bottom: 5px;">' . HtmLawed::htmLawed($value, $configHtmLawed) . '</td></tr>';
+            $submittedDataHtml .= "<tr><th align=\"left\">\n" . HtmLawed::htmLawed($label, $configHtmLawed) . "\n</th></tr>\n"
+                    . "<tr><td style=\"padding-bottom: 5px;\">\n" . HtmLawed::htmLawed($value, $configHtmLawed) . "\n</td></tr>\n";
         }
         $submittedDataHtml .= '</table>';
 
