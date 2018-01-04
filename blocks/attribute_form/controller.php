@@ -303,6 +303,7 @@ class Controller extends BlockController
             $this->saveAttributeForm($aft);
             $this->session->remove('attrFormCurrentStep');
             $this->session->remove('attrForm');
+            $this->session->remove('attrFiles');
             $this->redirectToView();
         }
 
