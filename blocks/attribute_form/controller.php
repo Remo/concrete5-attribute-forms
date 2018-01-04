@@ -283,11 +283,23 @@ class Controller extends BlockController
             $aks = unserialize($afVals) + $aks;
         }
 
+        $attributeFileValues = $this->session->get('attrFiles');
+        $files = $_FILES;
+        array_walk_recursive($files , [$this, 'replaceTempFile']);
+        if ($attributeFileValues) {
+            $fileValues = unserialize($attributeFileValues) + $files;
+        }
+        else {
+            $fileValues = $files;
+        }
+
         if ($nextFormPageHandle != 'complete') {
             $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
             $this->session->set('attrForm', serialize($aks));
+            $this->session->set('attrFiles', serialize($fileValues));
         } else {
             $_POST['akID'] = $aks;
+            $_FILES = $fileValues;
             $this->saveAttributeForm($aft);
             $this->session->remove('attrFormCurrentStep');
             $this->session->remove('attrForm');
@@ -295,6 +307,21 @@ class Controller extends BlockController
         }
 
         $this->redirect($this->urlToAction('step', $nextFormPageHandle));
+    }
+
+    private function replaceTempFile(&$value, $key)
+    {
+        $fh = Core::make('helper/file');
+        $tempDir = $fh->getTemporaryDirectory();
+
+        if ($key == 'value') {
+            if (is_uploaded_file($value)) {
+                $tempFile = tempnam($tempDir, 'files');
+                if (move_uploaded_file($value, $tempFile)); {
+                    $value = $tempFile;
+                }
+            }
+        }
     }
 
     private function securityCheck($aft, $nextFormPageHandle)
