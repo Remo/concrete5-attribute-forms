@@ -283,23 +283,29 @@ class Controller extends BlockController
             $aks = unserialize($afVals) + $aks;
         }
 
-        $attributeFileValues = $this->session->get('attrFiles');
-        $files = $_FILES;
-        array_walk_recursive($files , [$this, 'replaceTempFile']);
-        if ($attributeFileValues) {
-            $fileValues = unserialize($attributeFileValues) + $files;
-        }
-        else {
-            $fileValues = $files;
+        if (!empty($_FILES)) {
+            $files = $_FILES;
+
+            array_walk_recursive($files , [$this, 'replaceTempFile']);
+
+            $attributeFileValues = $this->session->get('attrFiles');
+
+            if ($attributeFileValues) {
+                $fileValues = array_merge(unserialize($attributeFileValues), $files);
+            }
+            else {
+                $fileValues = $files;
+            }
+
+            $this->session->set('attrFiles', serialize($fileValues));
         }
 
         if ($nextFormPageHandle != 'complete') {
             $this->session->set('attrFormCurrentStep', $nextFormPageHandle);
             $this->session->set('attrForm', serialize($aks));
-            $this->session->set('attrFiles', serialize($fileValues));
         } else {
             $_POST['akID'] = $aks;
-            $_FILES = $fileValues;
+            $_FILES = unserialize($this->session->get('attrFiles'));
             $this->saveAttributeForm($aft);
             $this->session->remove('attrFormCurrentStep');
             $this->session->remove('attrForm');
